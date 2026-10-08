@@ -4,10 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>The Layer Workshop</title>
+
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Font Awesome Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <!-- QRCode.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
@@ -30,9 +31,9 @@
             }
           },
           boxShadow: {
-            'soft': '0 4px 20px -2px rgba(82, 150, 213, 0.12)',
-            'card': '0 2px 10px rgba(169, 207, 240, 0.15)',
-            'nav': '0 -4px 20px rgba(82, 150, 213, 0.08)'
+            'soft': '0 4px 20px -2px rgba(82, 150, 213, 0.15)',
+            'card': '0 2px 10px rgba(169, 207, 240, 0.2)',
+            'sheet': '0 -10px 30px rgba(47, 97, 147, 0.18)'
           }
         }
       }
@@ -65,52 +66,59 @@
       -ms-overflow-style: none;
       scrollbar-width: none;
     }
+
+    .sheet-transition {
+      transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease;
+    }
   </style>
 </head>
-<body class="bg-[#F8FAFC] text-slate-800 antialiased selection:bg-brand-200">
+<body class="bg-[#F8FAFC] text-slate-800 antialiased selection:bg-brand-200 min-h-screen">
 
-  <!-- Desktop Gatekeeper -->
-  <div id="desktop-gatekeeper" class="hidden md:flex fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-md items-center justify-center p-6">
-    <div class="bg-white max-w-md w-full rounded-3xl p-8 text-center shadow-2xl border border-brand-100 flex flex-col items-center">
-      <div class="w-16 h-16 rounded-2xl bg-brand-50 border border-brand-200 flex items-center justify-center text-brand-500 text-2xl mb-4 shadow-soft">
-        <i class="fa-solid fa-mobile-screen"></i>
+  <!-- ========================================== -->
+  <!-- 1. DESKTOP GATEKEEPER                      -->
+  <!-- ========================================== -->
+  <div id="desktop-gatekeeper" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-md items-center justify-center p-4">
+    <div class="bg-white max-w-sm w-full rounded-3xl p-6 text-center shadow-2xl border border-brand-100 flex flex-col items-center">
+      <div class="w-14 h-14 rounded-2xl bg-brand-50 border border-brand-200 flex items-center justify-center text-brand-500 text-2xl mb-3 shadow-soft">
+        <i class="fa-solid fa-layer-group"></i>
       </div>
-      <h2 class="text-2xl font-bold text-slate-800 tracking-tight">The Layer Workshop</h2>
-      <p class="text-sm text-slate-500 mt-2 mb-6 leading-relaxed">
-        This shop is crafted exclusively for mobile screens. Open your smartphone camera to scan the code below.
+      <h2 class="text-xl font-bold text-slate-800 tracking-tight">The Layer Workshop</h2>
+      <p class="text-[11px] text-brand-600 font-semibold uppercase tracking-wider mb-2">Handmade by The Layer Workshop</p>
+      <p class="text-xs text-slate-500 mb-4 leading-relaxed">
+        This storefront is crafted for mobile screens. Scan with your phone or tap below to preview!
       </p>
 
-      <div class="p-4 bg-brand-50 rounded-2xl border border-brand-200 shadow-inner mb-6 inline-block">
-        <div id="desktop-qrcode" class="w-48 h-48 flex items-center justify-center bg-white p-2 rounded-xl"></div>
+      <div class="p-3 bg-brand-50 rounded-2xl border border-brand-200 mb-4 inline-block">
+        <div id="desktop-qrcode" class="w-40 h-40 flex items-center justify-center bg-white p-2 rounded-xl"></div>
       </div>
 
-      <div class="flex flex-col w-full gap-3">
-        <button onclick="dismissDesktopGate()" class="w-full py-3 px-4 rounded-xl text-sm font-semibold text-brand-700 bg-brand-100 hover:bg-brand-200 transition active:scale-95">
-          Preview in Browser
-        </button>
-      </div>
+      <button id="btn-dismiss-gate" onclick="dismissDesktopGate()" class="w-full py-3 px-4 rounded-xl text-xs font-bold text-white bg-brand-500 hover:bg-brand-600 transition active:scale-95 shadow-soft">
+        Preview in Browser
+      </button>
     </div>
   </div>
 
-  <!-- Mobile App Container -->
-  <div id="mobile-app" class="max-w-md mx-auto min-h-screen bg-brand-50/50 flex flex-col relative shadow-xl overflow-x-hidden pb-28">
+  <!-- ========================================== -->
+  <!-- 2. MAIN MOBILE STOREFRONT WRAPPER          -->
+  <!-- ========================================== -->
+  <div id="mobile-app" class="max-w-md mx-auto min-h-screen bg-brand-50/40 flex flex-col relative shadow-xl overflow-x-hidden pb-24 border-x border-brand-100">
 
     <!-- Header -->
-    <header class="sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b border-brand-100 safe-top">
+    <header class="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-brand-100 safe-top">
       <div class="px-4 py-3 flex items-center justify-between">
         <div>
-          <span class="text-[10px] tracking-wider uppercase font-semibold text-brand-600 block">Handmade & Curated</span>
+          <span class="text-[10px] tracking-wider uppercase font-semibold text-brand-600 block">Handmade by The Layer Workshop</span>
           <h1 class="text-lg font-bold text-slate-800 tracking-tight">The Layer Workshop</h1>
         </div>
         <div class="flex items-center gap-2">
-          <button onclick="openCart()" class="relative p-2.5 rounded-full bg-brand-50 text-brand-600 active:scale-90 transition border border-brand-200">
+          <button onclick="openCart()" class="relative p-2.5 rounded-full bg-brand-50 text-brand-600 active:scale-90 transition border border-brand-200" aria-label="Open Cart">
             <i class="fa-solid fa-bag-shopping text-sm"></i>
             <span id="header-cart-badge" class="hidden absolute -top-1 -right-1 bg-brand-500 text-white text-[10px] font-bold h-4 w-4 rounded-full flex items-center justify-center border-2 border-white">0</span>
           </button>
         </div>
       </div>
 
-      <!-- Search -->
+      <!-- Quick Search Bar -->
       <div class="px-4 pb-3">
         <div class="relative">
           <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-brand-400 text-xs"></i>
@@ -120,70 +128,64 @@
           </button>
         </div>
       </div>
-
-      <!-- Category Filter Pills -->
-      <div class="px-4 pb-2.5 flex gap-2 overflow-x-auto hide-scrollbar" id="category-pills"></div>
     </header>
 
-    <!-- Fulfillment Notice Banner -->
-    <div class="mx-4 mt-3 p-3 bg-white rounded-2xl border border-brand-200 text-xs text-slate-600 flex items-start gap-2.5 shadow-sm">
-      <i class="fa-solid fa-truck-fast text-brand-500 mt-0.5 text-sm"></i>
-      <div class="leading-relaxed">
-        <span class="font-semibold text-slate-800 block">Fulfillment Options</span>
-        Islandwide delivery rates depend on location. Meetups are available by arrangement.
-      </div>
-    </div>
-
-    <!-- Products Grid -->
+    <!-- Product Grid View -->
     <main class="flex-1 px-4 py-4">
+      <div class="flex items-center justify-between mb-3 px-1">
+        <span class="text-xs font-bold text-slate-700">All Products</span>
+        <span id="items-count" class="text-[11px] text-brand-600 font-semibold bg-white px-2.5 py-0.5 rounded-full border border-brand-200">4 items</span>
+      </div>
+
       <div id="product-grid" class="grid grid-cols-2 gap-3.5"></div>
+      
       <div id="empty-state" class="hidden py-16 text-center flex-col items-center">
         <i class="fa-solid fa-basket-shopping text-brand-300 text-4xl mb-3"></i>
         <p class="text-sm font-semibold text-slate-700">No products found</p>
-        <p class="text-xs text-slate-400 mt-1">Try searching for something else</p>
+        <p class="text-xs text-slate-400 mt-1">Try another search keyword</p>
       </div>
     </main>
 
-    <!-- Bottom Navigation -->
+    <!-- Bottom Navigation Bar -->
     <nav class="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-lg border-t border-brand-100 safe-bottom-nav">
       <div class="max-w-md mx-auto grid grid-cols-3 pt-2">
         <button onclick="switchTab('catalog')" id="nav-btn-catalog" class="flex flex-col items-center gap-1 text-brand-600 transition">
-          <i class="fa-solid fa-compass text-base"></i>
-          <span class="text-[10px] font-medium">Catalog</span>
+          <i class="fa-solid fa-store text-base"></i>
+          <span class="text-[10px] font-semibold">Store</span>
         </button>
         <button onclick="switchTab('favorites')" id="nav-btn-favorites" class="flex flex-col items-center gap-1 text-slate-400 transition">
           <i class="fa-solid fa-heart text-base"></i>
-          <span class="text-[10px] font-medium">Saved</span>
+          <span class="text-[10px] font-semibold">Saved</span>
         </button>
         <button onclick="openCart()" class="flex flex-col items-center gap-1 text-slate-400 relative transition">
           <div class="relative">
-            <i class="fa-solid fa-cart-shopping text-base"></i>
+            <i class="fa-solid fa-bag-shopping text-base"></i>
             <span id="nav-cart-badge" class="hidden absolute -top-1.5 -right-2 bg-brand-500 text-white text-[9px] font-bold h-3.5 w-3.5 rounded-full flex items-center justify-center">0</span>
           </div>
-          <span class="text-[10px] font-medium">Cart</span>
+          <span class="text-[10px] font-semibold">Cart</span>
         </button>
       </div>
     </nav>
 
-    <!-- Notification Toast -->
+    <!-- Toast Notification -->
     <div id="toast" class="fixed top-5 left-1/2 -translate-x-1/2 z-50 bg-slate-800 text-white text-xs px-4 py-2.5 rounded-full shadow-lg opacity-0 transition-opacity pointer-events-none flex items-center gap-2">
-      <i class="fa-solid fa-check text-brand-300"></i>
+      <i id="toast-icon" class="fa-solid fa-check text-brand-300"></i>
       <span id="toast-message">Added to cart</span>
     </div>
 
-    <!-- Product Details Modal Sheet -->
-    <div id="product-sheet-backdrop" onclick="closeProductModal()" class="fixed inset-0 bg-slate-900/40 z-50 backdrop-blur-xs opacity-0 pointer-events-none transition-opacity"></div>
-    <div id="product-sheet" class="fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-3xl border-t border-brand-100 transform translate-y-full transition-transform duration-300 safe-bottom max-w-md mx-auto overflow-hidden">
+    <!-- Product Details Bottom Sheet -->
+    <div id="product-sheet-backdrop" onclick="closeProductModal()" class="fixed inset-0 bg-slate-900/40 z-50 opacity-0 pointer-events-none transition-opacity"></div>
+    <div id="product-sheet" class="fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-3xl border-t border-brand-100 transform translate-y-full sheet-transition safe-bottom max-w-md mx-auto overflow-hidden shadow-sheet">
       <div class="w-10 h-1 bg-slate-200 rounded-full mx-auto my-3"></div>
       <div class="p-5 max-h-[80vh] overflow-y-auto">
-        <img id="modal-img" src="" class="w-full h-56 object-cover rounded-2xl mb-4 bg-brand-50 border border-brand-100">
+        <img id="modal-img" src="" class="w-full h-56 object-cover rounded-2xl mb-4 bg-brand-50 border border-brand-100" alt="">
         <div class="flex items-start justify-between gap-2 mb-2">
           <h2 id="modal-title" class="text-base font-bold text-slate-800"></h2>
-          <span id="modal-price" class="text-base font-bold text-brand-600"></span>
+          <span id="modal-price" class="text-base font-extrabold text-brand-600"></span>
         </div>
         <p id="modal-desc" class="text-xs text-slate-500 leading-relaxed mb-6"></p>
         <div class="flex gap-2">
-          <button onclick="toggleFavoriteFromModal()" id="modal-fav-btn" class="p-3.5 rounded-2xl border border-brand-200 text-slate-400 active:scale-95 transition">
+          <button onclick="toggleFavoriteFromModal()" id="modal-fav-btn" class="p-3.5 rounded-2xl border border-brand-200 text-slate-400 active:scale-95 transition" aria-label="Favorite">
             <i class="fa-regular fa-heart text-sm"></i>
           </button>
           <button onclick="addModalItemToCart()" class="flex-1 py-3.5 bg-brand-500 hover:bg-brand-600 text-white rounded-2xl text-xs font-semibold shadow-soft active:scale-95 transition flex items-center justify-center gap-2">
@@ -195,61 +197,94 @@
     </div>
 
     <!-- Shopping Cart Bottom Sheet -->
-    <div id="cart-sheet-backdrop" onclick="closeCart()" class="fixed inset-0 bg-slate-900/40 z-50 backdrop-blur-xs opacity-0 pointer-events-none transition-opacity"></div>
-    <div id="cart-sheet" class="fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-3xl border-t border-brand-100 transform translate-y-full transition-transform duration-300 safe-bottom max-w-md mx-auto flex flex-col max-h-[90vh]">
+    <div id="cart-sheet-backdrop" onclick="closeCart()" class="fixed inset-0 bg-slate-900/40 z-50 opacity-0 pointer-events-none transition-opacity"></div>
+    <div id="cart-sheet" class="fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-3xl border-t border-brand-100 transform translate-y-full sheet-transition safe-bottom max-w-md mx-auto flex flex-col max-h-[92vh] shadow-sheet">
       <div class="w-10 h-1 bg-slate-200 rounded-full mx-auto my-3"></div>
       
-      <div class="px-5 pb-3 border-b border-brand-100 flex items-center justify-between">
-        <h3 class="text-base font-bold text-slate-800">Your Cart</h3>
-        <button onclick="closeCart()" class="text-slate-400 hover:text-slate-600 text-sm">
+      <!-- Cart Header -->
+      <div class="px-5 pb-3 border-b border-brand-100 flex items-center justify-between shrink-0">
+        <h3 class="text-base font-bold text-slate-800 flex items-center gap-2">
+          <i class="fa-solid fa-bag-shopping text-brand-500 text-sm"></i>
+          Your Cart
+        </h3>
+        <button onclick="closeCart()" class="text-slate-400 hover:text-slate-600 text-sm p-1">
           <i class="fa-solid fa-xmark"></i>
         </button>
       </div>
 
+      <!-- Cart Items List -->
       <div id="cart-items" class="flex-1 overflow-y-auto p-5 divide-y divide-brand-50"></div>
 
-      <div class="p-5 bg-brand-50/70 border-t border-brand-100">
-        <div class="flex justify-between text-xs text-slate-600 mb-3">
-          <span>Subtotal</span>
-          <span id="cart-subtotal" class="font-bold text-slate-800 text-sm">$0.00</span>
+      <!-- Cart Summary & Telegram Checkout Form -->
+      <div class="p-5 bg-brand-50/70 border-t border-brand-100 shrink-0">
+        <!-- Subtotal -->
+        <div class="flex justify-between items-center mb-3">
+          <span class="text-xs text-slate-600 font-medium">Total Items Amount</span>
+          <span id="cart-subtotal" class="font-extrabold text-slate-900 text-base">$0.00</span>
         </div>
 
-        <div class="mb-3">
-          <label class="block text-[11px] font-semibold text-slate-700 mb-1.5">Fulfillment Preference:</label>
-          <div class="grid grid-cols-2 gap-2 text-xs">
-            <label class="flex items-center gap-1.5 p-2 bg-white rounded-xl border border-brand-200 cursor-pointer">
-              <input type="radio" name="fulfillment" value="delivery" checked onchange="toggleFulfillmentMode(this.value)" class="text-brand-500">
-              <span class="text-[11px] font-medium text-slate-700">Delivery</span>
-            </label>
-            <label class="flex items-center gap-1.5 p-2 bg-white rounded-xl border border-brand-200 cursor-pointer">
-              <input type="radio" name="fulfillment" value="meetup" onchange="toggleFulfillmentMode(this.value)" class="text-brand-500">
-              <span class="text-[11px] font-medium text-slate-700">Meetup</span>
-            </label>
+        <!-- Customer Inputs for Side-by-Side Reference -->
+        <div class="space-y-2.5 mb-3">
+          <div>
+            <label class="block text-[11px] font-semibold text-slate-700 mb-1">Telegram handle or WhatsApp / Phone number:</label>
+            <input type="text" id="cust-contact" placeholder="e.g. @username or +65 9123 4567" class="w-full text-xs p-2.5 rounded-xl border border-brand-200 bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-400">
+          </div>
+
+          <!-- Collection & Notes Section with Quick Tap Chips -->
+          <div>
+            <div class="flex items-center justify-between mb-1.5">
+              <label class="block text-[11px] font-semibold text-slate-700">Fulfillment & Notes:</label>
+              <span class="text-[10px] text-brand-600 font-medium">Tap to select:</span>
+            </div>
+
+            <!-- Quick Preset Chips -->
+            <div class="grid grid-cols-2 gap-2 mb-2">
+              <button type="button" onclick="setPresetFulfillment('Self-collect at Redhill MRT')" class="px-2.5 py-2 rounded-xl text-[11px] font-semibold bg-white border border-brand-200 text-brand-700 hover:bg-brand-100/70 active:scale-95 transition text-left flex items-center gap-1.5 shadow-sm">
+                <span>🚇</span>
+                <span class="truncate">Redhill MRT</span>
+              </button>
+              <button type="button" onclick="setPresetFulfillment('Delivery: [Enter Address / Postal Code]')" class="px-2.5 py-2 rounded-xl text-[11px] font-semibold bg-white border border-brand-200 text-brand-700 hover:bg-brand-100/70 active:scale-95 transition text-left flex items-center gap-1.5 shadow-sm">
+                <span>🚚</span>
+                <span class="truncate">Delivery</span>
+              </button>
+            </div>
+
+            <textarea 
+              id="cust-notes" 
+              rows="2" 
+              placeholder="Please state if you prefer self-collection at Redhill MRT or delivery (provide address/postal code)." 
+              class="w-full text-xs p-2.5 rounded-xl border border-brand-200 bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-400 placeholder:text-slate-400 leading-relaxed resize-none"
+            ></textarea>
           </div>
         </div>
 
-        <div class="mb-4">
-          <input type="text" id="fulfillment-notes" placeholder="Enter postal code / address (price depends on location)" class="w-full text-xs p-2.5 rounded-xl border border-brand-200 bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-400">
+        <!-- Telegram Info Box -->
+        <div class="p-2.5 mb-3 bg-white border border-brand-200 rounded-xl text-[11px] text-slate-600 flex items-start gap-2 shadow-sm">
+          <i class="fa-brands fa-telegram text-[#229ED9] text-base mt-0.5 shrink-0"></i>
+          <div class="leading-relaxed">
+            <span class="font-bold text-slate-800 block">Telegram Payment Flow:</span>
+            Your order details will open in Telegram so we can confirm payment and arrange self-collection or delivery side-by-side!
+          </div>
         </div>
 
-        <button onclick="checkoutWhatsApp()" class="w-full py-3 bg-[#25D366] hover:bg-[#20ba5a] text-white rounded-xl text-xs font-semibold shadow-soft active:scale-95 transition flex items-center justify-center gap-2 mb-2">
-          <i class="fa-brands fa-whatsapp text-sm"></i>
-          Order via WhatsApp
-        </button>
-
-        <button onclick="checkoutEmail()" class="w-full py-2.5 bg-brand-100 text-brand-700 hover:bg-brand-200 rounded-xl text-xs font-semibold active:scale-95 transition flex items-center justify-center gap-2">
-          <i class="fa-regular fa-envelope text-xs"></i>
-          Order via Email
+        <!-- Submit to Telegram Button -->
+        <button id="btn-telegram-order" onclick="checkoutTelegram()" class="w-full py-3.5 bg-[#229ED9] hover:bg-[#1e8cc0] text-white rounded-xl text-xs font-semibold shadow-soft active:scale-95 transition flex items-center justify-center gap-2">
+          <i class="fa-brands fa-telegram text-base"></i>
+          <span>Send Order & Message for Payment</span>
         </button>
       </div>
     </div>
 
   </div>
 
+  <!-- ========================================== -->
+  <!-- 3. JAVASCRIPT LOGIC                        -->
+  <!-- ========================================== -->
   <script>
     const STORE_CONFIG = {
-      whatsappNumber: "6591234567",
-      email: "thelayerworkshop@gmail.com",
+      telegramUsername: "TheLayerWorkshop", // Telegram handle without @
+      telegramBotToken: "",
+      telegramChatId: "",
       currency: "SGD"
     };
 
@@ -258,7 +293,6 @@
         id: "prod-1",
         name: "Layered Desk Tray",
         price: 24.00,
-        category: "Trays",
         image: "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?auto=format&fit=crop&w=600&q=80",
         description: "Minimalist stackable organizer designed to hold everyday stationery, keys, and accessories."
       },
@@ -266,7 +300,6 @@
         id: "prod-2",
         name: "Geometric Planter Pot",
         price: 18.50,
-        category: "Planters",
         image: "https://images.unsplash.com/photo-1485955900006-10f4d324d411?auto=format&fit=crop&w=600&q=80",
         description: "Indoor mini planter suitable for succulents and cacti, featuring drainage channels."
       },
@@ -274,7 +307,6 @@
         id: "prod-3",
         name: "Hex Coaster Set (4 pcs)",
         price: 16.00,
-        category: "Coasters",
         image: "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=600&q=80",
         description: "Water-resistant geometric drink coasters with soft non-slip grip pads."
       },
@@ -282,7 +314,6 @@
         id: "prod-4",
         name: "Sculptural Arch Vase",
         price: 32.00,
-        category: "Decor",
         image: "https://images.unsplash.com/photo-1581783342308-f792dbdd27c5?auto=format&fit=crop&w=600&q=80",
         description: "Artistic modern arch centerpiece designed for dried floral arrangements."
       }
@@ -290,110 +321,136 @@
 
     let cart = {};
     let favorites = new Set();
-    let selectedCategory = "All";
     let searchQuery = "";
     let activeModalProduct = null;
     let currentTab = "catalog";
 
     window.addEventListener("DOMContentLoaded", () => {
-      generateQRCode();
-      renderCategoryPills();
-      renderProducts();
-      updateCartBadge();
+      checkDeviceAndInit();
     });
 
-    function generateQRCode() {
-      const qrEl = document.getElementById("desktop-qrcode");
-      if (qrEl) {
-        qrEl.innerHTML = "";
-        new QRCode(qrEl, {
-          text: window.location.href,
-          width: 170,
-          height: 170,
-          colorDark: "#2F6193",
-          colorLight: "#FFFFFF",
-          correctLevel: QRCode.CorrectLevel.M
-        });
+    function checkDeviceAndInit() {
+      const gate = document.getElementById("desktop-gatekeeper");
+      const isIframe = window.self !== window.top;
+      const isMobile = window.innerWidth < 768;
+
+      // In editor preview iframes or mobile devices, show store directly
+      if (isMobile || isIframe) {
+        if (gate) {
+          gate.classList.add("hidden");
+          gate.classList.remove("flex");
+        }
+      } else {
+        if (gate) {
+          gate.classList.remove("hidden");
+          gate.classList.add("flex");
+          initQRCodeSafe();
+        }
+      }
+
+      renderProducts();
+      updateCartBadge();
+    }
+
+    function initQRCodeSafe() {
+      try {
+        const qrEl = document.getElementById("desktop-qrcode");
+        if (qrEl && typeof QRCode !== "undefined") {
+          qrEl.innerHTML = "";
+          new QRCode(qrEl, {
+            text: window.location.href || "https://thelayerworkshop.github.io/The-Layer-Workshop/",
+            width: 140,
+            height: 140,
+            colorDark: "#2F6193",
+            colorLight: "#FFFFFF",
+            correctLevel: QRCode.CorrectLevel.M
+          });
+        }
+      } catch (err) {
+        console.warn("QR code skipped:", err);
       }
     }
 
     function dismissDesktopGate() {
-      document.getElementById("desktop-gatekeeper").classList.add("hidden");
-    }
-
-    function renderCategoryPills() {
-      const categories = ["All", ...new Set(PRODUCTS.map(p => p.category))];
-      const container = document.getElementById("category-pills");
-      container.innerHTML = categories.map(cat => `
-        <button onclick="filterCategory('${cat}')" class="px-3.5 py-1.5 text-xs rounded-full whitespace-nowrap transition font-medium ${
-          selectedCategory === cat 
-            ? 'bg-brand-500 text-white shadow-soft' 
-            : 'bg-white text-slate-600 border border-brand-200'
-        }">${cat}</button>
-      `).join("");
-    }
-
-    function filterCategory(category) {
-      selectedCategory = category;
-      renderCategoryPills();
-      renderProducts();
+      const gate = document.getElementById("desktop-gatekeeper");
+      if (gate) {
+        gate.style.display = "none";
+        gate.classList.add("hidden");
+        gate.classList.remove("flex");
+      }
     }
 
     function handleSearch(val) {
-      searchQuery = val.trim().toLowerCase();
-      document.getElementById("search-clear-btn").classList.toggle("hidden", searchQuery === "");
+      searchQuery = (val || "").trim().toLowerCase();
+      const clearBtn = document.getElementById("search-clear-btn");
+      if (clearBtn) {
+        clearBtn.classList.toggle("hidden", searchQuery === "");
+      }
       renderProducts();
     }
 
     function clearSearch() {
       const input = document.getElementById("search-input");
-      input.value = "";
+      if (input) input.value = "";
       handleSearch("");
     }
 
     function switchTab(tab) {
       currentTab = tab;
-      document.getElementById("nav-btn-catalog").className = `flex flex-col items-center gap-1 transition ${tab === 'catalog' ? 'text-brand-600 font-semibold' : 'text-slate-400'}`;
-      document.getElementById("nav-btn-favorites").className = `flex flex-col items-center gap-1 transition ${tab === 'favorites' ? 'text-brand-600 font-semibold' : 'text-slate-400'}`;
+      const navCatalog = document.getElementById("nav-btn-catalog");
+      const navFav = document.getElementById("nav-btn-favorites");
+
+      if (navCatalog && navFav) {
+        navCatalog.className = `flex flex-col items-center gap-1 transition ${tab === 'catalog' ? 'text-brand-600 font-semibold' : 'text-slate-400'}`;
+        navFav.className = `flex flex-col items-center gap-1 transition ${tab === 'favorites' ? 'text-brand-600 font-semibold' : 'text-slate-400'}`;
+      }
       renderProducts();
     }
 
     function renderProducts() {
       const container = document.getElementById("product-grid");
       const emptyState = document.getElementById("empty-state");
+      const counterEl = document.getElementById("items-count");
+      if (!container) return;
 
       let filtered = PRODUCTS.filter(p => {
-        const matchesCategory = selectedCategory === "All" || p.category === selectedCategory;
         const matchesSearch = p.name.toLowerCase().includes(searchQuery) || p.description.toLowerCase().includes(searchQuery);
         const matchesTab = currentTab === "catalog" || (currentTab === "favorites" && favorites.has(p.id));
-        return matchesCategory && matchesSearch && matchesTab;
+        return matchesSearch && matchesTab;
       });
+
+      if (counterEl) {
+        counterEl.innerText = `${filtered.length} item${filtered.length === 1 ? '' : 's'}`;
+      }
 
       if (filtered.length === 0) {
         container.innerHTML = "";
-        emptyState.classList.remove("hidden");
-        emptyState.classList.add("flex");
+        if (emptyState) {
+          emptyState.classList.remove("hidden");
+          emptyState.classList.add("flex");
+        }
         return;
       }
 
-      emptyState.classList.add("hidden");
-      emptyState.classList.remove("flex");
+      if (emptyState) {
+        emptyState.classList.add("hidden");
+        emptyState.classList.remove("flex");
+      }
 
       container.innerHTML = filtered.map(p => `
         <div class="bg-white rounded-2xl p-2.5 border border-brand-100 shadow-card flex flex-col justify-between">
           <div onclick="openProductModal('${p.id}')" class="cursor-pointer">
             <div class="relative w-full h-36 rounded-xl overflow-hidden bg-brand-50 mb-2">
-              <img src="${p.image}" alt="${p.name}" class="w-full h-full object-cover">
+              <img src="${p.image}" alt="${p.name}" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/400x400/E6F0FA/2F6193?text=${encodeURIComponent(p.name)}'">
               <button onclick="event.stopPropagation(); toggleFavorite('${p.id}')" class="absolute top-2 right-2 w-7 h-7 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center text-slate-400 active:scale-90 transition">
                 <i class="${favorites.has(p.id) ? 'fa-solid fa-heart text-rose-500' : 'fa-regular fa-heart'} text-xs"></i>
               </button>
             </div>
-            <span class="text-[10px] text-brand-600 font-medium">${p.category}</span>
             <h4 class="text-xs font-bold text-slate-800 line-clamp-1 mb-1">${p.name}</h4>
           </div>
           <div class="flex items-center justify-between pt-1 border-t border-brand-50 mt-1">
             <span class="text-xs font-bold text-brand-600">$${p.price.toFixed(2)}</span>
-            <button onclick="addToCart('${p.id}')" class="w-7 h-7 rounded-xl bg-brand-50 text-brand-600 border border-brand-200 flex items-center justify-center active:scale-90 transition">
+            <button onclick="addToCart('${p.id}')" class="w-7 h-7 rounded-xl bg-brand-50 text-brand-600 border border-brand-200 flex items-center justify-center active:scale-90 transition" aria-label="Add to cart">
               <i class="fa-solid fa-plus text-xs"></i>
             </button>
           </div>
@@ -421,7 +478,9 @@
       document.getElementById("modal-desc").innerText = activeModalProduct.description;
 
       const favIcon = document.querySelector("#modal-fav-btn i");
-      favIcon.className = favorites.has(id) ? "fa-solid fa-heart text-rose-500" : "fa-regular fa-heart";
+      if (favIcon) {
+        favIcon.className = favorites.has(id) ? "fa-solid fa-heart text-rose-500" : "fa-regular fa-heart";
+      }
 
       document.getElementById("product-sheet-backdrop").classList.remove("opacity-0", "pointer-events-none");
       document.getElementById("product-sheet").classList.remove("translate-y-full");
@@ -437,7 +496,9 @@
       if (!activeModalProduct) return;
       toggleFavorite(activeModalProduct.id);
       const favIcon = document.querySelector("#modal-fav-btn i");
-      favIcon.className = favorites.has(activeModalProduct.id) ? "fa-solid fa-heart text-rose-500" : "fa-regular fa-heart";
+      if (favIcon) {
+        favIcon.className = favorites.has(activeModalProduct.id) ? "fa-solid fa-heart text-rose-500" : "fa-regular fa-heart";
+      }
     }
 
     function addModalItemToCart() {
@@ -457,14 +518,16 @@
       const headerBadge = document.getElementById("header-cart-badge");
       const navBadge = document.getElementById("nav-cart-badge");
 
-      if (total > 0) {
-        headerBadge.innerText = total;
-        headerBadge.classList.remove("hidden");
-        navBadge.innerText = total;
-        navBadge.classList.remove("hidden");
-      } else {
-        headerBadge.classList.add("hidden");
-        navBadge.classList.add("hidden");
+      if (headerBadge && navBadge) {
+        if (total > 0) {
+          headerBadge.innerText = total;
+          headerBadge.classList.remove("hidden");
+          navBadge.innerText = total;
+          navBadge.classList.remove("hidden");
+        } else {
+          headerBadge.classList.add("hidden");
+          navBadge.classList.add("hidden");
+        }
       }
     }
 
@@ -481,12 +544,13 @@
 
     function renderCartItems() {
       const container = document.getElementById("cart-items");
+      if (!container) return;
       const entries = Object.entries(cart);
 
       if (entries.length === 0) {
         container.innerHTML = `
           <div class="py-12 text-center text-slate-400">
-            <i class="fa-solid fa-cart-shopping text-3xl mb-2 text-brand-200"></i>
+            <i class="fa-solid fa-bag-shopping text-3xl mb-2 text-brand-200"></i>
             <p class="text-xs">Your cart is empty</p>
           </div>
         `;
@@ -497,12 +561,13 @@
       let subtotal = 0;
       container.innerHTML = entries.map(([id, qty]) => {
         const product = PRODUCTS.find(p => p.id === id);
+        if (!product) return "";
         const itemTotal = product.price * qty;
         subtotal += itemTotal;
 
         return `
           <div class="py-3 flex items-center justify-between gap-3">
-            <img src="${product.image}" class="w-12 h-12 rounded-xl object-cover bg-brand-50 border border-brand-100">
+            <img src="${product.image}" class="w-12 h-12 rounded-xl object-cover bg-brand-50 border border-brand-100" alt="">
             <div class="flex-1 min-w-0">
               <h5 class="text-xs font-semibold text-slate-800 truncate">${product.name}</h5>
               <span class="text-[11px] text-brand-600 font-bold">$${product.price.toFixed(2)}</span>
@@ -527,12 +592,12 @@
       updateCartBadge();
     }
 
-    function toggleFulfillmentMode(mode) {
-      const input = document.getElementById("fulfillment-notes");
-      if (mode === "delivery") {
-        input.placeholder = "Enter postal code / address (price depends on location)";
-      } else {
-        input.placeholder = "Enter preferred meetup location / MRT (subject to mutual schedule)";
+    function setPresetFulfillment(text) {
+      const textarea = document.getElementById("cust-notes");
+      if (textarea) {
+        textarea.value = text;
+        textarea.focus();
+        showToast(text.includes("Redhill") ? "Selected: Redhill MRT" : "Selected: Delivery");
       }
     }
 
@@ -545,55 +610,89 @@
 
       entries.forEach(([id, qty]) => {
         const item = PRODUCTS.find(p => p.id === id);
-        const total = item.price * qty;
-        subtotal += total;
-        itemsText += `- ${item.name} x${qty} ($${total.toFixed(2)})\n`;
+        if (item) {
+          const total = item.price * qty;
+          subtotal += total;
+          itemsText += `• ${item.name} x${qty} — $${total.toFixed(2)}\n`;
+        }
       });
 
-      const mode = document.querySelector('input[name="fulfillment"]:checked').value;
-      const notes = document.getElementById("fulfillment-notes").value.trim() || "Not specified";
+      const orderId = "TLW-" + Math.floor(1000 + Math.random() * 9000);
+      const custContact = (document.getElementById("cust-contact")?.value || "").trim() || "Not provided";
+      const custNotes = (document.getElementById("cust-notes")?.value || "").trim() || "Self-collect at Redhill MRT (default / to confirm)";
 
       return {
+        orderId,
         itemsText,
         subtotal: subtotal.toFixed(2),
-        mode: mode === "delivery" ? "Doorstep Delivery (Quote required)" : "Meetup (Arrangement required)",
-        notes
+        custContact,
+        custNotes
       };
     }
 
-    function checkoutWhatsApp() {
+    async function checkoutTelegram() {
       const order = buildOrderDetails();
       if (!order) {
         showToast("Cart is empty");
         return;
       }
 
-      const message = `Hello The Layer Workshop! I'd like to place an order:\n\n` +
-        `📦 *ITEMS:*\n${order.itemsText}\n` +
-        `💰 *SUBTOTAL:* $${order.subtotal} SGD\n\n` +
-        `📍 *FULFILLMENT:* ${order.mode}\n` +
-        `📝 *LOCATION / DETAILS:* ${order.notes}\n\n` +
-        `Please confirm availability and delivery price / meetup timing. Thank you!`;
+      const message = 
+`🛍️ *THE LAYER WORKSHOP — ORDER RECEIPT*
+🔖 *Order ID:* #${order.orderId}
+📱 *Contact (Telegram / WhatsApp / Phone):* ${order.custContact}
 
-      window.open(`https://wa.me/${STORE_CONFIG.whatsappNumber}?text=${encodeURIComponent(message)}`, "_blank");
-    }
+📦 *PRODUCTS ORDERED:*
+${order.itemsText}
+💰 *TOTAL AMOUNT:* $${order.subtotal} ${STORE_CONFIG.currency}
 
-    function checkoutEmail() {
-      const order = buildOrderDetails();
-      if (!order) {
-        showToast("Cart is empty");
-        return;
+📍 *FULFILLMENT / NOTES:*
+${order.custNotes}
+
+---
+_Hi @${STORE_CONFIG.telegramUsername}! I would like to confirm order #${order.orderId} and arrange for payment & collection/delivery. Thank you!_`;
+
+      // Copy order breakdown using textarea fallback compatible with iframes
+      try {
+        const tempTextarea = document.createElement("textarea");
+        tempTextarea.value = message;
+        document.body.appendChild(tempTextarea);
+        tempTextarea.select();
+        document.execCommand("copy");
+        document.body.removeChild(tempTextarea);
+      } catch (e) {
+        console.warn("Clipboard copy fallback:", e);
       }
 
-      const subject = `Order Inquiry - The Layer Workshop`;
-      const body = `Hi The Layer Workshop,\n\nI would like to order:\n\n${order.itemsText}\nSubtotal: $${order.subtotal} SGD\n\nFulfillment: ${order.mode}\nLocation/Notes: ${order.notes}\n\nPlease let me know the final price and arrangement.`;
+      // Optional Telegram bot push
+      if (STORE_CONFIG.telegramBotToken && STORE_CONFIG.telegramChatId) {
+        try {
+          const btn = document.getElementById("btn-telegram-order");
+          if (btn) btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin text-sm"></i> Sending...`;
 
-      window.location.href = `mailto:${STORE_CONFIG.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+          await fetch(`https://api.telegram.org/bot${STORE_CONFIG.telegramBotToken}/sendMessage`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              chat_id: STORE_CONFIG.telegramChatId,
+              text: message,
+              parse_mode: "Markdown"
+            })
+          });
+        } catch (err) {
+          console.warn("Telegram bot push error:", err);
+        }
+      }
+
+      showToast("Order copied! Opening Telegram...");
+      window.open(`https://t.me/${STORE_CONFIG.telegramUsername}?text=${encodeURIComponent(message)}`, "_blank");
     }
 
     function showToast(msg) {
       const toast = document.getElementById("toast");
-      document.getElementById("toast-message").innerText = msg;
+      const msgEl = document.getElementById("toast-message");
+      if (!toast || !msgEl) return;
+      msgEl.innerText = msg;
       toast.classList.remove("opacity-0", "pointer-events-none");
       setTimeout(() => {
         toast.classList.add("opacity-0", "pointer-events-none");
