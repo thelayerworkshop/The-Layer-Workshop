@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>The Layer Workshop</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- QRCode.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#F4F8FC',
+              100: '#E6F0FA',
+              200: '#CBE1F6',
+              300: '#A9CFF0',
+              400: '#7CB4E4',
+              500: '#5296D5',
+              600: '#3D7AB6',
+              700: '#2F6193',
+              800: '#23486F',
+              900: '#172F4A',
+            }
+          },
+          boxShadow: {
+            'soft': '0 4px 20px -2px rgba(82, 150, 213, 0.12)',
+            'card': '0 2px 10px rgba(169, 207, 240, 0.15)',
+            'nav': '0 -4px 20px rgba(82, 150, 213, 0.08)'
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      -webkit-tap-highlight-color: transparent;
+      overscroll-behavior-y: contain;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    
+    .safe-top {
+      padding-top: env(safe-area-inset-top, 0px);
+    }
+    
+    .safe-bottom {
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    .safe-bottom-nav {
+      padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 0.75rem);
+    }
+
+    .hide-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .hide-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+</head>
+<body class="bg-[#F8FAFC] text-slate-800 antialiased selection:bg-brand-200">
+
+  <!-- Desktop Gatekeeper -->
+  <div id="desktop-gatekeeper" class="hidden md:flex fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-md items-center justify-center p-6">
+    <div class="bg-white max-w-md w-full rounded-3xl p-8 text-center shadow-2xl border border-brand-100 flex flex-col items-center">
+      <div class="w-16 h-16 rounded-2xl bg-brand-50 border border-brand-200 flex items-center justify-center text-brand-500 text-2xl mb-4 shadow-soft">
+        <i class="fa-solid fa-mobile-screen"></i>
+      </div>
+      <h2 class="text-2xl font-bold text-slate-800 tracking-tight">The Layer Workshop</h2>
+      <p class="text-sm text-slate-500 mt-2 mb-6 leading-relaxed">
+        This shop is crafted exclusively for mobile screens. Open your smartphone camera to scan the code below.
+      </p>
+
+      <div class="p-4 bg-brand-50 rounded-2xl border border-brand-200 shadow-inner mb-6 inline-block">
+        <div id="desktop-qrcode" class="w-48 h-48 flex items-center justify-center bg-white p-2 rounded-xl"></div>
+      </div>
+
+      <div class="flex flex-col w-full gap-3">
+        <button onclick="dismissDesktopGate()" class="w-full py-3 px-4 rounded-xl text-sm font-semibold text-brand-700 bg-brand-100 hover:bg-brand-200 transition active:scale-95">
+          Preview in Browser
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile App Container -->
+  <div id="mobile-app" class="max-w-md mx-auto min-h-screen bg-brand-50/50 flex flex-col relative shadow-xl overflow-x-hidden pb-28">
+
+    <!-- Header -->
+    <header class="sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b border-brand-100 safe-top">
+      <div class="px-4 py-3 flex items-center justify-between">
+        <div>
+          <span class="text-[10px] tracking-wider uppercase font-semibold text-brand-600 block">Handmade & Curated</span>
+          <h1 class="text-lg font-bold text-slate-800 tracking-tight">The Layer Workshop</h1>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="openCart()" class="relative p-2.5 rounded-full bg-brand-50 text-brand-600 active:scale-90 transition border border-brand-200">
+            <i class="fa-solid fa-bag-shopping text-sm"></i>
+            <span id="header-cart-badge" class="hidden absolute -top-1 -right-1 bg-brand-500 text-white text-[10px] font-bold h-4 w-4 rounded-full flex items-center justify-center border-2 border-white">0</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Search -->
+      <div class="px-4 pb-3">
+        <div class="relative">
+          <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-brand-400 text-xs"></i>
+          <input type="text" id="search-input" oninput="handleSearch(this.value)" placeholder="Search products..." class="w-full pl-9 pr-8 py-2 text-xs rounded-xl bg-brand-50/70 border border-brand-200 focus:outline-none focus:ring-2 focus:ring-brand-400 text-slate-700 placeholder-brand-300">
+          <button id="search-clear-btn" onclick="clearSearch()" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Category Filter Pills -->
+      <div class="px-4 pb-2.5 flex gap-2 overflow-x-auto hide-scrollbar" id="category-pills"></div>
+    </header>
+
+    <!-- Fulfillment Notice Banner -->
+    <div class="mx-4 mt-3 p-3 bg-white rounded-2xl border border-brand-200 text-xs text-slate-600 flex items-start gap-2.5 shadow-sm">
+      <i class="fa-solid fa-truck-fast text-brand-500 mt-0.5 text-sm"></i>
+      <div class="leading-relaxed">
+        <span class="font-semibold text-slate-800 block">Fulfillment Options</span>
+        Islandwide delivery rates depend on location. Meetups are available by arrangement.
+      </div>
+    </div>
+
+    <!-- Products Grid -->
+    <main class="flex-1 px-4 py-4">
+      <div id="product-grid" class="grid grid-cols-2 gap-3.5"></div>
+      <div id="empty-state" class="hidden py-16 text-center flex-col items-center">
+        <i class="fa-solid fa-basket-shopping text-brand-300 text-4xl mb-3"></i>
+        <p class="text-sm font-semibold text-slate-700">No products found</p>
+        <p class="text-xs text-slate-400 mt-1">Try searching for something else</p>
+      </div>
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-lg border-t border-brand-100 safe-bottom-nav">
+      <div class="max-w-md mx-auto grid grid-cols-3 pt-2">
+        <button onclick="switchTab('catalog')" id="nav-btn-catalog" class="flex flex-col items-center gap-1 text-brand-600 transition">
+          <i class="fa-solid fa-compass text-base"></i>
+          <span class="text-[10px] font-medium">Catalog</span>
+        </button>
+        <button onclick="switchTab('favorites')" id="nav-btn-favorites" class="flex flex-col items-center gap-1 text-slate-400 transition">
+          <i class="fa-solid fa-heart text-base"></i>
+          <span class="text-[10px] font-medium">Saved</span>
+        </button>
+        <button onclick="openCart()" class="flex flex-col items-center gap-1 text-slate-400 relative transition">
+          <div class="relative">
+            <i class="fa-solid fa-cart-shopping text-base"></i>
+            <span id="nav-cart-badge" class="hidden absolute -top-1.5 -right-2 bg-brand-500 text-white text-[9px] font-bold h-3.5 w-3.5 rounded-full flex items-center justify-center">0</span>
+          </div>
+          <span class="text-[10px] font-medium">Cart</span>
+        </button>
+      </div>
+    </nav>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="fixed top-5 left-1/2 -translate-x-1/2 z-50 bg-slate-800 text-white text-xs px-4 py-2.5 rounded-full shadow-lg opacity-0 transition-opacity pointer-events-none flex items-center gap-2">
+      <i class="fa-solid fa-check text-brand-300"></i>
+      <span id="toast-message">Added to cart</span>
+    </div>
+
+    <!-- Product Details Modal Sheet -->
+    <div id="product-sheet-backdrop" onclick="closeProductModal()" class="fixed inset-0 bg-slate-900/40 z-50 backdrop-blur-xs opacity-0 pointer-events-none transition-opacity"></div>
+    <div id="product-sheet" class="fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-3xl border-t border-brand-100 transform translate-y-full transition-transform duration-300 safe-bottom max-w-md mx-auto overflow-hidden">
+      <div class="w-10 h-1 bg-slate-200 rounded-full mx-auto my-3"></div>
+      <div class="p-5 max-h-[80vh] overflow-y-auto">
+        <img id="modal-img" src="" class="w-full h-56 object-cover rounded-2xl mb-4 bg-brand-50 border border-brand-100">
+        <div class="flex items-start justify-between gap-2 mb-2">
+          <h2 id="modal-title" class="text-base font-bold text-slate-800"></h2>
+          <span id="modal-price" class="text-base font-bold text-brand-600"></span>
+        </div>
+        <p id="modal-desc" class="text-xs text-slate-500 leading-relaxed mb-6"></p>
+        <div class="flex gap-2">
+          <button onclick="toggleFavoriteFromModal()" id="modal-fav-btn" class="p-3.5 rounded-2xl border border-brand-200 text-slate-400 active:scale-95 transition">
+            <i class="fa-regular fa-heart text-sm"></i>
+          </button>
+          <button onclick="addModalItemToCart()" class="flex-1 py-3.5 bg-brand-500 hover:bg-brand-600 text-white rounded-2xl text-xs font-semibold shadow-soft active:scale-95 transition flex items-center justify-center gap-2">
+            <i class="fa-solid fa-plus"></i>
+            Add to Cart
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Shopping Cart Bottom Sheet -->
+    <div id="cart-sheet-backdrop" onclick="closeCart()" class="fixed inset-0 bg-slate-900/40 z-50 backdrop-blur-xs opacity-0 pointer-events-none transition-opacity"></div>
+    <div id="cart-sheet" class="fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-3xl border-t border-brand-100 transform translate-y-full transition-transform duration-300 safe-bottom max-w-md mx-auto flex flex-col max-h-[90vh]">
+      <div class="w-10 h-1 bg-slate-200 rounded-full mx-auto my-3"></div>
+      
+      <div class="px-5 pb-3 border-b border-brand-100 flex items-center justify-between">
+        <h3 class="text-base font-bold text-slate-800">Your Cart</h3>
+        <button onclick="closeCart()" class="text-slate-400 hover:text-slate-600 text-sm">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div id="cart-items" class="flex-1 overflow-y-auto p-5 divide-y divide-brand-50"></div>
+
+      <div class="p-5 bg-brand-50/70 border-t border-brand-100">
+        <div class="flex justify-between text-xs text-slate-600 mb-3">
+          <span>Subtotal</span>
+          <span id="cart-subtotal" class="font-bold text-slate-800 text-sm">$0.00</span>
+        </div>
+
+        <div class="mb-3">
+          <label class="block text-[11px] font-semibold text-slate-700 mb-1.5">Fulfillment Preference:</label>
+          <div class="grid grid-cols-2 gap-2 text-xs">
+            <label class="flex items-center gap-1.5 p-2 bg-white rounded-xl border border-brand-200 cursor-pointer">
+              <input type="radio" name="fulfillment" value="delivery" checked onchange="toggleFulfillmentMode(this.value)" class="text-brand-500">
+              <span class="text-[11px] font-medium text-slate-700">Delivery</span>
+            </label>
+            <label class="flex items-center gap-1.5 p-2 bg-white rounded-xl border border-brand-200 cursor-pointer">
+              <input type="radio" name="fulfillment" value="meetup" onchange="toggleFulfillmentMode(this.value)" class="text-brand-500">
+              <span class="text-[11px] font-medium text-slate-700">Meetup</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <input type="text" id="fulfillment-notes" placeholder="Enter postal code / address (price depends on location)" class="w-full text-xs p-2.5 rounded-xl border border-brand-200 bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-400">
+        </div>
+
+        <button onclick="checkoutWhatsApp()" class="w-full py-3 bg-[#25D366] hover:bg-[#20ba5a] text-white rounded-xl text-xs font-semibold shadow-soft active:scale-95 transition flex items-center justify-center gap-2 mb-2">
+          <i class="fa-brands fa-whatsapp text-sm"></i>
+          Order via WhatsApp
+        </button>
+
+        <button onclick="checkoutEmail()" class="w-full py-2.5 bg-brand-100 text-brand-700 hover:bg-brand-200 rounded-xl text-xs font-semibold active:scale-95 transition flex items-center justify-center gap-2">
+          <i class="fa-regular fa-envelope text-xs"></i>
+          Order via Email
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const STORE_CONFIG = {
+      whatsappNumber: "6591234567",
+      email: "thelayerworkshop@gmail.com",
+      currency: "SGD"
+    };
+
+    const PRODUCTS = [
+      {
+        id: "prod-1",
+        name: "Layered Desk Tray",
+        price: 24.00,
+        category: "Trays",
+        image: "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?auto=format&fit=crop&w=600&q=80",
+        description: "Minimalist stackable organizer designed to hold everyday stationery, keys, and accessories."
+      },
+      {
+        id: "prod-2",
+        name: "Geometric Planter Pot",
+        price: 18.50,
+        category: "Planters",
+        image: "https://images.unsplash.com/photo-1485955900006-10f4d324d411?auto=format&fit=crop&w=600&q=80",
+        description: "Indoor mini planter suitable for succulents and cacti, featuring drainage channels."
+      },
+      {
+        id: "prod-3",
+        name: "Hex Coaster Set (4 pcs)",
+        price: 16.00,
+        category: "Coasters",
+        image: "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=600&q=80",
+        description: "Water-resistant geometric drink coasters with soft non-slip grip pads."
+      },
+      {
+        id: "prod-4",
+        name: "Sculptural Arch Vase",
+        price: 32.00,
+        category: "Decor",
+        image: "https://images.unsplash.com/photo-1581783342308-f792dbdd27c5?auto=format&fit=crop&w=600&q=80",
+        description: "Artistic modern arch centerpiece designed for dried floral arrangements."
+      }
+    ];
+
+    let cart = {};
+    let favorites = new Set();
+    let selectedCategory = "All";
+    let searchQuery = "";
+    let activeModalProduct = null;
+    let currentTab = "catalog";
+
+    window.addEventListener("DOMContentLoaded", () => {
+      generateQRCode();
+      renderCategoryPills();
+      renderProducts();
+      updateCartBadge();
+    });
+
+    function generateQRCode() {
+      const qrEl = document.getElementById("desktop-qrcode");
+      if (qrEl) {
+        qrEl.innerHTML = "";
+        new QRCode(qrEl, {
+          text: window.location.href,
+          width: 170,
+          height: 170,
+          colorDark: "#2F6193",
+          colorLight: "#FFFFFF",
+          correctLevel: QRCode.CorrectLevel.M
+        });
+      }
+    }
+
+    function dismissDesktopGate() {
+      document.getElementById("desktop-gatekeeper").classList.add("hidden");
+    }
+
+    function renderCategoryPills() {
+      const categories = ["All", ...new Set(PRODUCTS.map(p => p.category))];
+      const container = document.getElementById("category-pills");
+      container.innerHTML = categories.map(cat => `
+        <button onclick="filterCategory('${cat}')" class="px-3.5 py-1.5 text-xs rounded-full whitespace-nowrap transition font-medium ${
+          selectedCategory === cat 
+            ? 'bg-brand-500 text-white shadow-soft' 
+            : 'bg-white text-slate-600 border border-brand-200'
+        }">${cat}</button>
+      `).join("");
+    }
+
+    function filterCategory(category) {
+      selectedCategory = category;
+      renderCategoryPills();
+      renderProducts();
+    }
+
+    function handleSearch(val) {
+      searchQuery = val.trim().toLowerCase();
+      document.getElementById("search-clear-btn").classList.toggle("hidden", searchQuery === "");
+      renderProducts();
+    }
+
+    function clearSearch() {
+      const input = document.getElementById("search-input");
+      input.value = "";
+      handleSearch("");
+    }
+
+    function switchTab(tab) {
+      currentTab = tab;
+      document.getElementById("nav-btn-catalog").className = `flex flex-col items-center gap-1 transition ${tab === 'catalog' ? 'text-brand-600 font-semibold' : 'text-slate-400'}`;
+      document.getElementById("nav-btn-favorites").className = `flex flex-col items-center gap-1 transition ${tab === 'favorites' ? 'text-brand-600 font-semibold' : 'text-slate-400'}`;
+      renderProducts();
+    }
+
+    function renderProducts() {
+      const container = document.getElementById("product-grid");
+      const emptyState = document.getElementById("empty-state");
+
+      let filtered = PRODUCTS.filter(p => {
+        const matchesCategory = selectedCategory === "All" || p.category === selectedCategory;
+        const matchesSearch = p.name.toLowerCase().includes(searchQuery) || p.description.toLowerCase().includes(searchQuery);
+        const matchesTab = currentTab === "catalog" || (currentTab === "favorites" && favorites.has(p.id));
+        return matchesCategory && matchesSearch && matchesTab;
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML = "";
+        emptyState.classList.remove("hidden");
+        emptyState.classList.add("flex");
+        return;
+      }
+
+      emptyState.classList.add("hidden");
+      emptyState.classList.remove("flex");
+
+      container.innerHTML = filtered.map(p => `
+        <div class="bg-white rounded-2xl p-2.5 border border-brand-100 shadow-card flex flex-col justify-between">
+          <div onclick="openProductModal('${p.id}')" class="cursor-pointer">
+            <div class="relative w-full h-36 rounded-xl overflow-hidden bg-brand-50 mb-2">
+              <img src="${p.image}" alt="${p.name}" class="w-full h-full object-cover">
+              <button onclick="event.stopPropagation(); toggleFavorite('${p.id}')" class="absolute top-2 right-2 w-7 h-7 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center text-slate-400 active:scale-90 transition">
+                <i class="${favorites.has(p.id) ? 'fa-solid fa-heart text-rose-500' : 'fa-regular fa-heart'} text-xs"></i>
+              </button>
+            </div>
+            <span class="text-[10px] text-brand-600 font-medium">${p.category}</span>
+            <h4 class="text-xs font-bold text-slate-800 line-clamp-1 mb-1">${p.name}</h4>
+          </div>
+          <div class="flex items-center justify-between pt-1 border-t border-brand-50 mt-1">
+            <span class="text-xs font-bold text-brand-600">$${p.price.toFixed(2)}</span>
+            <button onclick="addToCart('${p.id}')" class="w-7 h-7 rounded-xl bg-brand-50 text-brand-600 border border-brand-200 flex items-center justify-center active:scale-90 transition">
+              <i class="fa-solid fa-plus text-xs"></i>
+            </button>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function toggleFavorite(id) {
+      if (favorites.has(id)) {
+        favorites.delete(id);
+      } else {
+        favorites.add(id);
+        showToast("Added to saved items");
+      }
+      renderProducts();
+    }
+
+    function openProductModal(id) {
+      activeModalProduct = PRODUCTS.find(p => p.id === id);
+      if (!activeModalProduct) return;
+
+      document.getElementById("modal-img").src = activeModalProduct.image;
+      document.getElementById("modal-title").innerText = activeModalProduct.name;
+      document.getElementById("modal-price").innerText = `$${activeModalProduct.price.toFixed(2)}`;
+      document.getElementById("modal-desc").innerText = activeModalProduct.description;
+
+      const favIcon = document.querySelector("#modal-fav-btn i");
+      favIcon.className = favorites.has(id) ? "fa-solid fa-heart text-rose-500" : "fa-regular fa-heart";
+
+      document.getElementById("product-sheet-backdrop").classList.remove("opacity-0", "pointer-events-none");
+      document.getElementById("product-sheet").classList.remove("translate-y-full");
+    }
+
+    function closeProductModal() {
+      document.getElementById("product-sheet-backdrop").classList.add("opacity-0", "pointer-events-none");
+      document.getElementById("product-sheet").classList.add("translate-y-full");
+      activeModalProduct = null;
+    }
+
+    function toggleFavoriteFromModal() {
+      if (!activeModalProduct) return;
+      toggleFavorite(activeModalProduct.id);
+      const favIcon = document.querySelector("#modal-fav-btn i");
+      favIcon.className = favorites.has(activeModalProduct.id) ? "fa-solid fa-heart text-rose-500" : "fa-regular fa-heart";
+    }
+
+    function addModalItemToCart() {
+      if (!activeModalProduct) return;
+      addToCart(activeModalProduct.id);
+      closeProductModal();
+    }
+
+    function addToCart(id) {
+      cart[id] = (cart[id] || 0) + 1;
+      updateCartBadge();
+      showToast("Added to cart");
+    }
+
+    function updateCartBadge() {
+      const total = Object.values(cart).reduce((a, b) => a + b, 0);
+      const headerBadge = document.getElementById("header-cart-badge");
+      const navBadge = document.getElementById("nav-cart-badge");
+
+      if (total > 0) {
+        headerBadge.innerText = total;
+        headerBadge.classList.remove("hidden");
+        navBadge.innerText = total;
+        navBadge.classList.remove("hidden");
+      } else {
+        headerBadge.classList.add("hidden");
+        navBadge.classList.add("hidden");
+      }
+    }
+
+    function openCart() {
+      renderCartItems();
+      document.getElementById("cart-sheet-backdrop").classList.remove("opacity-0", "pointer-events-none");
+      document.getElementById("cart-sheet").classList.remove("translate-y-full");
+    }
+
+    function closeCart() {
+      document.getElementById("cart-sheet-backdrop").classList.add("opacity-0", "pointer-events-none");
+      document.getElementById("cart-sheet").classList.add("translate-y-full");
+    }
+
+    function renderCartItems() {
+      const container = document.getElementById("cart-items");
+      const entries = Object.entries(cart);
+
+      if (entries.length === 0) {
+        container.innerHTML = `
+          <div class="py-12 text-center text-slate-400">
+            <i class="fa-solid fa-cart-shopping text-3xl mb-2 text-brand-200"></i>
+            <p class="text-xs">Your cart is empty</p>
+          </div>
+        `;
+        document.getElementById("cart-subtotal").innerText = "$0.00";
+        return;
+      }
+
+      let subtotal = 0;
+      container.innerHTML = entries.map(([id, qty]) => {
+        const product = PRODUCTS.find(p => p.id === id);
+        const itemTotal = product.price * qty;
+        subtotal += itemTotal;
+
+        return `
+          <div class="py-3 flex items-center justify-between gap-3">
+            <img src="${product.image}" class="w-12 h-12 rounded-xl object-cover bg-brand-50 border border-brand-100">
+            <div class="flex-1 min-w-0">
+              <h5 class="text-xs font-semibold text-slate-800 truncate">${product.name}</h5>
+              <span class="text-[11px] text-brand-600 font-bold">$${product.price.toFixed(2)}</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <button onclick="changeQty('${id}', -1)" class="w-6 h-6 rounded-lg bg-brand-50 text-slate-600 border border-brand-200 flex items-center justify-center text-xs active:scale-95">-</button>
+              <span class="text-xs font-semibold w-4 text-center">${qty}</span>
+              <button onclick="changeQty('${id}', 1)" class="w-6 h-6 rounded-lg bg-brand-50 text-slate-600 border border-brand-200 flex items-center justify-center text-xs active:scale-95">+</button>
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      document.getElementById("cart-subtotal").innerText = `$${subtotal.toFixed(2)}`;
+    }
+
+    function changeQty(id, delta) {
+      if (!cart[id]) return;
+      cart[id] += delta;
+      if (cart[id] <= 0) delete cart[id];
+      renderCartItems();
+      updateCartBadge();
+    }
+
+    function toggleFulfillmentMode(mode) {
+      const input = document.getElementById("fulfillment-notes");
+      if (mode === "delivery") {
+        input.placeholder = "Enter postal code / address (price depends on location)";
+      } else {
+        input.placeholder = "Enter preferred meetup location / MRT (subject to mutual schedule)";
+      }
+    }
+
+    function buildOrderDetails() {
+      const entries = Object.entries(cart);
+      if (entries.length === 0) return null;
+
+      let itemsText = "";
+      let subtotal = 0;
+
+      entries.forEach(([id, qty]) => {
+        const item = PRODUCTS.find(p => p.id === id);
+        const total = item.price * qty;
+        subtotal += total;
+        itemsText += `- ${item.name} x${qty} ($${total.toFixed(2)})\n`;
+      });
+
+      const mode = document.querySelector('input[name="fulfillment"]:checked').value;
+      const notes = document.getElementById("fulfillment-notes").value.trim() || "Not specified";
+
+      return {
+        itemsText,
+        subtotal: subtotal.toFixed(2),
+        mode: mode === "delivery" ? "Doorstep Delivery (Quote required)" : "Meetup (Arrangement required)",
+        notes
+      };
+    }
+
+    function checkoutWhatsApp() {
+      const order = buildOrderDetails();
+      if (!order) {
+        showToast("Cart is empty");
+        return;
+      }
+
+      const message = `Hello The Layer Workshop! I'd like to place an order:\n\n` +
+        `📦 *ITEMS:*\n${order.itemsText}\n` +
+        `💰 *SUBTOTAL:* $${order.subtotal} SGD\n\n` +
+        `📍 *FULFILLMENT:* ${order.mode}\n` +
+        `📝 *LOCATION / DETAILS:* ${order.notes}\n\n` +
+        `Please confirm availability and delivery price / meetup timing. Thank you!`;
+
+      window.open(`https://wa.me/${STORE_CONFIG.whatsappNumber}?text=${encodeURIComponent(message)}`, "_blank");
+    }
+
+    function checkoutEmail() {
+      const order = buildOrderDetails();
+      if (!order) {
+        showToast("Cart is empty");
+        return;
+      }
+
+      const subject = `Order Inquiry - The Layer Workshop`;
+      const body = `Hi The Layer Workshop,\n\nI would like to order:\n\n${order.itemsText}\nSubtotal: $${order.subtotal} SGD\n\nFulfillment: ${order.mode}\nLocation/Notes: ${order.notes}\n\nPlease let me know the final price and arrangement.`;
+
+      window.location.href = `mailto:${STORE_CONFIG.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById("toast");
+      document.getElementById("toast-message").innerText = msg;
+      toast.classList.remove("opacity-0", "pointer-events-none");
+      setTimeout(() => {
+        toast.classList.add("opacity-0", "pointer-events-none");
+      }, 2000);
+    }
+  </script>
+</body>
+</html>
