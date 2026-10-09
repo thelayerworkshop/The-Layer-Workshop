@@ -308,7 +308,7 @@
       <div class="flex items-center gap-4 text-brand-600 font-medium">
         <a href="https://t.me/+rG7LlTWZ51Q5MzU1" target="_blank" rel="noopener noreferrer" class="hover:underline flex items-center gap-1">
           <i class="fa-brands fa-telegram text-sm text-[#229ED9]"></i>
-          <span>Telegram Channel</span>
+          <span>Telegram Store</span>
         </a>
         <button onclick="switchTab('faq')" class="hover:underline">FAQ</button>
       </div>
@@ -425,6 +425,21 @@
       </button>
     </div>
   </aside>
+
+  <!-- Floating Right-Side Quick Checkout Button -->
+  <button 
+    id="floating-checkout-btn" 
+    onclick="openCart()" 
+    aria-label="Quick Checkout" 
+    class="fixed right-4 md:right-7 bottom-20 md:bottom-8 z-40 hidden items-center gap-2.5 px-4 py-3 bg-brand-500 hover:bg-brand-600 active:scale-95 text-white rounded-full shadow-lg hover:shadow-xl border-2 border-white transition-all duration-300 ease-out group"
+  >
+    <div class="relative flex items-center justify-center">
+      <i class="fa-solid fa-bag-shopping text-sm group-hover:scale-110 transition-transform"></i>
+      <span id="floating-cart-badge" class="absolute -top-2 -right-2.5 bg-rose-500 text-white text-[10px] font-extrabold h-4 w-4 rounded-full flex items-center justify-center border border-white">0</span>
+    </div>
+    <span class="text-xs font-bold tracking-tight">Checkout</span>
+    <span id="floating-cart-total" class="text-[11px] font-semibold bg-white/20 px-2 py-0.5 rounded-full">$0.00</span>
+  </button>
 
   <!-- Notification Toast -->
   <div id="toast" class="fixed top-5 left-1/2 -translate-x-1/2 z-50 bg-slate-900/90 backdrop-blur-sm text-white text-xs px-4 py-2.5 rounded-full shadow-lg opacity-0 transition-opacity pointer-events-none flex items-center gap-2">
@@ -640,11 +655,33 @@
       const total = Object.values(cart).reduce((a, b) => a + b, 0);
       const headerBadge = document.getElementById("header-cart-badge");
       const navBadge = document.getElementById("nav-cart-badge");
+      const floatingBtn = document.getElementById("floating-checkout-btn");
+      const floatingBadge = document.getElementById("floating-cart-badge");
+      const floatingTotal = document.getElementById("floating-cart-total");
+
+      let subtotal = 0;
+      Object.entries(cart).forEach(([id, qty]) => {
+        const prod = PRODUCTS.find(p => p.id === id);
+        if (prod) subtotal += prod.price * qty;
+      });
 
       if (headerBadge) headerBadge.innerText = total;
       if (navBadge) {
         navBadge.innerText = total;
         navBadge.classList.toggle("hidden", total === 0);
+      }
+
+      // Update floating button visibility and contents
+      if (floatingBtn) {
+        if (total > 0) {
+          floatingBtn.classList.remove("hidden");
+          floatingBtn.classList.add("flex");
+          if (floatingBadge) floatingBadge.innerText = total;
+          if (floatingTotal) floatingTotal.innerText = `$${subtotal.toFixed(2)}`;
+        } else {
+          floatingBtn.classList.add("hidden");
+          floatingBtn.classList.remove("flex");
+        }
       }
     }
 
@@ -733,17 +770,17 @@
         if (item) {
           const total = item.price * qty;
           subtotal += total;
-          itemsText += `• ${item.name} x${qty} — $${total.toFixed(2)}\n`;
+          itemsText += `✩ ${item.name} ×${qty} — $${total.toFixed(2)}\n`;
         }
       });
 
       const orderId = "TLW-" + Math.floor(1000 + Math.random() * 9000);
       const custContact = (document.getElementById("cust-contact")?.value || "").trim();
-      const custNotes = (document.getElementById("cust-notes")?.value || "").trim() || "Self-collect at Redhill MRT (default / to confirm)";
+      const custNotes = (document.getElementById("cust-notes")?.value || "").trim() || "Self-collect at Redhill MRT";
 
       return {
         orderId,
-        itemsText,
+        itemsText: itemsText.trimEnd(),
         subtotal: subtotal.toFixed(2),
         custContact,
         custNotes
@@ -763,21 +800,17 @@
         return;
       }
 
-      // Pre-filled formatted message for Telegram
+      // Pre-filled formatted message adhering strictly to custom aesthetic template
       const message = 
-`🛍️ *THE LAYER WORKSHOP — ORDER RECEIPT*
-🔖 *Order ID:* #${order.orderId}
-📱 *Contact (Telegram / WhatsApp / Phone):* ${order.custContact}
-
-📦 *PRODUCTS ORDERED:*
+`˗ˏˋ  The Layer Workshop — Order Note ˎˊ˗
+🔖 Order: #${order.orderId}
+👤 Name/Tele: ${order.custContact}
+📦 What you’re getting:
 ${order.itemsText}
-💰 *TOTAL AMOUNT:* $${order.subtotal} ${STORE_CONFIG.currency}
-
-📍 *FULFILLMENT / NOTES (Local Delivery Only):*
-${order.custNotes}
-
----
-_Hi @${STORE_CONFIG.telegramUsername}! I would like to confirm order #${order.orderId} and arrange for payment & local fulfillment (Redhill MRT / Local Delivery). Thank you!_`;
+💰 Total: $${order.subtotal} SGD
+📍 Collection: ${order.custNotes}
+─── ･ ｡ﾟ☆: .☽ . :☆ﾟ. ───
+Hi @e1yse! Ready to confirm #${order.orderId} ✨ Let me know the PayNow details whenever you're free!`;
 
       // Safe clipboard copy as backup
       try {
