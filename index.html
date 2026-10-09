@@ -4,12 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>The Layer Workshop</title>
-
-  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Font Awesome Icons CDN -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script>
     tailwind.config = {
       theme: {
@@ -25,455 +21,296 @@
               600: '#3D7AB6',
               700: '#2F6193',
               800: '#23486F',
-              900: '#172F4A',
             }
-          },
-          boxShadow: {
-            'soft': '0 4px 20px -2px rgba(82, 150, 213, 0.15)',
-            'card': '0 2px 12px rgba(169, 207, 240, 0.22)',
-            'drawer': '0 0 35px rgba(23, 47, 74, 0.18)'
           }
         }
       }
     }
   </script>
-
   <style>
     body {
       -webkit-tap-highlight-color: transparent;
-      overscroll-behavior-y: contain;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      min-height: 100vh;
+      min-height: -webkit-fill-available;
     }
-    
-    .safe-top {
-      padding-top: env(safe-area-inset-top, 0px);
-    }
-    
-    .safe-bottom {
-      padding-bottom: env(safe-area-inset-bottom, 0px);
-    }
-
+    .safe-top { padding-top: env(safe-area-inset-top, 0px); }
     .safe-bottom-nav {
-      padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 0.65rem);
+      padding-bottom: calc(env(safe-area-inset-bottom, 16px) + 0.5rem);
     }
-
-    .drawer-transition {
-      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease;
-    }
-
-    details > summary svg.faq-chevron {
-      transition: transform 0.25s ease;
-    }
-    details[open] > summary svg.faq-chevron {
-      transform: rotate(180deg);
-    }
-    details > summary {
-      list-style: none;
-    }
-    details > summary::-webkit-details-marker {
-      display: none;
-    }
+    
+    .view-state { display: none; }
+    .view-active { display: flex; }
   </style>
 </head>
-<body class="bg-[#F8FAFC] text-slate-800 antialiased selection:bg-brand-200 min-h-screen flex flex-col">
+<body class="bg-[#F8FAFC] text-slate-800 antialiased selection:bg-brand-200">
 
-  <!-- Top Navigation Header -->
-  <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-brand-100 safe-top shadow-xs">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between gap-4">
-      
-      <!-- Brand Identity -->
-      <a href="#" onclick="switchTab('catalog'); return false;" class="flex items-center gap-3 shrink-0 group">
-        <div class="w-10 h-10 rounded-2xl bg-brand-50 border border-brand-200 flex items-center justify-center text-brand-600 shadow-soft group-hover:bg-brand-100 transition">
-          <i class="fa-solid fa-layer-group text-lg"></i>
-        </div>
+  <!-- Responsive Wrapper with extra bottom buffer for mobile scrolling -->
+  <div id="mobile-app" class="max-w-6xl mx-auto min-h-screen bg-brand-50/10 flex flex-col relative shadow-xl overflow-x-hidden pb-36 md:pb-12">
+
+    <!-- Header Navigation -->
+    <header class="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-brand-100 safe-top">
+      <div class="px-4 py-3 flex items-center justify-between">
         <div>
-          <span class="text-[10px] tracking-wider uppercase font-bold text-brand-600 block">Handmade by The Layer Workshop</span>
-          <h1 class="text-base sm:text-lg font-bold text-slate-800 tracking-tight leading-tight">The Layer Workshop</h1>
+          <span class="text-[10px] tracking-wider uppercase font-semibold text-brand-600 block">Handmade by The Layer Workshop</span>
+          <h1 class="text-base md:text-lg font-bold text-slate-800 tracking-tight">The Layer Workshop</h1>
         </div>
-      </a>
 
-      <!-- Desktop View Tabs -->
-      <nav class="hidden md:flex items-center gap-1 bg-brand-50/80 p-1 rounded-xl border border-brand-200">
-        <button onclick="switchTab('catalog')" id="header-btn-catalog" class="px-4 py-1.5 rounded-lg text-xs font-semibold bg-white text-brand-700 shadow-sm transition">
-          <i class="fa-solid fa-store mr-1.5 text-brand-500"></i>Store
-        </button>
-        <button onclick="switchTab('faq')" id="header-btn-faq" class="px-4 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-brand-700 transition">
-          <i class="fa-solid fa-circle-question mr-1.5 text-brand-500"></i>FAQ
-        </button>
-      </nav>
+        <div class="flex items-center gap-4">
+          <!-- Desktop Tabs -->
+          <nav class="hidden md:flex gap-1.5 text-xs font-semibold text-slate-600">
+            <button onclick="switchTab('catalog')" id="header-btn-catalog" class="px-3 py-1.5 rounded-lg text-brand-700 bg-brand-50 font-bold transition">Store</button>
+            <button onclick="switchTab('faq')" id="header-btn-faq" class="px-3 py-1.5 rounded-lg hover:bg-slate-50 transition">FAQ</button>
+          </nav>
 
-      <!-- Desktop Search Bar -->
-      <div id="desktop-search-container" class="hidden lg:flex flex-1 max-w-xs mx-2">
-        <div class="relative w-full">
+          <!-- Top Cart Icon Button -->
+          <button onclick="openCart()" class="relative p-2 rounded-full bg-brand-50 text-brand-600 active:scale-90 transition border border-brand-200">
+            <i class="fa-solid fa-bag-shopping text-sm"></i>
+            <span id="header-cart-badge" class="hidden absolute -top-1 -right-1 bg-brand-500 text-white text-[10px] font-bold h-4 w-4 rounded-full flex items-center justify-center border-2 border-white">0</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Live Search Box Section -->
+      <div id="search-bar" class="px-4 pb-3">
+        <div class="relative max-w-md">
           <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-brand-400 text-xs"></i>
-          <input type="text" id="desktop-search-input" oninput="handleSearch(this.value)" placeholder="Search products..." class="w-full pl-9 pr-8 py-2 text-xs rounded-xl bg-brand-50/70 border border-brand-200 focus:outline-none focus:ring-2 focus:ring-brand-400 text-slate-700 placeholder-brand-300 transition">
-          <button id="desktop-search-clear" onclick="clearSearch()" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs">
+          <input type="text" id="search-input" oninput="handleSearch(this.value)" placeholder="Search products..." class="w-full pl-9 pr-8 py-1.5 text-xs rounded-xl bg-brand-50/70 border border-brand-200 focus:outline-none focus:ring-2 focus:ring-brand-400 text-slate-700 placeholder-brand-300">
+          <button id="search-clear-btn" onclick="clearSearch()" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs">
             <i class="fa-solid fa-xmark"></i>
           </button>
         </div>
       </div>
+    </header>
 
-      <!-- Header Cart Trigger -->
-      <div class="flex items-center gap-2.5">
-        <button onclick="openCart()" class="relative flex items-center gap-2 px-3.5 py-2 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-semibold text-xs active:scale-95 transition shadow-soft" aria-label="Open Cart">
-          <i class="fa-solid fa-bag-shopping text-sm"></i>
-          <span class="hidden sm:inline">Cart</span>
-          <span id="header-cart-badge" class="bg-white text-brand-600 font-extrabold text-[11px] px-1.5 py-0.2 rounded-full min-w-5 h-5 flex items-center justify-center">0</span>
-        </button>
-      </div>
-    </div>
-
-    <!-- Mobile Search Bar -->
-    <div id="mobile-search-bar" class="lg:hidden px-4 pb-3">
-      <div class="relative">
-        <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-brand-400 text-xs"></i>
-        <input type="text" id="mobile-search-input" oninput="handleSearch(this.value)" placeholder="Search products..." class="w-full pl-9 pr-8 py-2 text-xs rounded-xl bg-brand-50/70 border border-brand-200 focus:outline-none focus:ring-2 focus:ring-brand-400 text-slate-700 placeholder-brand-300">
-        <button id="mobile-search-clear" onclick="clearSearch()" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs">
-          <i class="fa-solid fa-xmark"></i>
-        </button>
-      </div>
-    </div>
-  </header>
-
-  <!-- Main View Container -->
-  <main class="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-6 pb-28 md:pb-12">
-    
-    <!-- VIEW: CATALOG -->
-    <div id="view-catalog" class="space-y-6">
+    <!-- Main Screens -->
+    <main class="flex-1 px-4 py-4 max-w-6xl w-full mx-auto">
       
-      <!-- Highlights Banner -->
-      <div class="bg-gradient-to-r from-brand-50 via-white to-brand-100/50 border border-brand-200 rounded-2xl p-4 sm:p-6 shadow-sm">
-        <div>
-          <div class="flex flex-wrap items-center gap-2 mb-1">
-            <span class="px-2.5 py-0.5 rounded-full bg-brand-200/80 text-brand-800 text-[10px] font-bold uppercase tracking-wider">
-              🇸🇬 Local Delivery Only
-            </span>
-            <span class="text-xs text-slate-500">• Direct confirmation via Telegram</span>
-          </div>
-          <h2 class="text-base sm:text-xl font-extrabold text-slate-800 tracking-tight">Handmade Creations by The Layer Workshop</h2>
-          <p class="text-xs sm:text-sm text-slate-500 mt-1 max-w-2xl">
+      <!-- VIEW: CATALOG / PRODUCTS -->
+      <div id="view-catalog" class="view-state view-active flex-col">
+        <!-- Banner info -->
+        <div class="mb-4 bg-gradient-to-r from-brand-50 to-white border border-brand-100 rounded-2xl p-4 shadow-sm">
+          <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-brand-100 text-brand-700 mb-2">
+            🇸🇬 LOCAL DELIVERY ONLY • Direct confirmation via Telegram
+          </span>
+          <h2 class="text-base font-bold text-slate-800 tracking-tight">Handmade Creations by The Layer Workshop</h2>
+          <p class="text-xs text-slate-500 mt-1 max-w-2xl leading-relaxed">
             Browse our handmade products below. Add items to your cart and checkout directly via Telegram to arrange local delivery or self-collection.
           </p>
         </div>
-      </div>
 
-      <!-- Catalog Header Bar -->
-      <div class="flex items-center justify-between">
-        <div class="flex items-center gap-2">
-          <h3 class="text-sm sm:text-base font-bold text-slate-800">All Products</h3>
-          <span id="items-count-badge" class="text-[11px] font-semibold text-brand-700 bg-brand-100/80 px-2.5 py-0.5 rounded-full border border-brand-200">3 items</span>
+        <div id="product-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3.5 w-full"></div>
+        <div id="empty-state" class="hidden py-16 text-center flex-col items-center">
+          <i class="fa-solid fa-basket-shopping text-brand-300 text-4xl mb-3"></i>
+          <p class="text-sm font-semibold text-slate-700">No products found</p>
+          <p class="text-xs text-slate-400 mt-1">Try searching for something else</p>
         </div>
       </div>
 
-      <!-- Product Grid -->
-      <div id="product-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-3.5 sm:gap-6"></div>
-      
-      <!-- Empty State -->
-      <div id="empty-state" class="hidden py-16 text-center flex-col items-center">
-        <div class="w-16 h-16 rounded-full bg-brand-50 border border-brand-200 flex items-center justify-center text-brand-400 text-2xl mb-3 shadow-inner">
-          <i class="fa-solid fa-basket-shopping"></i>
+      <!-- VIEW: FAQ -->
+      <div id="view-faq" class="view-state flex-col gap-5 max-w-2xl mx-auto w-full pb-8">
+        <!-- Compact minimalist question contact card -->
+        <div class="bg-[#E6F0FA] border border-[#A9CFF0] rounded-xl p-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
+          <div>
+            <h4 class="text-sm font-bold text-slate-800 tracking-tight">Have questions or need help?</h4>
+            <p class="text-xs text-slate-600 font-medium">Telegram handle: @e1yse</p>
+          </div>
+          <a href="https://t.me/e1yse" target="_blank" class="text-xs font-semibold py-1.5 px-3 bg-[#5296D5] hover:bg-[#3D7AB6] text-white rounded-lg transition inline-flex items-center gap-1.5 whitespace-nowrap">
+            <i class="fa-brands fa-telegram"></i>
+            Contact me here
+          </a>
         </div>
-        <p class="text-sm font-semibold text-slate-700">No products found</p>
-        <p class="text-xs text-slate-400 mt-1">Try another search keyword or reset below</p>
-        <button onclick="clearSearch()" class="mt-3 px-4 py-1.5 text-xs rounded-xl bg-brand-100 text-brand-700 font-semibold hover:bg-brand-200 transition">
-          Reset Search
+
+        <div class="flex flex-col gap-3">
+          <h3 class="text-base font-bold text-slate-800 tracking-tight px-1 flex items-center gap-2">
+            <i class="fa-regular fa-comments text-brand-500"></i>
+            Frequently Asked Questions
+          </h3>
+
+          <div class="space-y-2">
+            <div class="bg-white border border-brand-100 rounded-xl overflow-hidden shadow-sm">
+              <button onclick="toggleAccordion('faq-1')" class="w-full p-4 text-left flex justify-between items-center text-slate-800 text-xs font-bold hover:bg-slate-50 transition">
+                <span>How can I place an order?</span>
+                <i id="icon-faq-1" class="fa-solid fa-chevron-down text-brand-400 text-[10px] transition-transform"></i>
+              </button>
+              <div id="content-faq-1" class="hidden px-4 pb-4 text-xs text-slate-500 leading-relaxed border-t border-brand-50/50 pt-2">
+                Simply select your items and fill in your contact information in the Cart drawer. Click "Order & Confirm Payment via Telegram" to initiate confirmation details directly.
+              </div>
+            </div>
+
+            <div class="bg-white border border-brand-100 rounded-xl overflow-hidden shadow-sm">
+              <button onclick="toggleAccordion('faq-2')" class="w-full p-4 text-left flex justify-between items-center text-slate-800 text-xs font-bold hover:bg-slate-50 transition">
+                <span>Where can I pick up my purchase?</span>
+                <i id="icon-faq-2" class="fa-solid fa-chevron-down text-brand-400 text-[10px] transition-transform"></i>
+              </button>
+              <div id="content-faq-2" class="hidden px-4 pb-4 text-xs text-slate-500 leading-relaxed border-t border-brand-50/50 pt-2">
+                We accommodate free self-collection meetups at Redhill MRT. Ensure you schedule timings in advance.
+              </div>
+            </div>
+
+            <div class="bg-white border border-brand-100 rounded-xl overflow-hidden shadow-sm">
+              <button onclick="toggleAccordion('faq-3')" class="w-full p-4 text-left flex justify-between items-center text-slate-800 text-xs font-bold hover:bg-slate-50 transition">
+                <span>Do you offer delivery services?</span>
+                <i id="icon-faq-3" class="fa-solid fa-chevron-down text-brand-400 text-[10px] transition-transform"></i>
+              </button>
+              <div id="content-faq-3" class="hidden px-4 pb-4 text-xs text-slate-500 leading-relaxed border-t border-brand-50/50 pt-2">
+                Yes, local delivery within Singapore only. Note that delivery charges depend on distance/location and are verified when the order is confirmed.
+              </div>
+            </div>
+
+            <div class="bg-white border border-brand-100 rounded-xl overflow-hidden shadow-sm">
+              <button onclick="toggleAccordion('faq-4')" class="w-full p-4 text-left flex justify-between items-center text-slate-800 text-xs font-bold hover:bg-slate-50 transition">
+                <span>Is customization available?</span>
+                <i id="icon-faq-4" class="fa-solid fa-chevron-down text-brand-400 text-[10px] transition-transform"></i>
+              </button>
+              <div id="content-faq-4" class="hidden px-4 pb-4 text-xs text-slate-500 leading-relaxed border-t border-brand-50/50 pt-2">
+                Yes! Reach out directly with your queries and material, scale, or design specifics to discuss further.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer at bottom of document -->
+      <footer class="mt-12 pt-6 border-t border-brand-100 text-center text-xs text-slate-400">
+        <div class="flex justify-center items-center gap-4 mb-2">
+          <a href="https://t.me/+rG7LlTWZ51Q5MzU1" target="_blank" class="text-brand-600 hover:text-brand-700 font-semibold inline-flex items-center gap-1">
+            <i class="fa-brands fa-telegram"></i> Telegram Store
+          </a>
+          <span>•</span>
+          <button onclick="switchTab('faq')" class="hover:text-slate-600">FAQ</button>
+        </div>
+        <p>© 2026 The Layer Workshop. Handmade in Singapore (Local delivery only).</p>
+      </footer>
+    </main>
+
+    <!-- Floating Checkout Pill Button (Appears when items are in cart) -->
+    <div id="floating-checkout-btn" class="hidden fixed right-4 bottom-24 md:bottom-8 z-40">
+      <button onclick="openCart()" class="bg-[#5296D5] hover:bg-[#3D7AB6] text-white shadow-lg shadow-brand-500/25 px-4 py-3 rounded-full flex items-center gap-3 transition-transform active:scale-95 border border-white/20">
+        <div class="relative flex items-center justify-center">
+          <i class="fa-solid fa-bag-shopping text-sm"></i>
+          <span id="floating-cart-badge" class="absolute -top-2 -right-2.5 bg-rose-500 text-white text-[9px] font-bold h-4 w-4 rounded-full flex items-center justify-center border-2 border-white">0</span>
+        </div>
+        <span class="text-xs font-semibold">Checkout</span>
+        <span id="floating-cart-subtotal" class="text-xs font-bold bg-white/20 px-2 py-0.5 rounded-full">$0.00</span>
+      </button>
+    </div>
+
+    <!-- Mobile Navigation Panel -->
+    <nav class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-lg border-t border-brand-100 safe-bottom-nav">
+      <div class="max-w-md mx-auto grid grid-cols-3 pt-2">
+        <button onclick="switchTab('catalog')" id="nav-btn-catalog" class="flex flex-col items-center gap-1 text-brand-600 transition">
+          <i class="fa-solid fa-compass text-base"></i>
+          <span class="text-[10px] font-medium">Store</span>
+        </button>
+        <button onclick="switchTab('faq')" id="nav-btn-faq" class="flex flex-col items-center gap-1 text-slate-400 transition">
+          <i class="fa-solid fa-question text-base"></i>
+          <span class="text-[10px] font-medium">FAQ</span>
+        </button>
+        <button onclick="openCart()" class="flex flex-col items-center gap-1 text-slate-400 relative transition">
+          <div class="relative">
+            <i class="fa-solid fa-cart-shopping text-base"></i>
+            <span id="nav-cart-badge" class="hidden absolute -top-1.5 -right-2 bg-brand-500 text-white text-[9px] font-bold h-3.5 w-3.5 rounded-full flex items-center justify-center">0</span>
+          </div>
+          <span class="text-[10px] font-medium">Cart</span>
+        </button>
+      </div>
+    </nav>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="fixed top-5 left-1/2 -translate-x-1/2 z-50 bg-slate-800 text-white text-xs px-4 py-2 rounded-full shadow-lg opacity-0 transition-opacity pointer-events-none flex items-center gap-2">
+      <i class="fa-solid fa-check text-brand-300"></i>
+      <span id="toast-message">Added to cart</span>
+    </div>
+
+    <!-- Product Details Modal Sheet -->
+    <div id="product-sheet-backdrop" onclick="closeProductModal()" class="fixed inset-0 bg-slate-900/40 z-50 opacity-0 pointer-events-none transition-opacity"></div>
+    <div id="product-sheet" class="fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-3xl border-t border-brand-100 transform translate-y-full transition-transform duration-300 max-w-md mx-auto overflow-hidden">
+      <div class="w-10 h-1 bg-slate-200 rounded-full mx-auto my-3"></div>
+      <div class="p-5 max-h-[80vh] overflow-y-auto">
+        <div id="modal-img-container" class="w-full h-56 rounded-2xl mb-4 bg-brand-50 border border-brand-100 flex items-center justify-center text-brand-600 font-bold text-2xl"></div>
+        <div class="flex items-start justify-between gap-2 mb-2">
+          <h2 id="modal-title" class="text-base font-bold text-slate-800 text-left"></h2>
+          <span id="modal-price" class="text-base font-bold text-brand-600"></span>
+        </div>
+        <p id="modal-desc" class="text-xs text-slate-500 leading-relaxed mb-6 text-left"></p>
+        <button onclick="addModalItemToCart()" class="w-full py-3.5 bg-brand-500 hover:bg-brand-600 text-white rounded-2xl text-xs font-semibold shadow-soft active:scale-95 transition flex items-center justify-center gap-2">
+          <i class="fa-solid fa-plus"></i> Add to Cart
         </button>
       </div>
     </div>
 
-    <!-- VIEW: FAQ -->
-    <div id="view-faq" class="hidden max-w-3xl mx-auto space-y-6">
+    <!-- Cart Slideout/Drawer -->
+    <div id="cart-sheet-backdrop" onclick="closeCart()" class="fixed inset-0 bg-slate-900/40 z-50 opacity-0 pointer-events-none transition-opacity"></div>
+    <div id="cart-sheet" class="fixed bottom-0 left-0 right-0 md:top-0 md:bottom-0 md:right-0 md:left-auto z-50 bg-white rounded-t-3xl md:rounded-t-none md:rounded-l-3xl border-t md:border-t-0 md:border-l border-brand-100 transform translate-y-full md:translate-y-0 md:translate-x-full transition-transform duration-300 max-w-md w-full mx-auto flex flex-col max-h-[92vh] md:max-h-screen">
+      <div class="w-10 h-1 bg-slate-200 rounded-full mx-auto my-3 md:hidden"></div>
       
-      <!-- Section Header -->
-      <div class="text-center">
-        <h2 class="text-xl sm:text-2xl font-extrabold text-slate-800 tracking-tight">Frequently Asked Questions</h2>
+      <!-- Cart Header -->
+      <div class="px-5 py-4 border-b border-brand-100 flex items-center justify-between">
+        <h3 class="text-base font-bold text-slate-800">Your Cart</h3>
+        <button onclick="closeCart()" class="text-slate-400 hover:text-slate-600 text-sm">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
       </div>
 
-      <!-- Compact Contact Box -->
-      <div class="bg-[#E6F0FA] border border-[#A9CFF0] rounded-2xl p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 shadow-sm">
-        <div>
-          <h4 class="text-sm font-bold text-slate-800 tracking-tight">Have questions or need help?</h4>
-          <p class="text-xs text-slate-600 font-medium">Telegram handle: @e1yse</p>
+      <!-- Items List -->
+      <div id="cart-items" class="flex-1 overflow-y-auto p-5 divide-y divide-brand-50"></div>
+
+      <!-- Order Form -->
+      <div class="p-5 bg-brand-50/70 border-t border-brand-100">
+        <div class="flex justify-between text-xs text-slate-600 mb-3">
+          <span>Subtotal</span>
+          <span id="cart-subtotal" class="font-bold text-slate-800 text-sm">$0.00</span>
         </div>
-        <a href="https://t.me/e1yse" target="_blank" class="text-xs font-semibold py-2 px-3.5 bg-[#5296D5] hover:bg-[#3D7AB6] text-white rounded-xl transition inline-flex items-center gap-2 whitespace-nowrap shadow-soft active:scale-95">
-          <i class="fa-brands fa-telegram text-sm"></i>
-          Contact me here
-        </a>
-      </div>
 
-      <!-- FAQ Accordion List -->
-      <div class="space-y-3">
-        <!-- FAQ 1 -->
-        <details class="group bg-white rounded-2xl border border-brand-100 p-4 shadow-sm hover:border-brand-200 transition" open>
-          <summary class="flex items-center justify-between cursor-pointer font-bold text-xs sm:text-sm text-slate-800 select-none">
-            <span class="flex items-center gap-2.5">
-              <span class="w-6 h-6 rounded-lg bg-brand-50 text-brand-600 flex items-center justify-center text-xs">
-                <i class="fa-solid fa-wallet"></i>
-              </span>
-              How do I place an order and make payment?
-            </span>
-            <svg class="faq-chevron w-4 h-4 text-brand-500 shrink-0 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-            </svg>
-          </summary>
-          <p class="mt-3 text-xs sm:text-sm text-slate-600 leading-relaxed pl-8 border-t border-brand-50 pt-3">
-            Simply add your chosen items to the cart, fill in your contact information and notes, then tap <strong>"Order & Confirm Payment via Telegram"</strong>. This generates your order receipt with a unique Order ID and opens your Telegram chat directly with us with the complete message pre-filled. You just hit <strong>Send</strong>, and payment details (PayNow / bank transfer) will be shared directly to confirm your order!
-          </p>
-        </details>
-
-        <!-- FAQ 2 -->
-        <details class="group bg-white rounded-2xl border border-brand-100 p-4 shadow-sm hover:border-brand-200 transition">
-          <summary class="flex items-center justify-between cursor-pointer font-bold text-xs sm:text-sm text-slate-800 select-none">
-            <span class="flex items-center gap-2.5">
-              <span class="w-6 h-6 rounded-lg bg-brand-50 text-brand-600 flex items-center justify-center text-xs">
-                <i class="fa-solid fa-truck"></i>
-              </span>
-              What are the fulfillment options?
-            </span>
-            <svg class="faq-chevron w-4 h-4 text-brand-500 shrink-0 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-            </svg>
-          </summary>
-          <p class="mt-3 text-xs sm:text-sm text-slate-600 leading-relaxed pl-8 border-t border-brand-50 pt-3">
-            We operate on a <strong>local delivery only</strong> basis within Singapore. You may choose between:<br>
-            • <strong>Self-Collection @ Redhill MRT:</strong> Complimentary meetup by appointment timing scheduled via Telegram.<br>
-            • <strong>Local Delivery (Singapore Only):</strong> Doorstep delivery within Singapore. Delivery fees depend on your postal code and are confirmed together with your order in Telegram. (We do not offer international shipping).
-          </p>
-        </details>
-
-        <!-- FAQ 3 -->
-        <details class="group bg-white rounded-2xl border border-brand-100 p-4 shadow-sm hover:border-brand-200 transition">
-          <summary class="flex items-center justify-between cursor-pointer font-bold text-xs sm:text-sm text-slate-800 select-none">
-            <span class="flex items-center gap-2.5">
-              <span class="w-6 h-6 rounded-lg bg-brand-50 text-brand-600 flex items-center justify-center text-xs">
-                <i class="fa-solid fa-shapes"></i>
-              </span>
-              Are items handmade or made-to-order?
-            </span>
-            <svg class="faq-chevron w-4 h-4 text-brand-500 shrink-0 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-            </svg>
-          </summary>
-          <p class="mt-3 text-xs sm:text-sm text-slate-600 leading-relaxed pl-8 border-t border-brand-50 pt-3">
-            All items are designed and handcrafted with precision right here in Singapore by The Layer Workshop. Due to the handmade nature, slight organic textures make each piece unique. Ready-stock availability and crafting lead times will be confirmed right away in Telegram.
-          </p>
-        </details>
-
-        <!-- FAQ 4 -->
-        <details class="group bg-white rounded-2xl border border-brand-100 p-4 shadow-sm hover:border-brand-200 transition">
-          <summary class="flex items-center justify-between cursor-pointer font-bold text-xs sm:text-sm text-slate-800 select-none">
-            <span class="flex items-center gap-2.5">
-              <span class="w-6 h-6 rounded-lg bg-brand-50 text-brand-600 flex items-center justify-center text-xs">
-                <i class="fa-solid fa-wand-magic-sparkles"></i>
-              </span>
-              Can I request custom designs, colors, or variations?
-            </span>
-            <svg class="faq-chevron w-4 h-4 text-brand-500 shrink-0 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-            </svg>
-          </summary>
-          <p class="mt-3 text-xs sm:text-sm text-slate-600 leading-relaxed pl-8 border-t border-brand-50 pt-3">
-            Yes! We love custom projects. Whether you'd like a specific dimension, custom color tone, or bulk quantities for gifting, reach out to us directly on Telegram at <strong>@e1yse</strong> and we'll see how we can bring your idea to life.
-          </p>
-        </details>
-      </div>
-
-    </div>
-  </main>
-  <!-- Mobile Bottom Navigation Bar -->
-  <nav class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-lg border-t border-brand-100 safe-bottom-nav">
-    <div class="max-w-md mx-auto grid grid-cols-3 pt-2">
-      <button onclick="switchTab('catalog')" id="mob-nav-catalog" class="flex flex-col items-center gap-1 text-brand-600 transition">
-        <i class="fa-solid fa-store text-base"></i>
-        <span class="text-[10px] font-semibold">Store</span>
-      </button>
-      <button onclick="switchTab('faq')" id="mob-nav-faq" class="flex flex-col items-center gap-1 text-slate-400 transition">
-        <i class="fa-solid fa-circle-question text-base"></i>
-        <span class="text-[10px] font-semibold">FAQ</span>
-      </button>
-      <button onclick="openCart()" class="flex flex-col items-center gap-1 text-slate-500 relative transition">
-        <div class="relative">
-          <i class="fa-solid fa-bag-shopping text-base"></i>
-          <span id="nav-cart-badge" class="hidden absolute -top-1.5 -right-2.5 bg-brand-500 text-white text-[9px] font-bold h-4 w-4 rounded-full flex items-center justify-center">0</span>
+        <div class="mb-3">
+          <label class="block text-[11px] font-semibold text-slate-700 mb-1">Telegram handle or Name <span class="text-rose-500">*</span></label>
+          <input type="text" id="customer-contact" placeholder="e.g. @username or your name" class="w-full text-xs p-2.5 rounded-xl border border-brand-200 bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-400">
         </div>
-        <span class="text-[10px] font-semibold">Cart</span>
-      </button>
-    </div>
-  </nav>
 
-  <!-- Footer -->
-  <footer class="mt-auto border-t border-brand-100 bg-white py-6 text-center text-xs text-slate-500">
-    <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
-      <p>© 2026 The Layer Workshop. Handmade in Singapore (Local delivery only).</p>
-      <div class="flex items-center gap-4 text-brand-600 font-medium">
-        <a href="https://t.me/+rG7LlTWZ51Q5MzU1" target="_blank" rel="noopener noreferrer" class="hover:underline flex items-center gap-1">
-          <i class="fa-brands fa-telegram text-sm text-[#229ED9]"></i>
-          <span>Telegram Store</span>
-        </a>
-        <button onclick="switchTab('faq')" class="hover:underline">FAQ</button>
-      </div>
-    </div>
-  </footer>
+        <div class="mb-4">
+          <div class="flex items-center justify-between mb-1">
+            <label class="text-[11px] font-semibold text-slate-700">Collection / Delivery</label>
+            <div class="flex gap-1.5">
+              <button type="button" onclick="setPreset('Redhill')" class="text-[10px] bg-white border border-brand-200 text-brand-700 px-2 py-0.5 rounded-lg active:scale-95 font-medium">🚇 Redhill MRT</button>
+              <button type="button" onclick="setPreset('Delivery')" class="text-[10px] bg-white border border-brand-200 text-brand-700 px-2 py-0.5 rounded-lg active:scale-95 font-medium">🚚 Local Delivery</button>
+            </div>
+          </div>
+          <textarea id="order-notes" rows="2" placeholder="Self-collect at Redhill MRT" class="w-full text-xs p-2.5 rounded-xl border border-brand-200 bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-400">Self-collect at Redhill MRT</textarea>
+        </div>
 
-  <!-- Product Details Modal -->
-  <div id="product-modal-backdrop" onclick="closeProductModal()" class="fixed inset-0 bg-slate-900/40 z-50 opacity-0 pointer-events-none transition-opacity"></div>
-  <div id="product-modal" class="fixed inset-x-0 bottom-0 md:inset-0 md:flex md:items-center md:justify-center z-50 pointer-events-none">
-    <div class="bg-white rounded-t-3xl md:rounded-3xl border border-brand-100 transform translate-y-full md:translate-y-0 md:scale-95 opacity-0 drawer-transition safe-bottom max-w-md w-full mx-auto overflow-hidden shadow-2xl pointer-events-auto">
-      <div class="md:hidden w-10 h-1 bg-slate-200 rounded-full mx-auto my-3"></div>
-      
-      <div class="p-5 sm:p-6 max-h-[85vh] overflow-y-auto">
-        <div class="flex justify-end mb-2">
-          <button onclick="closeProductModal()" class="text-slate-400 hover:text-slate-600 p-1.5 rounded-full hover:bg-slate-100 transition">
-            <i class="fa-solid fa-xmark text-sm"></i>
-          </button>
-        </div>
-        <img id="modal-img" src="" class="w-full h-56 sm:h-64 object-cover rounded-2xl mb-4 bg-brand-50 border border-brand-100" alt="">
-        <div class="flex items-start justify-between gap-3 mb-2">
-          <h2 id="modal-title" class="text-base sm:text-lg font-bold text-slate-800"></h2>
-          <span id="modal-price" class="text-base sm:text-lg font-extrabold text-brand-600"></span>
-        </div>
-        <p id="modal-desc" class="text-xs sm:text-sm text-slate-500 leading-relaxed mb-6"></p>
-        <button onclick="addModalItemToCart()" class="w-full py-3.5 bg-brand-500 hover:bg-brand-600 text-white rounded-xl text-xs sm:text-sm font-semibold shadow-soft active:scale-95 transition flex items-center justify-center gap-2">
-          <i class="fa-solid fa-plus"></i>
-          <span>Add to Cart</span>
+        <button onclick="checkoutTelegram()" class="w-full py-3 bg-[#24A1DE] hover:bg-[#1E8BC0] text-white rounded-xl text-xs font-semibold active:scale-95 transition flex items-center justify-center gap-2">
+          <i class="fa-brands fa-telegram text-base"></i>
+          Order & Confirm Payment via Telegram
         </button>
       </div>
     </div>
+
   </div>
 
-  <!-- Cart Slide-Over Drawer -->
-  <div id="cart-drawer-backdrop" onclick="closeCart()" class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-50 opacity-0 pointer-events-none transition-opacity"></div>
-  <aside id="cart-drawer" class="fixed bottom-0 md:top-0 right-0 left-0 md:left-auto md:w-[420px] z-50 bg-white md:border-l border-t md:border-t-0 border-brand-100 transform translate-y-full md:translate-y-0 md:translate-x-full drawer-transition safe-bottom shadow-drawer flex flex-col max-h-[92vh] md:max-h-screen md:h-screen rounded-t-3xl md:rounded-t-none">
-    
-    <!-- Mobile Drag Handle -->
-    <div class="md:hidden w-10 h-1 bg-slate-200 rounded-full mx-auto my-3 shrink-0"></div>
-    
-    <!-- Cart Header -->
-    <div class="px-5 py-4 border-b border-brand-100 flex items-center justify-between shrink-0 bg-white">
-      <h3 class="text-base font-bold text-slate-800 flex items-center gap-2">
-        <i class="fa-solid fa-bag-shopping text-brand-500"></i>
-        <span>Shopping Cart</span>
-      </h3>
-      <button onclick="closeCart()" class="text-slate-400 hover:text-slate-600 p-1.5 rounded-lg hover:bg-brand-50 transition" aria-label="Close cart">
-        <i class="fa-solid fa-xmark text-sm"></i>
-      </button>
-    </div>
-
-    <!-- Scrollable Items List -->
-    <div id="cart-items" class="flex-1 overflow-y-auto p-5 divide-y divide-brand-50"></div>
-
-    <!-- Checkout Form Area -->
-    <div class="p-5 bg-brand-50/70 border-t border-brand-100 shrink-0">
-      
-      <!-- Subtotal -->
-      <div class="flex justify-between items-center mb-3">
-        <span class="text-xs text-slate-600 font-medium">Subtotal</span>
-        <span id="cart-subtotal" class="font-extrabold text-slate-900 text-base">$0.00 SGD</span>
-      </div>
-
-      <!-- Contact Details -->
-      <div class="space-y-3 mb-3">
-        <div>
-          <label class="block text-[11px] font-semibold text-slate-700 mb-1">
-            Telegram handle or WhatsApp / Phone number <span class="text-rose-500">*</span>
-          </label>
-          <input type="text" id="cust-contact" placeholder="e.g. @username or +65 9123 4567" class="w-full text-xs p-2.5 rounded-xl border border-brand-200 bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-400 placeholder:text-slate-400">
-        </div>
-
-        <!-- Fulfillment & Presets with Local Delivery Only -->
-        <div>
-          <div class="flex items-center justify-between mb-1.5">
-            <label class="block text-[11px] font-semibold text-slate-700">
-              Fulfillment Notes <span class="text-[10px] text-brand-600 font-normal">(Local delivery only)</span>
-            </label>
-            <span class="text-[10px] text-brand-600 font-medium">Tap to fill:</span>
-          </div>
-
-          <div class="grid grid-cols-2 gap-2 mb-2">
-            <button type="button" onclick="setPresetFulfillment('Self-collect at Redhill MRT')" class="px-2.5 py-2 rounded-xl text-[11px] font-semibold bg-white border border-brand-200 text-brand-700 hover:bg-brand-100 active:scale-95 transition text-left flex items-center gap-1.5 shadow-xs">
-              <span>🚇</span>
-              <span class="truncate">Redhill MRT</span>
-            </button>
-            <button type="button" onclick="setPresetFulfillment('Local Delivery: [Enter Address / Postal Code] (Singapore only)')" class="px-2.5 py-2 rounded-xl text-[11px] font-semibold bg-white border border-brand-200 text-brand-700 hover:bg-brand-100 active:scale-95 transition text-left flex items-center gap-1.5 shadow-xs">
-              <span>🚚</span>
-              <span class="truncate">Local Delivery</span>
-            </button>
-          </div>
-
-          <textarea 
-            id="cust-notes" 
-            rows="2" 
-            placeholder="State preference: Self-collection at Redhill MRT or Local Delivery (Singapore only with address/postal code)." 
-            class="w-full text-xs p-2.5 rounded-xl border border-brand-200 bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-400 placeholder:text-slate-400 leading-relaxed resize-none"
-          ></textarea>
-        </div>
-      </div>
-
-      <!-- Telegram Ordering Notice -->
-      <div class="p-2.5 mb-3 bg-white border border-brand-200 rounded-xl text-[11px] text-slate-600 flex items-start gap-2 shadow-xs">
-        <i class="fa-brands fa-telegram text-[#229ED9] text-base mt-0.5 shrink-0"></i>
-        <div class="leading-relaxed">
-          <span class="font-bold text-slate-800 block">Direct Order to @e1yse</span>
-          Your order breakdown and Order ID will open in Telegram with the message pre-filled. Just tap Send!
-        </div>
-      </div>
-
-      <!-- Telegram Checkout Button -->
-      <button id="btn-telegram-order" onclick="checkoutTelegram()" class="w-full py-3.5 bg-[#229ED9] hover:bg-[#1e8cc0] text-white rounded-xl text-xs font-semibold shadow-soft active:scale-95 transition flex items-center justify-center gap-2">
-        <i class="fa-brands fa-telegram text-base"></i>
-        <span>Order & Confirm Payment via Telegram</span>
-      </button>
-    </div>
-  </aside>
-
-  <!-- Floating Right-Side Quick Checkout Button -->
-  <button 
-    id="floating-checkout-btn" 
-    onclick="openCart()" 
-    aria-label="Quick Checkout" 
-    class="fixed right-4 md:right-7 bottom-20 md:bottom-8 z-40 hidden items-center gap-2.5 px-4 py-3 bg-brand-500 hover:bg-brand-600 active:scale-95 text-white rounded-full shadow-lg hover:shadow-xl border-2 border-white transition-all duration-300 ease-out group"
-  >
-    <div class="relative flex items-center justify-center">
-      <i class="fa-solid fa-bag-shopping text-sm group-hover:scale-110 transition-transform"></i>
-      <span id="floating-cart-badge" class="absolute -top-2 -right-2.5 bg-rose-500 text-white text-[10px] font-extrabold h-4 w-4 rounded-full flex items-center justify-center border border-white">0</span>
-    </div>
-    <span class="text-xs font-bold tracking-tight">Checkout</span>
-    <span id="floating-cart-total" class="text-[11px] font-semibold bg-white/20 px-2 py-0.5 rounded-full">$0.00</span>
-  </button>
-
-  <!-- Notification Toast -->
-  <div id="toast" class="fixed top-5 left-1/2 -translate-x-1/2 z-50 bg-slate-900/90 backdrop-blur-sm text-white text-xs px-4 py-2.5 rounded-full shadow-lg opacity-0 transition-opacity pointer-events-none flex items-center gap-2">
-    <i class="fa-solid fa-check text-brand-300"></i>
-    <span id="toast-message">Added to cart</span>
-  </div>
   <script>
-    // Configuration: Completely token-free and safe for public GitHub
     const STORE_CONFIG = {
       telegramUsername: "e1yse",
       currency: "SGD"
     };
 
-    // Product Inventory
     const PRODUCTS = [
       {
         id: "prod-1",
         name: "Item 1",
         price: 1.00,
-        image: "https://placehold.co/600x600/E6F0FA/2F6193?text=Item+1",
         description: "An elegant basic custom object perfectly handmade and layered by the workshop team."
       },
       {
         id: "prod-2",
         name: "Item 2",
         price: 2.00,
-        image: "https://placehold.co/600x600/E6F0FA/2F6193?text=Item+2",
         description: "An intricate medium multi-layered custom geometric decor or tray."
       },
       {
         id: "prod-3",
         name: "Item 3",
         price: 3.00,
-        image: "https://placehold.co/600x600/E6F0FA/2F6193?text=Item+3",
         description: "A premium signature heavy layered handmade object designed with durable finish."
       }
     ];
@@ -488,145 +325,139 @@
       updateCartBadge();
     });
 
-    // View Switching: Store vs FAQ
-    function switchTab(tabName) {
-      currentTab = tabName;
-
-      const catalogView = document.getElementById("view-catalog");
-      const faqView = document.getElementById("view-faq");
-      const mobileSearchBar = document.getElementById("mobile-search-bar");
-
-      const deskCatalog = document.getElementById("header-btn-catalog");
-      const deskFaq = document.getElementById("header-btn-faq");
-
-      const mobCatalog = document.getElementById("mob-nav-catalog");
-      const mobFaq = document.getElementById("mob-nav-faq");
-
-      if (tabName === "catalog") {
-        catalogView.classList.remove("hidden");
-        faqView.classList.add("hidden");
-        if (mobileSearchBar) mobileSearchBar.classList.remove("hidden");
-
-        deskCatalog.className = "px-4 py-1.5 rounded-lg text-xs font-semibold bg-white text-brand-700 shadow-sm transition";
-        deskFaq.className = "px-4 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-brand-700 transition";
-
-        mobCatalog.className = "flex flex-col items-center gap-1 text-brand-600 transition";
-        mobFaq.className = "flex flex-col items-center gap-1 text-slate-400 transition";
+    function setPreset(type) {
+      const notes = document.getElementById("order-notes");
+      if (type === 'Redhill') {
+        notes.value = "Self-collect at Redhill MRT";
       } else {
-        catalogView.classList.add("hidden");
-        faqView.classList.remove("hidden");
-        if (mobileSearchBar) mobileSearchBar.classList.add("hidden");
-
-        deskCatalog.className = "px-4 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-brand-700 transition";
-        deskFaq.className = "px-4 py-1.5 rounded-lg text-xs font-semibold bg-white text-brand-700 shadow-sm transition";
-
-        mobCatalog.className = "flex flex-col items-center gap-1 text-slate-400 transition";
-        mobFaq.className = "flex flex-col items-center gap-1 text-brand-600 transition";
+        notes.value = "Local Delivery: [Enter Address / Postal Code]";
       }
-
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      notes.focus();
     }
 
-    // Live Keyword Search
-    function handleSearch(val) {
-      searchQuery = (val || "").trim().toLowerCase();
-      
-      const desktopInput = document.getElementById("desktop-search-input");
-      const mobileInput = document.getElementById("mobile-search-input");
-      const desktopClear = document.getElementById("desktop-search-clear");
-      const mobileClear = document.getElementById("mobile-search-clear");
+    function toggleAccordion(id) {
+      const content = document.getElementById(`content-${id}`);
+      const icon = document.getElementById(`icon-${id}`);
+      if (!content || !icon) return;
 
-      if (desktopInput && desktopInput.value !== val) desktopInput.value = val;
-      if (mobileInput && mobileInput.value !== val) mobileInput.value = val;
-
-      if (desktopClear) desktopClear.classList.toggle("hidden", searchQuery === "");
-      if (mobileClear) mobileClear.classList.toggle("hidden", searchQuery === "");
-
-      if (searchQuery !== "" && currentTab !== "catalog") {
-        switchTab("catalog");
+      if (content.classList.contains("hidden")) {
+        content.classList.remove("hidden");
+        icon.classList.add("rotate-180");
+      } else {
+        content.classList.add("hidden");
+        icon.classList.remove("rotate-180");
       }
+    }
 
+    function handleSearch(val) {
+      searchQuery = val.trim().toLowerCase();
+      document.getElementById("search-clear-btn").classList.toggle("hidden", searchQuery === "");
       renderProducts();
     }
 
     function clearSearch() {
+      const input = document.getElementById("search-input");
+      input.value = "";
       handleSearch("");
     }
 
-    // Product Cards Render
+    function switchTab(tab) {
+      currentTab = tab;
+
+      const desktopCatalogBtn = document.getElementById("header-btn-catalog");
+      const desktopFaqBtn = document.getElementById("header-btn-faq");
+      if (desktopCatalogBtn && desktopFaqBtn) {
+        if (tab === 'catalog') {
+          desktopCatalogBtn.className = "px-3 py-1.5 rounded-lg text-brand-700 bg-brand-50 font-bold transition";
+          desktopFaqBtn.className = "px-3 py-1.5 rounded-lg hover:bg-slate-50 transition";
+        } else {
+          desktopCatalogBtn.className = "px-3 py-1.5 rounded-lg hover:bg-slate-50 transition";
+          desktopFaqBtn.className = "px-3 py-1.5 rounded-lg text-brand-700 bg-brand-50 font-bold transition";
+        }
+      }
+
+      const mobileCatalogBtn = document.getElementById("nav-btn-catalog");
+      const mobileFaqBtn = document.getElementById("nav-btn-faq");
+      if (mobileCatalogBtn && mobileFaqBtn) {
+        if (tab === 'catalog') {
+          mobileCatalogBtn.className = "flex flex-col items-center gap-1 text-brand-600 transition";
+          mobileFaqBtn.className = "flex flex-col items-center gap-1 text-slate-400 transition";
+        } else {
+          mobileCatalogBtn.className = "flex flex-col items-center gap-1 text-slate-400 transition";
+          mobileFaqBtn.className = "flex flex-col items-center gap-1 text-brand-600 transition";
+        }
+      }
+
+      const catalogView = document.getElementById("view-catalog");
+      const faqView = document.getElementById("view-faq");
+      const searchBar = document.getElementById("search-bar");
+      
+      if (tab === "catalog") {
+        catalogView.classList.add("view-active");
+        faqView.classList.remove("view-active");
+        searchBar.style.display = "block";
+      } else {
+        catalogView.classList.remove("view-active");
+        faqView.classList.add("view-active");
+        searchBar.style.display = "none";
+      }
+      
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
     function renderProducts() {
       const container = document.getElementById("product-grid");
       const emptyState = document.getElementById("empty-state");
-      const countBadge = document.getElementById("items-count-badge");
-      if (!container) return;
 
-      const filtered = PRODUCTS.filter(p => {
+      let filtered = PRODUCTS.filter(p => {
         return p.name.toLowerCase().includes(searchQuery) || p.description.toLowerCase().includes(searchQuery);
       });
 
-      if (countBadge) {
-        countBadge.innerText = `${filtered.length} item${filtered.length === 1 ? '' : 's'}`;
-      }
-
       if (filtered.length === 0) {
         container.innerHTML = "";
-        if (emptyState) {
-          emptyState.classList.remove("hidden");
-          emptyState.classList.add("flex");
-        }
+        emptyState.classList.remove("hidden");
+        emptyState.classList.add("flex");
         return;
       }
 
-      if (emptyState) {
-        emptyState.classList.add("hidden");
-        emptyState.classList.remove("flex");
-      }
+      emptyState.classList.add("hidden");
+      emptyState.classList.remove("flex");
 
       container.innerHTML = filtered.map(p => `
-        <div class="bg-white rounded-2xl p-3 sm:p-4 border border-brand-100 shadow-card flex flex-col justify-between hover:shadow-soft transition group">
+        <div class="bg-white rounded-2xl p-3 border border-brand-100 shadow-sm flex flex-col justify-between hover:shadow-md transition">
           <div onclick="openProductModal('${p.id}')" class="cursor-pointer">
-            <div class="relative w-full aspect-square rounded-xl overflow-hidden bg-brand-50 mb-3 border border-brand-100/70">
-              <img src="${p.image}" alt="${p.name}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+            <div class="w-full h-36 rounded-xl bg-gradient-to-br from-brand-50 to-brand-100/60 border border-brand-200/50 mb-2 flex items-center justify-center text-brand-600 font-bold text-xl">
+              ${p.name}
             </div>
-            <h4 class="text-xs sm:text-sm font-bold text-slate-800 line-clamp-1 mb-1 group-hover:text-brand-600 transition">${p.name}</h4>
-            <p class="text-[11px] text-slate-500 line-clamp-2 leading-relaxed mb-3">${p.description}</p>
+            <h4 class="text-xs font-bold text-slate-800 line-clamp-1 mb-1 text-left">${p.name}</h4>
+            <p class="text-[11px] text-slate-400 line-clamp-2 leading-relaxed mb-2">${p.description}</p>
           </div>
-          <div class="flex items-center justify-between pt-2 border-t border-brand-50 mt-1">
-            <span class="text-xs sm:text-sm font-extrabold text-brand-600">$${p.price.toFixed(2)}</span>
-            <button onclick="addToCart('${p.id}')" class="px-3 py-1.5 rounded-xl bg-brand-50 hover:bg-brand-500 text-brand-600 hover:text-white border border-brand-200 hover:border-brand-500 flex items-center gap-1.5 text-xs font-semibold active:scale-95 transition" aria-label="Add to cart">
-              <i class="fa-solid fa-plus text-[10px]"></i>
-              <span>Add</span>
+          <div class="flex items-center justify-between pt-1 border-t border-brand-50 mt-1">
+            <span class="text-xs font-bold text-brand-600">$${p.price.toFixed(2)}</span>
+            <button onclick="addToCart('${p.id}')" class="px-2.5 py-1 rounded-xl bg-brand-50 hover:bg-brand-100 text-brand-600 border border-brand-200 flex items-center gap-1 text-[11px] font-semibold active:scale-95 transition">
+              <i class="fa-solid fa-plus text-[10px]"></i> Add
             </button>
           </div>
         </div>
       `).join("");
     }
 
-    // Modal Handlers
     function openProductModal(id) {
       activeModalProduct = PRODUCTS.find(p => p.id === id);
       if (!activeModalProduct) return;
 
-      document.getElementById("modal-img").src = activeModalProduct.image;
+      document.getElementById("modal-img-container").innerText = activeModalProduct.name;
       document.getElementById("modal-title").innerText = activeModalProduct.name;
-      document.getElementById("modal-price").innerText = `$${activeModalProduct.price.toFixed(2)} ${STORE_CONFIG.currency}`;
+      document.getElementById("modal-price").innerText = `$${activeModalProduct.price.toFixed(2)}`;
       document.getElementById("modal-desc").innerText = activeModalProduct.description;
 
-      const backdrop = document.getElementById("product-modal-backdrop");
-      const modal = document.querySelector("#product-modal > div");
-
-      backdrop.classList.remove("opacity-0", "pointer-events-none");
-      modal.classList.remove("translate-y-full", "opacity-0", "md:scale-95");
-      modal.classList.add("translate-y-0", "opacity-100", "md:scale-100");
+      document.getElementById("product-sheet-backdrop").classList.remove("opacity-0", "pointer-events-none");
+      document.getElementById("product-sheet").classList.remove("translate-y-full");
     }
 
     function closeProductModal() {
-      const backdrop = document.getElementById("product-modal-backdrop");
-      const modal = document.querySelector("#product-modal > div");
-
-      backdrop.classList.add("opacity-0", "pointer-events-none");
-      modal.classList.add("translate-y-full", "opacity-0", "md:scale-95");
-      modal.classList.remove("translate-y-0", "opacity-100", "md:scale-100");
+      document.getElementById("product-sheet-backdrop").classList.add("opacity-0", "pointer-events-none");
+      document.getElementById("product-sheet").classList.add("translate-y-full");
       activeModalProduct = null;
     }
 
@@ -636,11 +467,107 @@
       closeProductModal();
     }
 
-    // Cart Handlers
     function addToCart(id) {
       cart[id] = (cart[id] || 0) + 1;
       updateCartBadge();
       showToast("Added to cart");
+    }
+
+    function updateCartBadge() {
+      const total = Object.values(cart).reduce((a, b) => a + b, 0);
+      const headerBadge = document.getElementById("header-cart-badge");
+      const navBadge = document.getElementById("nav-cart-badge");
+      const floatingBtn = document.getElementById("floating-checkout-btn");
+      const floatingBadge = document.getElementById("floating-cart-badge");
+      const floatingSubtotal = document.getElementById("floating-cart-subtotal");
+
+      let subtotal = 0;
+      Object.entries(cart).forEach(([id, qty]) => {
+        const item = PRODUCTS.find(p => p.id === id);
+        if (item) subtotal += item.price * qty;
+      });
+
+      if (total > 0) {
+        headerBadge.innerText = total;
+        headerBadge.classList.remove("hidden");
+        if (navBadge) {
+          navBadge.innerText = total;
+          navBadge.classList.remove("hidden");
+        }
+        if (floatingBtn) {
+          floatingBtn.classList.remove("hidden");
+          floatingBadge.innerText = total;
+          floatingSubtotal.innerText = `$${subtotal.toFixed(2)}`;
+        }
+      } else {
+        headerBadge.classList.add("hidden");
+        if (navBadge) navBadge.classList.add("hidden");
+        if (floatingBtn) floatingBtn.classList.add("hidden");
+      }
+    }
+
+    function openCart() {
+      renderCartItems();
+      const sheet = document.getElementById("cart-sheet");
+      const backdrop = document.getElementById("cart-sheet-backdrop");
+      
+      backdrop.classList.remove("opacity-0", "pointer-events-none");
+      if (window.innerWidth >= 768) {
+        sheet.classList.remove("md:translate-x-full");
+      } else {
+        sheet.classList.remove("translate-y-full");
+      }
+    }
+
+    function closeCart() {
+      const sheet = document.getElementById("cart-sheet");
+      const backdrop = document.getElementById("cart-sheet-backdrop");
+
+      backdrop.classList.add("opacity-0", "pointer-events-none");
+      sheet.classList.add("translate-y-full");
+      sheet.classList.add("md:translate-x-full");
+    }
+
+    function renderCartItems() {
+      const container = document.getElementById("cart-items");
+      const entries = Object.entries(cart);
+
+      if (entries.length === 0) {
+        container.innerHTML = `
+          <div class="py-12 text-center text-slate-400 flex flex-col items-center">
+            <i class="fa-solid fa-cart-shopping text-3xl mb-2 text-brand-200"></i>
+            <p class="text-xs">Your cart is empty</p>
+          </div>
+        `;
+        document.getElementById("cart-subtotal").innerText = "$0.00";
+        return;
+      }
+
+      let subtotal = 0;
+      container.innerHTML = entries.map(([id, qty]) => {
+        const product = PRODUCTS.find(p => p.id === id);
+        const itemTotal = product.price * qty;
+        subtotal += itemTotal;
+
+        return `
+          <div class="py-3 flex items-center justify-between gap-3 text-left">
+            <div class="w-10 h-10 rounded-xl bg-brand-50 border border-brand-100 flex items-center justify-center text-brand-600 font-bold text-xs shrink-0">
+              ${product.name}
+            </div>
+            <div class="flex-1 min-w-0">
+              <h5 class="text-xs font-semibold text-slate-800 truncate">${product.name}</h5>
+              <span class="text-[11px] text-brand-600 font-bold">$${product.price.toFixed(2)}</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <button onclick="changeQty('${id}', -1)" class="w-6 h-6 rounded-lg bg-brand-50 text-slate-600 border border-brand-200 flex items-center justify-center text-xs active:scale-95">-</button>
+              <span class="text-xs font-semibold w-4 text-center">${qty}</span>
+              <button onclick="changeQty('${id}', 1)" class="w-6 h-6 rounded-lg bg-brand-50 text-slate-600 border border-brand-200 flex items-center justify-center text-xs active:scale-95">+</button>
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      document.getElementById("cart-subtotal").innerText = `$${subtotal.toFixed(2)}`;
     }
 
     function changeQty(id, delta) {
@@ -651,193 +578,64 @@
       updateCartBadge();
     }
 
-    function updateCartBadge() {
-      const total = Object.values(cart).reduce((a, b) => a + b, 0);
-      const headerBadge = document.getElementById("header-cart-badge");
-      const navBadge = document.getElementById("nav-cart-badge");
-      const floatingBtn = document.getElementById("floating-checkout-btn");
-      const floatingBadge = document.getElementById("floating-cart-badge");
-      const floatingTotal = document.getElementById("floating-cart-total");
-
-      let subtotal = 0;
-      Object.entries(cart).forEach(([id, qty]) => {
-        const prod = PRODUCTS.find(p => p.id === id);
-        if (prod) subtotal += prod.price * qty;
-      });
-
-      if (headerBadge) headerBadge.innerText = total;
-      if (navBadge) {
-        navBadge.innerText = total;
-        navBadge.classList.toggle("hidden", total === 0);
-      }
-
-      // Update floating button visibility and contents
-      if (floatingBtn) {
-        if (total > 0) {
-          floatingBtn.classList.remove("hidden");
-          floatingBtn.classList.add("flex");
-          if (floatingBadge) floatingBadge.innerText = total;
-          if (floatingTotal) floatingTotal.innerText = `$${subtotal.toFixed(2)}`;
-        } else {
-          floatingBtn.classList.add("hidden");
-          floatingBtn.classList.remove("flex");
-        }
-      }
-    }
-
-    function openCart() {
-      renderCartItems();
-      const backdrop = document.getElementById("cart-drawer-backdrop");
-      const drawer = document.getElementById("cart-drawer");
-
-      backdrop.classList.remove("opacity-0", "pointer-events-none");
-      drawer.classList.remove("translate-y-full", "md:translate-x-full");
-      drawer.classList.add("translate-y-0", "md:translate-x-0");
-    }
-
-    function closeCart() {
-      const backdrop = document.getElementById("cart-drawer-backdrop");
-      const drawer = document.getElementById("cart-drawer");
-
-      backdrop.classList.add("opacity-0", "pointer-events-none");
-      drawer.classList.add("translate-y-full", "md:translate-x-full");
-      drawer.classList.remove("translate-y-0", "md:translate-x-0");
-    }
-
-    function renderCartItems() {
-      const container = document.getElementById("cart-items");
-      if (!container) return;
-      const entries = Object.entries(cart);
-
-      if (entries.length === 0) {
-        container.innerHTML = `
-          <div class="py-16 text-center text-slate-400">
-            <div class="w-14 h-14 rounded-2xl bg-brand-50 border border-brand-100 flex items-center justify-center text-brand-300 text-xl mx-auto mb-3">
-              <i class="fa-solid fa-bag-shopping"></i>
-            </div>
-            <p class="text-xs font-semibold text-slate-600">Your cart is empty</p>
-            <p class="text-[11px] text-slate-400 mt-0.5">Explore our items to start an order</p>
-          </div>
-        `;
-        document.getElementById("cart-subtotal").innerText = "$0.00 SGD";
-        return;
-      }
-
-      let subtotal = 0;
-      container.innerHTML = entries.map(([id, qty]) => {
-        const product = PRODUCTS.find(p => p.id === id);
-        if (!product) return "";
-        const itemTotal = product.price * qty;
-        subtotal += itemTotal;
-
-        return `
-          <div class="py-3 flex items-center justify-between gap-3">
-            <img src="${product.image}" class="w-12 h-12 rounded-xl object-cover bg-brand-50 border border-brand-100 shrink-0" alt="${product.name}">
-            <div class="flex-1 min-w-0">
-              <h5 class="text-xs font-bold text-slate-800 truncate">${product.name}</h5>
-              <span class="text-[11px] text-brand-600 font-bold">$${product.price.toFixed(2)}</span>
-            </div>
-            <div class="flex items-center gap-2 shrink-0">
-              <button onclick="changeQty('${id}', -1)" class="w-6 h-6 rounded-lg bg-brand-50 hover:bg-brand-100 text-slate-600 border border-brand-200 flex items-center justify-center text-xs active:scale-95 transition">-</button>
-              <span class="text-xs font-bold w-4 text-center">${qty}</span>
-              <button onclick="changeQty('${id}', 1)" class="w-6 h-6 rounded-lg bg-brand-50 hover:bg-brand-100 text-slate-600 border border-brand-200 flex items-center justify-center text-xs active:scale-95 transition">+</button>
-            </div>
-          </div>
-        `;
-      }).join("");
-
-      document.getElementById("cart-subtotal").innerText = `$${subtotal.toFixed(2)} ${STORE_CONFIG.currency}`;
-    }
-
-    function setPresetFulfillment(presetText) {
-      const textarea = document.getElementById("cust-notes");
-      if (textarea) {
-        textarea.value = presetText;
-        textarea.focus();
-        showToast(presetText.includes("Redhill") ? "Selected: Redhill MRT" : "Selected: Local Delivery");
-      }
-    }
-
-    function buildOrderDetails() {
-      const entries = Object.entries(cart);
-      if (entries.length === 0) return null;
-
-      let itemsText = "";
-      let subtotal = 0;
-
-      entries.forEach(([id, qty]) => {
-        const item = PRODUCTS.find(p => p.id === id);
-        if (item) {
-          const total = item.price * qty;
-          subtotal += total;
-          itemsText += `✩ ${item.name} ×${qty} — $${total.toFixed(2)}\n`;
-        }
-      });
-
-      const orderId = "TLW-" + Math.floor(1000 + Math.random() * 9000);
-      const custContact = (document.getElementById("cust-contact")?.value || "").trim();
-      const custNotes = (document.getElementById("cust-notes")?.value || "").trim() || "Self-collect at Redhill MRT";
-
-      return {
-        orderId,
-        itemsText: itemsText.trimEnd(),
-        subtotal: subtotal.toFixed(2),
-        custContact,
-        custNotes
-      };
-    }
-
     function checkoutTelegram() {
-      const order = buildOrderDetails();
-      if (!order) {
+      const entries = Object.entries(cart);
+      if (entries.length === 0) {
         showToast("Cart is empty");
         return;
       }
 
-      if (!order.custContact) {
-        showToast("Please enter your Telegram / WhatsApp / Phone number");
-        document.getElementById("cust-contact")?.focus();
+      const contact = document.getElementById("customer-contact").value.trim();
+      if (!contact) {
+        showToast("Please enter your name or Telegram handle");
+        document.getElementById("customer-contact").focus();
         return;
       }
 
-      // Pre-filled formatted message adhering strictly to custom aesthetic template
+      const notes = document.getElementById("order-notes").value.trim() || "Self-collect at Redhill MRT";
+      const orderId = "TLW-" + Math.floor(1000 + Math.random() * 9000);
+
+      let itemsSummary = "";
+      let subtotal = 0;
+
+      entries.forEach(([id, qty]) => {
+        const item = PRODUCTS.find(p => p.id === id);
+        const itemTotal = item.price * qty;
+        subtotal += itemTotal;
+        itemsSummary += `✩ ${item.name} ×${qty} — $${itemTotal.toFixed(2)}\n`;
+      });
+
       const message = 
 `˗ˏˋ  The Layer Workshop — Order Note ˎˊ˗
-🔖 Order: #${order.orderId}
-👤 Name/Tele: ${order.custContact}
+🔖 Order: #${orderId}
+👤 Name/Tele: ${contact}
 📦 What you’re getting:
-${order.itemsText}
-💰 Total: $${order.subtotal} SGD
-📍 Collection: ${order.custNotes}
+${itemsSummary}💰 Total: $${subtotal.toFixed(2)} SGD
+📍 Collection: ${notes}
 ─── ･ ｡ﾟ☆: .☽ . :☆ﾟ. ───
-Hi @e1yse! Ready to confirm #${order.orderId} ✨ Let me know the PayNow details whenever you're free!`;
+Hi @e1yse! Ready to confirm #${orderId} ✨ Let me know the PayNow details whenever you're free!`;
 
-      // Safe clipboard copy as backup
-      try {
-        const tempTextarea = document.createElement("textarea");
-        tempTextarea.value = message;
-        document.body.appendChild(tempTextarea);
-        tempTextarea.select();
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(message);
+      } else {
+        const txt = document.createElement("textarea");
+        txt.value = message;
+        document.body.appendChild(txt);
+        txt.select();
         document.execCommand("copy");
-        document.body.removeChild(tempTextarea);
-      } catch (e) {
-        console.warn("Clipboard copy fallback:", e);
+        document.body.removeChild(txt);
       }
 
-      showToast("Order copied! Opening Telegram...");
-      // Launches Telegram directly with pre-filled message text
       window.open(`https://t.me/${STORE_CONFIG.telegramUsername}?text=${encodeURIComponent(message)}`, "_blank");
     }
 
     function showToast(msg) {
       const toast = document.getElementById("toast");
-      const msgEl = document.getElementById("toast-message");
-      if (!toast || !msgEl) return;
-      msgEl.innerText = msg;
+      document.getElementById("toast-message").innerText = msg;
       toast.classList.remove("opacity-0", "pointer-events-none");
       setTimeout(() => {
         toast.classList.add("opacity-0", "pointer-events-none");
-      }, 2200);
+      }, 2000);
     }
   </script>
 </body>
