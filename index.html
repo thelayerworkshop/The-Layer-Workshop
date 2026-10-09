@@ -63,21 +63,25 @@
     .drawer-transition {
       transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
     }
-    details > summary svg.faq-chevron {
-      transition: transform 0.25s ease;
-    }
-    details[open] > summary svg.faq-chevron {
-      transform: rotate(180deg);
-    }
-    details > summary {
-      list-style: none;
-    }
-    details > summary::-webkit-details-marker {
-      display: none;
-    }
     .luxury-blur {
       backdrop-filter: blur(14px);
       -webkit-backdrop-filter: blur(14px);
+    }
+    /* Native Details and Summary reset: removes dead zones and default arrows */
+    details summary::-webkit-details-marker,
+    details summary::marker {
+      display: none;
+      content: "";
+    }
+    details summary {
+      list-style: none;
+    }
+    details[open] .faq-arrow {
+      transform: rotate(180deg);
+    }
+    details[open] {
+      border-color: #A9CFF0;
+      box-shadow: 0 4px 14px -2px rgba(82, 150, 213, 0.12);
     }
   </style>
 </head>
@@ -89,9 +93,9 @@
       
       <!-- Left: Navigation Links & Search -->
       <div class="flex items-center gap-6 sm:gap-8 text-xs font-medium tracking-widest uppercase">
-        <button onclick="toggleMobileMenu()" class="md:hidden flex items-center gap-2 hover:opacity-75 transition" aria-label="Toggle Menu">
+        <button onclick="switchTab('catalog')" class="md:hidden flex items-center gap-2 hover:opacity-75 transition" aria-label="Toggle Menu">
           <i class="fa-solid fa-bars text-sm"></i>
-          <span class="text-[11px] tracking-wider">Menu</span>
+          <span class="text-[11px] tracking-wider">Store</span>
         </button>
         
         <nav class="hidden md:flex items-center gap-6">
@@ -130,17 +134,16 @@
 
   <!-- Full-Bleed Editorial Hero Cover Image -->
   <section id="hero-cover" class="relative w-full h-[88vh] sm:h-[92vh] flex items-end justify-center pb-16 sm:pb-24 overflow-hidden select-none bg-slate-900">
-    <!-- Cover Photography Background -->
     <img 
       src="https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&w=2000&q=85" 
       alt="The Layer Workshop Atelier" 
       class="absolute inset-0 w-full h-full object-cover object-center filter brightness-[0.78] contrast-[1.05] transition-transform duration-1000 scale-100 hover:scale-105"
     />
     
-    <!-- Editorial Gradient Vignettes -->
+    <!-- Vignette Gradient -->
     <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-black/40"></div>
 
-    <!-- Center Editorial Content -->
+    <!-- Center Hero Typography -->
     <div class="relative z-10 max-w-4xl mx-auto px-6 text-center text-white flex flex-col items-center">
       <p class="text-[11px] sm:text-xs tracking-widest3 font-medium uppercase text-white/90 mb-2">
         HANDMADE IN SINGAPORE
@@ -154,7 +157,6 @@
         Meticulous layered artisan objects tailored with patience, tactile geometric balance, and fine finishes.
       </p>
 
-      <!-- Editorial Underlined Call To Action -->
       <a 
         href="#catalog-section" 
         onclick="switchTab('catalog');" 
@@ -168,7 +170,7 @@
       </a>
     </div>
 
-    <!-- Subtle Scroll Down Indicator -->
+    <!-- Scroll Indicator -->
     <div class="absolute bottom-4 left-1/2 -translate-x-1/2 text-white/50 text-[10px] tracking-widest uppercase flex items-center gap-1.5 animate-pulse">
       <span>Scroll</span>
     </div>
@@ -203,7 +205,7 @@
     <!-- VIEW: CATALOG -->
     <section id="view-catalog" class="space-y-10">
       
-      <!-- Catalog Anchor Target & Header -->
+      <!-- Catalog Section Header -->
       <div id="catalog-section" class="pt-6 flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-slate-200/80 pb-6">
         <div>
           <div class="flex items-center gap-2.5 mb-2">
@@ -225,7 +227,7 @@
         </div>
       </div>
 
-      <!-- Product Cards Grid (Clean Minimal Cards without Stock Photos) -->
+      <!-- Minimal Product Cards Grid (No Stock Photos) -->
       <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8"></div>
       
       <!-- Empty State -->
@@ -241,20 +243,17 @@
       </div>
     </section>
 
-    <!-- VIEW: FAQ -->
+    <!-- VIEW: FAQ (100% full-box clickable area with zero dead zones) -->
     <section id="view-faq" class="hidden max-w-3xl mx-auto space-y-8 pt-6">
       
-      <!-- FAQ Title -->
       <div class="text-center space-y-2">
-        <span class="text-[10px] tracking-widest3 font-semibold uppercase text-brand-600">Client Assistance</span>
         <h3 class="font-serif text-3xl sm:text-4xl text-slate-900 font-normal tracking-wide">Frequently Asked Questions</h3>
       </div>
 
-      <!-- Compact Minimalist Contact Box -->
+      <!-- Clean Minimalist Contact Banner -->
       <div class="bg-[#E6F0FA] border border-[#A9CFF0] rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shadow-sm">
         <div>
           <h4 class="text-sm font-bold text-slate-800 tracking-tight">Have questions or need help?</h4>
-          <p class="text-xs text-slate-600 font-medium mt-0.5">Telegram handle: @e1yse</p>
         </div>
         <a 
           href="https://t.me/e1yse" 
@@ -267,87 +266,104 @@
         </a>
       </div>
 
-      <!-- Accordion Items -->
-      <div class="space-y-3">
-        <!-- FAQ 1 -->
-        <details class="group bg-white rounded-2xl border border-slate-200/90 p-5 shadow-xs hover:border-brand-300 transition" open>
-          <summary class="flex items-center justify-between cursor-pointer font-semibold text-xs sm:text-sm text-slate-800 select-none">
-            <span class="flex items-center gap-3">
-              <span class="w-6 h-6 rounded-full bg-brand-50 text-brand-600 flex items-center justify-center text-xs">
-                <i class="fa-solid fa-cart-shopping"></i>
+      <!-- Full-Box Clickable FAQ Accordions: outer details has p-0 & overflow-hidden; summary has full w-full, p-5 sm:p-6, flex, and inner elements have pointer-events-none -->
+      <div class="space-y-3.5">
+        
+        <!-- FAQ 01: How do I place an order? -->
+        <details class="group bg-white rounded-2xl border border-slate-200/90 p-0 overflow-hidden shadow-xs hover:border-brand-300 transition duration-200">
+          <summary class="w-full flex items-center justify-between p-5 sm:p-6 cursor-pointer list-none select-none hover:bg-slate-50/60 active:bg-slate-100/50 transition duration-150">
+            <span class="flex items-center gap-3.5 pointer-events-none min-w-0 pr-3">
+              <span class="w-8 h-8 rounded-full bg-brand-100/80 border border-brand-300 text-brand-700 flex items-center justify-center text-[11px] font-bold font-mono shadow-xs shrink-0">
+                01
               </span>
-              How does ordering & payment work?
+              <span class="font-semibold text-xs sm:text-sm text-slate-800 leading-snug">
+                How do I place an order?
+              </span>
             </span>
-            <svg class="faq-chevron w-4 h-4 text-slate-400 shrink-0 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="faq-arrow w-4 h-4 text-slate-400 shrink-0 pointer-events-none transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
             </svg>
           </summary>
-          <p class="mt-3 text-xs sm:text-sm text-slate-600 font-light leading-relaxed pl-9 border-t border-slate-100 pt-3">
-            Add your pieces to the cart, specify your contact details and delivery address/postal code, and tap <strong>"Order & Confirm Payment via Telegram"</strong>. Your order summary and Order ID will open directly in Telegram with the aesthetic order note already typed out. Tap <strong>Send</strong> to confirm and receive PayNow details!
-          </p>
-        </details>
-
-        <!-- FAQ 2 -->
-        <details class="group bg-white rounded-2xl border border-slate-200/90 p-5 shadow-xs hover:border-brand-300 transition">
-          <summary class="flex items-center justify-between cursor-pointer font-semibold text-xs sm:text-sm text-slate-800 select-none">
-            <span class="flex items-center gap-3">
-              <span class="w-6 h-6 rounded-full bg-brand-50 text-brand-600 flex items-center justify-center text-xs">
-                <i class="fa-solid fa-truck"></i>
-              </span>
-              What are the delivery options?
-            </span>
-            <svg class="faq-chevron w-4 h-4 text-slate-400 shrink-0 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-            </svg>
-          </summary>
-          <div class="mt-3 text-xs sm:text-sm text-slate-600 font-light leading-relaxed pl-9 border-t border-slate-100 pt-3 space-y-1">
-            <p>We operate on a <strong>local delivery only</strong> basis within Singapore:</p>
-            <p>• <strong>Doorstep Local Delivery:</strong> Islandwide delivery within Singapore. Standard courier fee will be included upon order confirmation.</p>
+          <div class="px-5 sm:px-6 pb-5 pt-1 text-xs text-slate-500 leading-relaxed border-t border-slate-100/80">
+            <p class="pl-11">
+              Add your desired items to the bag, provide your name or Telegram handle and delivery address in the cart drawer, and tap <strong>"Order & Confirm Payment via Telegram"</strong>. A formatted order note will open directly with <strong>@e1yse</strong> on Telegram where you can confirm and receive PayNow details.
+            </p>
           </div>
         </details>
 
-        <!-- FAQ 3 -->
-        <details class="group bg-white rounded-2xl border border-slate-200/90 p-5 shadow-xs hover:border-brand-300 transition">
-          <summary class="flex items-center justify-between cursor-pointer font-semibold text-xs sm:text-sm text-slate-800 select-none">
-            <span class="flex items-center gap-3">
-              <span class="w-6 h-6 rounded-full bg-brand-50 text-brand-600 flex items-center justify-center text-xs">
-                <i class="fa-solid fa-shapes"></i>
+        <!-- FAQ 02: Collection & Delivery -->
+        <details class="group bg-white rounded-2xl border border-slate-200/90 p-0 overflow-hidden shadow-xs hover:border-brand-300 transition duration-200">
+          <summary class="w-full flex items-center justify-between p-5 sm:p-6 cursor-pointer list-none select-none hover:bg-slate-50/60 active:bg-slate-100/50 transition duration-150">
+            <span class="flex items-center gap-3.5 pointer-events-none min-w-0 pr-3">
+              <span class="w-8 h-8 rounded-full bg-brand-100/80 border border-brand-300 text-brand-700 flex items-center justify-center text-[11px] font-bold font-mono shadow-xs shrink-0">
+                02
               </span>
-              Are creations made-to-order or in stock?
+              <span class="font-semibold text-xs sm:text-sm text-slate-800 leading-snug">
+                What are the available collection or delivery options?
+              </span>
             </span>
-            <svg class="faq-chevron w-4 h-4 text-slate-400 shrink-0 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="faq-arrow w-4 h-4 text-slate-400 shrink-0 pointer-events-none transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
             </svg>
           </summary>
-          <p class="mt-3 text-xs sm:text-sm text-slate-600 font-light leading-relaxed pl-9 border-t border-slate-100 pt-3">
-            Every creation is layered and finished by hand with precision at our Singapore atelier. We keep a limited batch of ready creations while additional requests are fulfilled within 2–4 days.
-          </p>
+          <div class="px-5 sm:px-6 pb-5 pt-1 text-xs text-slate-500 leading-relaxed border-t border-slate-100/80">
+            <p class="pl-11">
+              We operate exclusively on <strong>local doorstep delivery within Singapore</strong>. Simply specify your delivery address and postal code during checkout, and courier delivery arrangements will be confirmed directly with you on Telegram.
+            </p>
+          </div>
         </details>
 
-        <!-- FAQ 4 -->
-        <details class="group bg-white rounded-2xl border border-slate-200/90 p-5 shadow-xs hover:border-brand-300 transition">
-          <summary class="flex items-center justify-between cursor-pointer font-semibold text-xs sm:text-sm text-slate-800 select-none">
-            <span class="flex items-center gap-3">
-              <span class="w-6 h-6 rounded-full bg-brand-50 text-brand-600 flex items-center justify-center text-xs">
-                <i class="fa-solid fa-sparkles"></i>
+        <!-- FAQ 03: Bespoke Customizations -->
+        <details class="group bg-white rounded-2xl border border-slate-200/90 p-0 overflow-hidden shadow-xs hover:border-brand-300 transition duration-200">
+          <summary class="w-full flex items-center justify-between p-5 sm:p-6 cursor-pointer list-none select-none hover:bg-slate-50/60 active:bg-slate-100/50 transition duration-150">
+            <span class="flex items-center gap-3.5 pointer-events-none min-w-0 pr-3">
+              <span class="w-8 h-8 rounded-full bg-brand-100/80 border border-brand-300 text-brand-700 flex items-center justify-center text-[11px] font-bold font-mono shadow-xs shrink-0">
+                03
               </span>
-              Can I request bespoke customizations?
+              <span class="font-semibold text-xs sm:text-sm text-slate-800 leading-snug">
+                Can I request bespoke customizations?
+              </span>
             </span>
-            <svg class="faq-chevron w-4 h-4 text-slate-400 shrink-0 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="faq-arrow w-4 h-4 text-slate-400 shrink-0 pointer-events-none transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
             </svg>
           </summary>
-          <p class="mt-3 text-xs sm:text-sm text-slate-600 font-light leading-relaxed pl-9 border-t border-slate-100 pt-3">
-            Yes! Custom palettes, personalized geometric scales, and bulk event orders can be requested directly by messaging <strong>@e1yse</strong> on Telegram.
-          </p>
+          <div class="px-5 sm:px-6 pb-5 pt-1 text-xs text-slate-500 leading-relaxed border-t border-slate-100/80">
+            <p class="pl-11">
+              Yes, custom scales, layered color palettes, and bespoke designs can be requested! Tap <strong>"Contact me here"</strong> or message <strong>@e1yse</strong> directly on Telegram to discuss your custom project.
+            </p>
+          </div>
         </details>
+
+        <!-- FAQ 04: Payment & PayNow -->
+        <details class="group bg-white rounded-2xl border border-slate-200/90 p-0 overflow-hidden shadow-xs hover:border-brand-300 transition duration-200">
+          <summary class="w-full flex items-center justify-between p-5 sm:p-6 cursor-pointer list-none select-none hover:bg-slate-50/60 active:bg-slate-100/50 transition duration-150">
+            <span class="flex items-center gap-3.5 pointer-events-none min-w-0 pr-3">
+              <span class="w-8 h-8 rounded-full bg-brand-100/80 border border-brand-300 text-brand-700 flex items-center justify-center text-[11px] font-bold font-mono shadow-xs shrink-0">
+                04
+              </span>
+              <span class="font-semibold text-xs sm:text-sm text-slate-800 leading-snug">
+                How do I arrange PayNow payment?
+              </span>
+            </span>
+            <svg class="faq-arrow w-4 h-4 text-slate-400 shrink-0 pointer-events-none transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </summary>
+          <div class="px-5 sm:px-6 pb-5 pt-1 text-xs text-slate-500 leading-relaxed border-t border-slate-100/80">
+            <p class="pl-11">
+              When your order note is submitted to Telegram, you will be provided with the registered PayNow QR / mobile number. Once payment is made and verified via screenshot in chat, your order will be prepared and dispatched for delivery.
+            </p>
+          </div>
+        </details>
+
       </div>
 
     </section>
   </main>
 
-  <!-- Editorial Footer with Safe Bottom Padding -->
-  <footer class="mt-auto border-t border-slate-200/80 bg-white py-12 px-6 text-center text-xs text-slate-500">
+  <!-- Editorial Footer with Safe Bottom Padding (pb-36 for phone scrolling) -->
+  <footer class="mt-auto border-t border-slate-200/80 bg-white py-12 pb-36 md:pb-12 px-6 text-center text-xs text-slate-500">
     <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
       <div class="text-left md:text-left">
         <span class="font-serif text-lg tracking-[0.2em] uppercase text-slate-900 block font-medium">The Layer Workshop</span>
@@ -369,7 +385,7 @@
       </div>
 
       <div class="text-right md:text-right text-[11px] text-slate-400">
-        <p>© 2026 The Layer Workshop. All rights reserved.</p>
+        <p>© 2026 The Layer Workshop. Handmade in Singapore (Local delivery only).</p>
       </div>
     </div>
   </footer>
@@ -415,7 +431,6 @@
   <div id="product-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
     <div class="bg-white rounded-3xl max-w-lg w-full overflow-hidden shadow-2xl border border-slate-100 transform scale-95 opacity-0 transition-all duration-300 pointer-events-auto safe-bottom">
       
-      <!-- Minimalist Card Badge Header -->
       <div class="relative p-8 bg-gradient-to-br from-brand-50 via-white to-brand-100/40 border-b border-brand-100 flex flex-col items-center justify-center text-center">
         <button onclick="closeProductModal()" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-white/90 text-slate-600 hover:text-black flex items-center justify-center transition shadow-xs" aria-label="Close modal">
           <i class="fa-solid fa-xmark text-sm"></i>
@@ -457,7 +472,7 @@
   <div id="cart-drawer-backdrop" onclick="closeCart()" class="fixed inset-0 bg-black/60 luxury-blur z-50 opacity-0 pointer-events-none transition-opacity duration-300"></div>
   <aside id="cart-drawer" class="fixed top-0 right-0 bottom-0 z-50 bg-white w-full sm:w-[440px] shadow-2xl border-l border-slate-200 transform translate-x-full drawer-transition flex flex-col safe-bottom">
     
-    <!-- Drawer Top Header -->
+    <!-- Drawer Header -->
     <div class="px-6 py-5 border-b border-slate-200 flex items-center justify-between bg-slate-50/50">
       <div class="flex items-center gap-2">
         <i class="fa-solid fa-bag-shopping text-sm text-slate-700"></i>
@@ -471,7 +486,7 @@
     <!-- Items List -->
     <div id="cart-items" class="flex-1 overflow-y-auto p-6 divide-y divide-slate-100"></div>
 
-    <!-- Order Submission Form (Tokens-Free Telegram Integration) -->
+    <!-- Order Submission Form -->
     <div class="p-6 bg-slate-50 border-t border-slate-200 space-y-4">
       
       <!-- Subtotal -->
@@ -493,7 +508,7 @@
         />
       </div>
 
-      <!-- Fulfillment Address Notes -->
+      <!-- Fulfillment Delivery Notes -->
       <div>
         <label class="block text-[11px] uppercase tracking-wider font-semibold text-slate-700 mb-1">
           Delivery Address & Notes
@@ -534,7 +549,7 @@
       currency: "SGD"
     };
 
-    // Product Inventory (No stock photos or placeholder images)
+    // Product Inventory
     const PRODUCTS = [
       {
         id: "prod-1",
@@ -645,7 +660,7 @@
       handleSearch("");
     }
 
-    // Render Products Grid (Minimalist Geometric Layout Without Any Stock Photos)
+    // Render Products Grid
     function renderProducts() {
       const container = document.getElementById("product-grid");
       const emptyState = document.getElementById("empty-state");
@@ -674,7 +689,6 @@
         <article class="group flex flex-col justify-between bg-white rounded-3xl overflow-hidden border border-slate-200/90 shadow-xs hover:shadow-xl transition-all duration-300">
           <div onclick="openProductModal('${p.id}')" class="cursor-pointer p-6 pb-2">
             
-            <!-- Minimal Geometric Card Header -->
             <div class="h-44 w-full rounded-2xl bg-gradient-to-br from-brand-50 via-white to-brand-100/40 border border-brand-100/80 flex flex-col items-center justify-center p-6 text-center group-hover:border-brand-300 transition-colors duration-300">
               <div class="w-12 h-12 rounded-2xl bg-white shadow-xs border border-brand-200 flex items-center justify-center text-brand-600 mb-3 group-hover:scale-110 transition-transform">
                 <i class="fa-solid fa-layer-group text-lg"></i>
@@ -684,7 +698,6 @@
               <span class="text-[11px] text-slate-400 font-light mt-0.5">${p.subtitle}</span>
             </div>
 
-            <!-- Description -->
             <div class="pt-5">
               <p class="text-xs text-slate-500 font-light line-clamp-2 leading-relaxed">${p.description}</p>
             </div>
@@ -850,7 +863,7 @@
       document.getElementById("cart-subtotal").innerText = `$${subtotal.toFixed(2)} SGD`;
     }
 
-    // Checkout Telegram Template Output
+    // Checkout Telegram Template Output & Cart Clear
     function checkoutTelegram() {
       const entries = Object.entries(cart);
       if (entries.length === 0) {
@@ -865,7 +878,7 @@
         return;
       }
 
-      const notes = (document.getElementById("cust-notes")?.value || "").trim() || "Local Delivery";
+      const notes = (document.getElementById("cust-notes")?.value || "").trim() || "Local Delivery: Singapore";
       const orderId = "TLW-" + Math.floor(1000 + Math.random() * 9000);
 
       let itemsSummary = "";
@@ -880,7 +893,7 @@
         }
       });
 
-      // Strict requested template
+      // Exact aesthetic order note template
       const message = 
 `˗ˏˋ  The Layer Workshop — Order Note ˎˊ˗
 🔖 Order: #${orderId}
@@ -906,19 +919,17 @@ Hi @e1yse! Ready to confirm #${orderId} ✨ Let me know the PayNow details whene
       showToast("Order copied! Opening Telegram...");
       window.open(`https://t.me/${STORE_CONFIG.telegramUsername}?text=${encodeURIComponent(message)}`, "_blank");
 
-      // Clear the cart and reset inputs after checkout
+      // Auto-clear cart and reset form after checkout
       cart = {};
       updateCartBadge();
       renderCartItems();
 
-      // Reset contact field while leaving the default delivery prefix
       const contactInput = document.getElementById("cust-contact");
       if (contactInput) contactInput.value = "";
 
       const notesInput = document.getElementById("cust-notes");
       if (notesInput) notesInput.value = "Local Delivery: [Enter Address / Postal Code]";
 
-      // Close the cart drawer cleanly after redirect
       setTimeout(() => {
         closeCart();
       }, 500);
