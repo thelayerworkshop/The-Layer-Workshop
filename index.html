@@ -36,6 +36,10 @@
               700: '#2F6193',
               800: '#23486F',
               900: '#142942',
+            },
+            whatsapp: {
+              DEFAULT: '#25D366',
+              dark: '#1EBE5D'
             }
           },
           boxShadow: {
@@ -225,7 +229,7 @@
             <i class="faq-chevron fa-solid fa-chevron-down text-slate-400 text-xs transition-transform duration-300 pointer-events-none"></i>
           </summary>
           <div class="px-5 sm:px-6 pb-6 pt-1 text-xs text-slate-500 leading-relaxed border-t border-slate-100">
-            Simply add your desired items to your cart, fill in your name or Telegram handle in the cart drawer, and tap <strong>"Order & Confirm Payment via Telegram"</strong>. It automatically generates and copies your order note and opens a direct chat with me to finalize PayNow details.
+            Simply add your desired items to your cart, fill in your name or handle in the bag, and tap <strong>"Order & Confirm Payment via Telegram"</strong> or <strong>"Order & Confirm Payment via WhatsApp"</strong>. Your order note will automatically copy and open a direct chat with me to finalize PayNow details.
           </div>
         </details>
 
@@ -253,7 +257,7 @@
             <i class="faq-chevron fa-solid fa-chevron-down text-slate-400 text-xs transition-transform duration-300 pointer-events-none"></i>
           </summary>
           <div class="px-5 sm:px-6 pb-6 pt-1 text-xs text-slate-500 leading-relaxed border-t border-slate-100">
-            We accept PayNow / FAST bank transfers in Singapore. Once you submit your order via Telegram, we will provide the PayNow QR or number for convenient transfer.
+            We accept PayNow / FAST bank transfers in Singapore. Once you submit your order via Telegram or WhatsApp, I will provide the PayNow QR or number for convenient transfer.
           </div>
         </details>
 
@@ -267,7 +271,7 @@
             <i class="faq-chevron fa-solid fa-chevron-down text-slate-400 text-xs transition-transform duration-300 pointer-events-none"></i>
           </summary>
           <div class="px-5 sm:px-6 pb-6 pt-1 text-xs text-slate-500 leading-relaxed border-t border-slate-100">
-            Yes, custom dimensions and tailored orders can be arranged! Tap the "Contact me here" button above or mention your specific request when sending your order note on Telegram.
+            Yes, custom dimensions and tailored orders can be arranged! Tap the "Contact me here" button above or mention your specific request when sending your order note.
           </div>
         </details>
 
@@ -380,10 +384,17 @@
         <textarea id="order-notes" rows="2" placeholder="Local Delivery: [Enter Address / Postal Code]" class="w-full text-xs p-3 rounded-xl border border-slate-200 bg-white text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-400">Local Delivery: [Enter Address / Postal Code]</textarea>
       </div>
 
-      <button onclick="checkoutTelegram()" class="w-full py-3.5 bg-[#24A1DE] hover:bg-[#1E8BC0] text-white rounded-xl text-xs font-semibold tracking-wider active:scale-95 transition flex items-center justify-center gap-2 shadow-sm cursor-pointer">
-        <i class="fa-brands fa-telegram text-base"></i>
-        <span>Order & Confirm Payment via Telegram</span>
-      </button>
+      <div class="space-y-2.5">
+        <button onclick="checkoutVia('telegram')" class="w-full py-3.5 bg-[#24A1DE] hover:bg-[#1E8BC0] text-white rounded-xl text-xs font-semibold tracking-wider active:scale-95 transition flex items-center justify-center gap-2 shadow-sm cursor-pointer">
+          <i class="fa-brands fa-telegram text-base"></i>
+          <span>Order & Confirm Payment via Telegram</span>
+        </button>
+
+        <button onclick="checkoutVia('whatsapp')" class="w-full py-3.5 bg-[#25D366] hover:bg-[#20ba59] text-white rounded-xl text-xs font-semibold tracking-wider active:scale-95 transition flex items-center justify-center gap-2 shadow-sm cursor-pointer">
+          <i class="fa-brands fa-whatsapp text-base"></i>
+          <span>Order & Confirm Payment via WhatsApp</span>
+        </button>
+      </div>
     </div>
   </div>
 
@@ -396,6 +407,7 @@
   <script>
     const STORE_CONFIG = {
       telegramUsername: "e1yse",
+      whatsappPhone: "6588282357",
       currency: "SGD"
     };
 
@@ -498,7 +510,7 @@
       }
     }
 
-    // CART STATE CONTROLS
+    // CART STATE CONTROLS (1-99)
     function addItemByIndex(idx) {
       if (cartQuantities[idx] >= 99) {
         showToast("Maximum quantity of 99 reached");
@@ -802,8 +814,8 @@
       sheet.classList.add("md:translate-x-full");
     }
 
-    // TELEGRAM CHECKOUT & AUTO-CLEAR CART
-    function checkoutTelegram() {
+    // CHECKOUT LOGIC WITH DEDICATED TELEGRAM & WHATSAPP TEMPLATES
+    function checkoutVia(channel) {
       const activeIndices = cartQuantities
         .map((qty, idx) => ({ qty, idx }))
         .filter(item => item.qty > 0);
@@ -815,7 +827,7 @@
 
       const contact = document.getElementById("customer-contact").value.trim();
       if (!contact) {
-        showToast("Please enter your name or Telegram handle");
+        showToast("Please enter your name or contact info");
         document.getElementById("customer-contact").focus();
         return;
       }
@@ -833,7 +845,9 @@
         itemsSummary += `✩ ${item.name} ×${qty} — $${itemTotal.toFixed(2)}\n`;
       });
 
-      const message = 
+      let message = "";
+      if (channel === "telegram") {
+        message = 
 `˗ˏˋ  The Layer Workshop — Order Note ˎˊ˗
 🔖 Order: #${orderId}
 👤 Name/Tele: ${contact}
@@ -842,6 +856,17 @@ ${itemsSummary}💰 Total: $${subtotal.toFixed(2)} SGD
 📍 Collection: ${notes}
 ─── ･ ｡ﾟ☆: .☽ . :☆ﾟ. ───
 Hi @e1yse! Ready to confirm #${orderId} ✨ Let me know the PayNow details whenever you're free!`;
+      } else {
+        message = 
+`˗ˏˋ  The Layer Workshop — Order Note ˎˊ˗
+Order: #${orderId}
+Name/Contact: ${contact}
+What you’re getting:
+${itemsSummary}Total: $${subtotal.toFixed(2)} SGD
+Collection: ${notes}
+─── ･ ｡ﾟ☆: .☽ . :☆ﾟ. ───
+Hi! Ready to confirm #${orderId}  Let me know the PayNow details whenever you're free!`;
+      }
 
       // Copy fallback
       if (navigator.clipboard) {
@@ -867,8 +892,12 @@ Hi @e1yse! Ready to confirm #${orderId} ✨ Let me know the PayNow details whene
       document.getElementById("order-notes").value = "Local Delivery: [Enter Address / Postal Code]";
       setTimeout(closeCart, 400);
 
-      // Deep link to Telegram chat
-      window.open(`https://t.me/${STORE_CONFIG.telegramUsername}?text=${encodeURIComponent(message)}`, "_blank");
+      // Deep link to selected messaging platform
+      if (channel === "telegram") {
+        window.open(`https://t.me/${STORE_CONFIG.telegramUsername}?text=${encodeURIComponent(message)}`, "_blank");
+      } else {
+        window.open(`https://wa.me/${STORE_CONFIG.whatsappPhone}?text=${encodeURIComponent(message)}`, "_blank");
+      }
     }
 
     function showToast(msg) {
