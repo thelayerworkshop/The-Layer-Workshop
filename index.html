@@ -5,12 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>The Layer Workshop</title>
 
-  <!-- Tailwind CSS CDN -->
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Google Fonts for Editorial Luxury Aesthetics -->
+
+  <!-- Google Fonts: Cormorant Garamond & Montserrat -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Montserrat:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Montserrat:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+  
   <!-- Font Awesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
@@ -37,9 +39,9 @@
             }
           },
           boxShadow: {
-            'luxury': '0 20px 40px -15px rgba(20, 41, 66, 0.08)',
+            'luxury': '0 20px 45px -15px rgba(20, 41, 66, 0.08)',
             'card': '0 4px 20px -2px rgba(20, 41, 66, 0.04)',
-            'pill': '0 10px 25px -5px rgba(82, 150, 213, 0.4)',
+            'pill': '0 10px 25px -5px rgba(82, 150, 213, 0.45)',
           }
         }
       }
@@ -64,7 +66,7 @@
     .view-state { display: none; }
     .view-active { display: flex; }
 
-    /* Hide spin buttons on number inputs for clean luxury aesthetic */
+    /* Number inputs without browser arrows */
     input[type=number]::-webkit-inner-spin-button, 
     input[type=number]::-webkit-outer-spin-button { 
       -webkit-appearance: none; 
@@ -74,7 +76,7 @@
       -moz-appearance: textfield;
     }
 
-    /* Native Details and Summary reset: removes dead zones and default browser markers */
+    /* FAQ accordion styling & zero dead-zone reset */
     details summary::-webkit-details-marker,
     details summary::marker {
       display: none;
@@ -90,6 +92,16 @@
       border-color: #A9CFF0;
       box-shadow: 0 4px 14px -2px rgba(82, 150, 213, 0.12);
     }
+
+    /* Direct navigation highlight pulse */
+    @keyframes highlightCard {
+      0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(82, 150, 213, 0.7); border-color: #5296D5; }
+      50% { transform: scale(1.02); box-shadow: 0 0 0 10px rgba(82, 150, 213, 0.25); border-color: #5296D5; }
+      100% { transform: scale(1); box-shadow: 0 4px 20px -2px rgba(20, 41, 66, 0.04); }
+    }
+    .item-highlight {
+      animation: highlightCard 1.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
   </style>
 </head>
 <body class="bg-[#FBFDFE] text-slate-800 antialiased selection:bg-brand-200 selection:text-brand-900 font-sans pb-36 md:pb-16 flex flex-col">
@@ -104,15 +116,15 @@
         alt="The Layer Workshop Atelier" 
         class="w-full h-full object-cover object-center scale-105 transform motion-safe:animate-[pulse_10s_ease-in-out_infinite]"
       />
-      <div class="absolute inset-0 bg-gradient-to-b from-black/60 via-black/25 to-black/85"></div>
+      <div class="absolute inset-0 bg-gradient-to-b from-black/65 via-black/30 to-black/85"></div>
       <div class="absolute inset-0 bg-radial-gradient from-transparent via-transparent to-black/50"></div>
     </div>
 
-    <!-- Top Luxury Navigation Bar (Floating on cover) -->
+    <!-- Top Luxury Navigation Bar -->
     <header id="site-header" class="relative z-20 w-full transition-all duration-300 safe-top border-b border-white/10">
       <div class="max-w-7xl mx-auto px-5 sm:px-8 py-5 flex items-center justify-between">
         
-        <!-- Left: Quick Links & Search -->
+        <!-- Left: Store link & Search trigger -->
         <div class="flex items-center gap-6 sm:gap-8">
           <button onclick="switchTab('catalog')" class="text-[11px] sm:text-xs tracking-[0.25em] uppercase font-medium text-white/90 hover:text-white transition">
             Store
@@ -130,14 +142,13 @@
           </span>
         </div>
 
-        <!-- Right: FAQ & Bag -->
+        <!-- Right: FAQ & Bag Trigger -->
         <div class="flex items-center gap-6 sm:gap-8">
           <button onclick="switchTab('faq')" class="text-[11px] sm:text-xs tracking-[0.25em] uppercase font-medium text-white/90 hover:text-white transition">
             FAQ
           </button>
 
-          <!-- Top Cart Trigger -->
-          <button onclick="openCart()" class="relative group flex items-center gap-2 text-[11px] sm:text-xs tracking-[0.2em] uppercase font-medium text-white/90 hover:text-white transition">
+          <button onclick="openCart()" class="relative group flex items-center gap-2 text-[11px] sm:text-xs tracking-[0.2em] uppercase font-medium text-white/90 hover:text-white transition cursor-pointer">
             <span class="hidden sm:inline">Bag</span>
             <div class="relative">
               <i class="fa-solid fa-bag-shopping text-sm text-white/80 group-hover:text-white"></i>
@@ -176,9 +187,9 @@
         <div class="w-12 h-px bg-slate-300 mx-auto mt-4"></div>
       </div>
 
-      <!-- Clean Minimalist Geometric Product Grid (No photos) -->
+      <!-- Minimalist Geometric Product Grid (No photos, clean badges) -->
       <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-        <!-- Rendered dynamically with delegation data-product-index -->
+        <!-- Rendered dynamically -->
       </div>
     </section>
 
@@ -201,7 +212,7 @@
         </a>
       </div>
 
-      <!-- Full-Row Clickable FAQ Cards (Zero dead zones) -->
+      <!-- Full-Box Clickable FAQ Cards (01-04 with zero dead zones) -->
       <div class="space-y-3.5">
         
         <!-- FAQ 01 -->
@@ -319,7 +330,7 @@
           <input 
             type="text" 
             id="overlay-search-input" 
-            placeholder="Search items (e.g. Item 1, Item 2)..." 
+            placeholder="Type to search items (e.g. item 1, item 2)..." 
             class="w-full bg-transparent text-sm sm:text-base font-medium text-slate-800 placeholder-slate-400 focus:outline-none"
             autofocus
           >
@@ -329,6 +340,7 @@
         </button>
       </div>
 
+      <!-- Live Search Results Container (Empty by default) -->
       <div id="overlay-search-results" class="max-h-[60vh] overflow-y-auto divide-y divide-slate-100"></div>
     </div>
   </div>
@@ -387,7 +399,7 @@
       currency: "SGD"
     };
 
-    // Master Product Catalog: Fixed Zero-Indexed Array
+    // Exactly 3 Distinct Products
     const PRODUCTS = [
       {
         id: "prod-1",
@@ -409,10 +421,8 @@
       }
     ];
 
-    // Bulletproof Array-Backed Cart Quantities (indexed by PRODUCTS position: 0, 1, 2)
-    // Ensures Item 1, Item 2, and Item 3 NEVER collide, overwrite, or fail lookup
-    const cartQuantities = [0, 0, 0];
-
+    // Robust array-based cart quantities: [Item 1, Item 2, Item 3]
+    let cartQuantities = [0, 0, 0];
     let currentTab = "catalog";
 
     window.addEventListener("DOMContentLoaded", () => {
@@ -428,7 +438,7 @@
 
       container.innerHTML = PRODUCTS.map((p, index) => {
         return `
-          <div class="bg-white rounded-3xl p-6 border border-slate-200/90 shadow-card flex flex-col justify-between hover:shadow-luxury hover:border-brand-200 transition duration-300">
+          <div id="card-${p.id}" class="bg-white rounded-3xl p-6 border border-slate-200/90 shadow-card flex flex-col justify-between hover:shadow-luxury hover:border-brand-200 transition duration-300">
             <div>
               <div class="w-full h-44 rounded-2xl bg-gradient-to-br from-brand-50 to-brand-100/60 border border-brand-100 flex flex-col items-center justify-center gap-2 text-brand-700 mb-5">
                 <i class="fa-solid fa-layer-group text-2xl text-brand-400"></i>
@@ -457,8 +467,7 @@
       }).join("");
     }
 
-    // BULLETPROOF EVENT DELEGATION:
-    // Captures clicks on dynamically generated product cards and search results without inline string quoting bugs
+    // EVENT DELEGATION
     function setupEventDelegation() {
       document.body.addEventListener("click", (e) => {
         const targetBtn = e.target.closest("button[data-action]");
@@ -481,7 +490,6 @@
         }
       });
 
-      // Search input live handler
       const searchInput = document.getElementById("overlay-search-input");
       if (searchInput) {
         searchInput.addEventListener("input", (e) => {
@@ -490,39 +498,34 @@
       }
     }
 
-    // CART STATE CONTROLS (BY NUMERIC INDEX)
+    // CART STATE CONTROLS
     function addItemByIndex(idx) {
-      const current = cartQuantities[idx] || 0;
-      cartQuantities[idx] = Math.min(99, current + 1);
+      if (cartQuantities[idx] >= 99) {
+        showToast("Maximum quantity of 99 reached");
+        return;
+      }
+      cartQuantities[idx] = Math.min(99, (cartQuantities[idx] || 0) + 1);
       updateCartBadge();
       renderCartItems();
       showToast(`Added ${PRODUCTS[idx].name} to bag`);
     }
 
     function changeQtyByIndex(idx, delta) {
-      const current = cartQuantities[idx] || 0;
-      let updated = current + delta;
-      if (updated > 99) updated = 99;
-      if (updated < 0) updated = 0;
-      cartQuantities[idx] = updated;
-
-      updateCartBadge();
-      renderCartItems();
-    }
-
-    function setQtyDirectly(idx, rawValue) {
-      let parsed = parseInt(rawValue, 10);
-      if (isNaN(parsed) || parsed < 0) parsed = 0;
-      if (parsed > 99) parsed = 99;
-      cartQuantities[idx] = parsed;
-
+      const nextVal = (cartQuantities[idx] || 0) + delta;
+      if (nextVal <= 0) {
+        cartQuantities[idx] = 0;
+      } else if (nextVal > 99) {
+        cartQuantities[idx] = 99;
+      } else {
+        cartQuantities[idx] = nextVal;
+      }
       updateCartBadge();
       renderCartItems();
     }
 
     function handleQtyInputLive(idx, inputElement) {
       let val = inputElement.value;
-      if (val === "") return; // Allow user to backspace before typing
+      if (val === "") return;
       let parsed = parseInt(val, 10);
       if (isNaN(parsed)) parsed = 1;
       if (parsed > 99) {
@@ -534,7 +537,6 @@
       cartQuantities[idx] = parsed;
       updateCartBadge();
 
-      // Update live subtotal in drawer without resetting input focus
       let subtotal = 0;
       cartQuantities.forEach((qty, i) => {
         if (qty > 0) subtotal += PRODUCTS[i].price * qty;
@@ -675,10 +677,12 @@
     function openSearchOverlay() {
       const overlay = document.getElementById("search-overlay");
       const input = document.getElementById("overlay-search-input");
+      const resultsContainer = document.getElementById("overlay-search-results");
+
       overlay.classList.remove("hidden");
       overlay.classList.add("flex");
       input.value = "";
-      handleSearch("");
+      resultsContainer.innerHTML = ""; // No suggested items by default
       setTimeout(() => input.focus(), 60);
     }
 
@@ -692,11 +696,19 @@
       const term = query.trim().toLowerCase();
       const resultsContainer = document.getElementById("overlay-search-results");
 
-      const filtered = PRODUCTS.map((p, index) => ({ p, index })).filter(({ p }) => 
-        p.name.toLowerCase().includes(term) || p.description.toLowerCase().includes(term)
-      );
+      if (!term) {
+        resultsContainer.innerHTML = "";
+        return;
+      }
 
-      if (filtered.length === 0) {
+      const matches = [];
+      PRODUCTS.forEach((p, index) => {
+        if (p.name.toLowerCase().includes(term) || p.description.toLowerCase().includes(term)) {
+          matches.push({ product: p, index });
+        }
+      });
+
+      if (matches.length === 0) {
         resultsContainer.innerHTML = `
           <div class="py-8 text-center text-slate-400">
             <i class="fa-solid fa-magnifying-glass text-2xl text-slate-300 mb-2"></i>
@@ -706,28 +718,41 @@
         return;
       }
 
-      resultsContainer.innerHTML = filtered.map(({ p, index }) => `
-        <div class="py-3.5 flex items-center justify-between gap-3">
+      resultsContainer.innerHTML = matches.map(m => `
+        <div onclick="navigateToItem('${m.product.id}')" class="py-3.5 px-3 rounded-xl flex items-center justify-between gap-3 hover:bg-slate-50 cursor-pointer transition">
           <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-brand-50 border border-brand-100 flex items-center justify-center text-brand-600 text-sm font-bold">
+            <div class="w-10 h-10 rounded-xl bg-brand-50 border border-brand-100 flex items-center justify-center text-brand-600 text-sm font-bold shrink-0">
               <i class="fa-solid fa-layer-group text-xs"></i>
             </div>
             <div>
-              <h5 class="text-xs font-bold text-slate-800">${p.name}</h5>
-              <span class="text-[11px] text-brand-600 font-semibold">$${p.price.toFixed(2)} SGD</span>
+              <h5 class="text-xs font-bold text-slate-800">${m.product.name}</h5>
+              <span class="text-[11px] text-brand-600 font-semibold">$${m.product.price.toFixed(2)} SGD</span>
             </div>
           </div>
           <button 
             type="button" 
-            data-action="add-item" 
-            data-product-index="${index}" 
-            data-close-search="true"
+            onclick="event.stopPropagation(); addItemByIndex(${m.index});" 
             class="px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-brand-600 text-white text-xs font-semibold active:scale-95 transition cursor-pointer"
           >
             + Add to Cart
           </button>
         </div>
       `).join("");
+    }
+
+    function navigateToItem(productId) {
+      closeSearchOverlay();
+      switchTab('catalog');
+
+      setTimeout(() => {
+        const targetCard = document.getElementById(`card-${productId}`);
+        if (targetCard) {
+          targetCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          targetCard.classList.remove('item-highlight');
+          void targetCard.offsetWidth;
+          targetCard.classList.add('item-highlight');
+        }
+      }, 150);
     }
 
     document.addEventListener("keydown", (e) => {
@@ -747,7 +772,6 @@
         faqView.classList.remove("view-active");
         if (navCatalog) navCatalog.className = "flex flex-col items-center gap-1 text-brand-600 transition";
         if (navFaq) navFaq.className = "flex flex-col items-center gap-1 text-slate-400 transition";
-        document.getElementById("store-section").scrollIntoView({ behavior: "smooth" });
       } else {
         catalogView.classList.remove("view-active");
         faqView.classList.add("view-active");
@@ -778,7 +802,7 @@
       sheet.classList.add("md:translate-x-full");
     }
 
-    // CHECKOUT LOGIC WITH AUTOMATIC CART CLEARING
+    // TELEGRAM CHECKOUT & AUTO-CLEAR CART
     function checkoutTelegram() {
       const activeIndices = cartQuantities
         .map((qty, idx) => ({ qty, idx }))
@@ -809,7 +833,6 @@
         itemsSummary += `✩ ${item.name} ×${qty} — $${itemTotal.toFixed(2)}\n`;
       });
 
-      // Exact order note template
       const message = 
 `˗ˏˋ  The Layer Workshop — Order Note ˎˊ˗
 🔖 Order: #${orderId}
@@ -820,7 +843,7 @@ ${itemsSummary}💰 Total: $${subtotal.toFixed(2)} SGD
 ─── ･ ｡ﾟ☆: .☽ . :☆ﾟ. ───
 Hi @e1yse! Ready to confirm #${orderId} ✨ Let me know the PayNow details whenever you're free!`;
 
-      // Copy to clipboard fallback
+      // Copy fallback
       if (navigator.clipboard) {
         navigator.clipboard.writeText(message).catch(() => copyFallback(message));
       } else {
@@ -836,7 +859,7 @@ Hi @e1yse! Ready to confirm #${orderId} ✨ Let me know the PayNow details whene
         document.body.removeChild(txt);
       }
 
-      // AUTOMATICALLY CLEAR THE CART ON CHECKOUT
+      // Automatic cart clearing upon checkout
       cartQuantities.fill(0);
       updateCartBadge();
       renderCartItems();
@@ -844,7 +867,7 @@ Hi @e1yse! Ready to confirm #${orderId} ✨ Let me know the PayNow details whene
       document.getElementById("order-notes").value = "Local Delivery: [Enter Address / Postal Code]";
       setTimeout(closeCart, 400);
 
-      // Deep-link to Telegram
+      // Deep link to Telegram chat
       window.open(`https://t.me/${STORE_CONFIG.telegramUsername}?text=${encodeURIComponent(message)}`, "_blank");
     }
 
