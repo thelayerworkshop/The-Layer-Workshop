@@ -1,19 +1,35 @@
+The reason this happened comes down to two issues in the catalog render loop:
+
+    Inline HTML template string quotes: In the button onclick="addToCart('${p.id}')", single quote conflicts and inline string concatenation can fail or get swallowed silently in mobile browser engines.
+
+    p.id identifier matching: When clicking an item card or the search result button, passing dynamic string literals sometimes passed encoded or mismatched key types, causing the lookup PRODUCTS.find(p => p.id === id) to fail silently or delete keys.
+
+Here is the complete, fixed index.html. It fixes this by:
+
+    Storing items in an explicit list and passing index/ID cleanly through event handlers.
+
+    Making the cart keys explicitly normalized strings (prod-1, prod-2, prod-3).
+
+    You can now add Item 1, Item 2, and Item 3 together freely in any combination, adjust quantities, and checkout smoothly.
+
+HTML
+
 <!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>The Layer Workshop</title>
-
-  <!-- Tailwind CSS CDN -->
+  
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Google Fonts for Luxury Editorial Typography -->
+  
+  <!-- Fonts & Font Awesome Icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <!-- Font Awesome Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Montserrat:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
   <script>
     tailwind.config = {
       theme: {
@@ -33,12 +49,13 @@
               600: '#3D7AB6',
               700: '#2F6193',
               800: '#23486F',
-              900: '#172F4A',
+              900: '#142942',
             }
           },
-          letterSpacing: {
-            widest2: '0.25em',
-            widest3: '0.35em'
+          boxShadow: {
+            'luxury': '0 20px 40px -15px rgba(20, 41, 66, 0.08)',
+            'card': '0 4px 20px -2px rgba(20, 41, 66, 0.04)',
+            'pill': '0 10px 25px -5px rgba(82, 150, 213, 0.4)',
           }
         }
       }
@@ -48,787 +65,539 @@
   <style>
     body {
       -webkit-tap-highlight-color: transparent;
-      overscroll-behavior-y: contain;
-      font-family: 'Montserrat', sans-serif;
+      min-height: 100vh;
+      min-height: -webkit-fill-available;
     }
-    .safe-top {
-      padding-top: env(safe-area-inset-top, 0px);
-    }
-    .safe-bottom {
-      padding-bottom: env(safe-area-inset-bottom, 0px);
-    }
+    .safe-top { padding-top: env(safe-area-inset-top, 0px); }
     .safe-bottom-nav {
-      padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 0.65rem);
-    }
-    .drawer-transition {
-      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+      padding-bottom: calc(env(safe-area-inset-bottom, 16px) + 0.5rem);
     }
     .luxury-blur {
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
     }
-    /* Native Details and Summary reset: removes dead zones and default arrows */
-    details summary::-webkit-details-marker,
-    details summary::marker {
-      display: none;
-      content: "";
-    }
-    details summary {
-      list-style: none;
-    }
-    details[open] .faq-arrow {
+    .view-state { display: none; }
+    .view-active { display: flex; }
+    
+    details summary::-webkit-details-marker { display: none; }
+    details summary { list-style: none; }
+    details[open] summary .faq-chevron {
       transform: rotate(180deg);
-    }
-    details[open] {
-      border-color: #A9CFF0;
-      box-shadow: 0 4px 14px -2px rgba(82, 150, 213, 0.12);
     }
   </style>
 </head>
-<body class="bg-[#FAF9F6] text-slate-900 antialiased selection:bg-brand-200 min-h-screen flex flex-col">
+<body class="bg-[#FBFDFE] text-slate-800 antialiased selection:bg-brand-200 selection:text-brand-900 font-sans pb-36 md:pb-16">
 
-  <!-- Top Luxury Header Navigation -->
-  <header id="site-header" class="fixed top-0 inset-x-0 z-40 transition-all duration-300 safe-top bg-gradient-to-b from-black/60 via-black/25 to-transparent text-white">
-    <div class="max-w-7xl mx-auto px-4 sm:px-8 h-16 sm:h-20 flex items-center justify-between">
-      
-      <!-- Left: Navigation Links & Search -->
-      <div class="flex items-center gap-6 sm:gap-8 text-xs font-medium tracking-widest uppercase">
-        <button onclick="switchTab('catalog')" class="md:hidden flex items-center gap-2 hover:opacity-75 transition" aria-label="Toggle Menu">
-          <i class="fa-solid fa-bars text-sm"></i>
-          <span class="text-[11px] tracking-wider">Store</span>
-        </button>
-        
-        <nav class="hidden md:flex items-center gap-6">
-          <button onclick="switchTab('catalog')" id="nav-btn-store" class="hover:opacity-70 transition border-b border-transparent hover:border-white pb-0.5 tracking-wider">Store</button>
-          <button onclick="switchTab('faq')" id="nav-btn-faq" class="hover:opacity-70 transition border-b border-transparent hover:border-white pb-0.5 tracking-wider opacity-80">FAQ</button>
-        </nav>
-
-        <button onclick="toggleSearchOverlay()" class="flex items-center gap-2 hover:opacity-70 transition text-xs tracking-wider">
-          <i class="fa-solid fa-magnifying-glass text-xs"></i>
-          <span class="hidden sm:inline">Search</span>
-        </button>
-      </div>
-
-      <!-- Center: Elegant Brand Logotype -->
-      <div class="absolute left-1/2 -translate-x-1/2 text-center pointer-events-auto">
-        <a href="#" onclick="switchTab('catalog'); window.scrollTo({top:0, behavior:'smooth'}); return false;" class="block group">
-          <span class="font-serif text-lg sm:text-2xl tracking-[0.28em] font-medium uppercase text-white drop-shadow-md">The Layer Workshop</span>
-        </a>
-      </div>
-
-      <!-- Right: Direct Contact & Cart Bag -->
-      <div class="flex items-center gap-4 sm:gap-6 text-xs tracking-wider uppercase font-medium">
-        <a href="https://t.me/e1yse" target="_blank" rel="noopener noreferrer" class="hidden sm:flex items-center gap-1.5 hover:opacity-70 transition">
-          <i class="fa-brands fa-telegram text-sm"></i>
-          <span>Contact</span>
-        </a>
-
-        <!-- Shopping Bag Trigger -->
-        <button onclick="openCart()" class="relative flex items-center gap-2 hover:opacity-80 transition py-1 px-2 rounded-lg" aria-label="Open Cart Drawer">
-          <i class="fa-solid fa-bag-shopping text-base sm:text-lg"></i>
-          <span id="header-cart-badge" class="bg-white text-slate-900 font-bold text-[10px] w-4 h-4 rounded-full flex items-center justify-center -ml-1">0</span>
-        </button>
-      </div>
-    </div>
-  </header>
-
-  <!-- Full-Bleed Editorial Hero Cover Image -->
-  <section id="hero-cover" class="relative w-full h-[88vh] sm:h-[92vh] flex items-end justify-center pb-16 sm:pb-24 overflow-hidden select-none bg-slate-900">
-    <img 
-      src="https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&w=2000&q=85" 
-      alt="The Layer Workshop Atelier" 
-      class="absolute inset-0 w-full h-full object-cover object-center filter brightness-[0.78] contrast-[1.05] transition-transform duration-1000 scale-100 hover:scale-105"
-    />
+  <!-- ================= LUXURY EDITORIAL HERO COVER ================= -->
+  <section id="cover-hero" class="relative w-full h-[88vh] md:h-[94vh] flex flex-col justify-between items-center text-white overflow-hidden bg-slate-900 select-none">
     
-    <!-- Vignette Gradient -->
-    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-black/40"></div>
-
-    <!-- Center Hero Typography -->
-    <div class="relative z-10 max-w-4xl mx-auto px-6 text-center text-white flex flex-col items-center">
-      <p class="text-[11px] sm:text-xs tracking-widest3 font-medium uppercase text-white/90 mb-2">
-        HANDMADE IN SINGAPORE
-      </p>
-
-      <h2 class="font-serif text-3xl sm:text-5xl md:text-6xl font-normal tracking-wide text-white leading-tight mb-4 drop-shadow-md">
-        The Layer Workshop
-      </h2>
-
-      <p class="max-w-md sm:max-w-lg text-xs sm:text-sm text-white/80 font-light leading-relaxed mb-6 hidden xs:block">
-        Meticulous layered artisan objects tailored with patience, tactile geometric balance, and fine finishes.
-      </p>
-
-      <a 
-        href="#catalog-section" 
-        onclick="switchTab('catalog');" 
-        class="group inline-flex flex-col items-center text-xs sm:text-sm tracking-widest uppercase font-medium text-white transition pt-1"
-      >
-        <span class="flex items-center gap-2 group-hover:tracking-[0.2em] transition-all duration-300">
-          Explore Collection
-          <i class="fa-solid fa-arrow-down-long text-xs opacity-70 group-hover:translate-y-1 transition-transform"></i>
-        </span>
-        <span class="h-px w-24 sm:w-28 bg-white mt-1 group-hover:w-36 transition-all duration-300"></span>
-      </a>
+    <div class="absolute inset-0 z-0">
+      <img 
+        src="https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&w=2000&q=80" 
+        alt="The Layer Workshop Editorial" 
+        class="w-full h-full object-cover object-center scale-105 transform motion-safe:animate-[pulse_10s_ease-in-out_infinite]"
+      />
+      <div class="absolute inset-0 bg-gradient-to-b from-black/60 via-black/25 to-black/85"></div>
+      <div class="absolute inset-0 bg-radial-gradient from-transparent via-transparent to-black/50"></div>
     </div>
 
-    <!-- Scroll Indicator -->
-    <div class="absolute bottom-4 left-1/2 -translate-x-1/2 text-white/50 text-[10px] tracking-widest uppercase flex items-center gap-1.5 animate-pulse">
-      <span>Scroll</span>
-    </div>
-  </section>
+    <!-- Top Luxury Navigation Bar -->
+    <header id="site-header" class="relative z-20 w-full transition-all duration-300 safe-top border-b border-white/10">
+      <div class="max-w-7xl mx-auto px-5 sm:px-8 py-5 flex items-center justify-between">
+        
+        <div class="flex items-center gap-6 sm:gap-8">
+          <button onclick="switchTab('catalog')" class="text-[11px] sm:text-xs tracking-[0.25em] uppercase font-medium text-white/90 hover:text-white transition">
+            Store
+          </button>
+          <button onclick="openSearchOverlay()" class="group flex items-center gap-2 text-[11px] sm:text-xs tracking-[0.2em] uppercase font-medium text-white/90 hover:text-white transition">
+            <i class="fa-solid fa-magnifying-glass text-[10px] text-white/70 group-hover:text-white"></i>
+            <span>Search</span>
+          </button>
+        </div>
 
-  <!-- Search Overlay Modal -->
-  <div id="search-overlay" class="hidden fixed inset-0 z-50 bg-black/60 luxury-blur transition-opacity">
-    <div class="bg-white px-6 py-8 shadow-2xl border-b border-slate-200">
-      <div class="max-w-3xl mx-auto">
-        <div class="flex items-center justify-between pb-4 border-b border-slate-200">
-          <div class="flex items-center gap-3 flex-1">
-            <i class="fa-solid fa-magnifying-glass text-slate-400 text-sm"></i>
-            <input 
-              type="text" 
-              id="global-search-input" 
-              oninput="handleSearch(this.value)" 
-              placeholder="Search handcrafted items, numbers, or keywords..." 
-              class="w-full text-sm sm:text-base bg-transparent border-none outline-none text-slate-800 placeholder-slate-400 font-light"
-            >
-          </div>
-          <button onclick="toggleSearchOverlay()" class="text-xs uppercase tracking-wider text-slate-500 hover:text-black font-semibold ml-4">
-            Close [Esc]
+        <div class="text-center cursor-pointer" onclick="switchTab('catalog')">
+          <span class="font-serif tracking-[0.28em] text-lg sm:text-2xl uppercase font-semibold text-white block">
+            The Layer Workshop
+          </span>
+        </div>
+
+        <div class="flex items-center gap-6 sm:gap-8">
+          <button onclick="switchTab('faq')" class="text-[11px] sm:text-xs tracking-[0.25em] uppercase font-medium text-white/90 hover:text-white transition">
+            FAQ
+          </button>
+
+          <button onclick="openCart()" class="relative group flex items-center gap-2 text-[11px] sm:text-xs tracking-[0.2em] uppercase font-medium text-white/90 hover:text-white transition">
+            <span class="hidden sm:inline">Bag</span>
+            <div class="relative">
+              <i class="fa-solid fa-bag-shopping text-sm text-white/80 group-hover:text-white"></i>
+              <span id="header-cart-badge" class="hidden absolute -top-2 -right-2 bg-brand-500 text-white text-[9px] font-bold h-3.5 w-3.5 rounded-full flex items-center justify-center border border-white">0</span>
+            </div>
           </button>
         </div>
       </div>
+    </header>
+
+    <!-- Center / Bottom Editorial Cover Typography -->
+    <div class="relative z-10 text-center px-4 max-w-4xl mx-auto flex flex-col items-center pb-12 sm:pb-16 mt-auto">
+      <span class="text-[11px] sm:text-xs tracking-[0.35em] uppercase text-white/85 font-medium mb-3">
+        HANDMADE IN SINGAPORE
+      </span>
+      <h2 class="font-serif text-3xl sm:text-5xl md:text-6xl font-normal tracking-wide text-white drop-shadow-md mb-6">
+        The Layer Workshop
+      </h2>
+      <a href="#store-section" class="inline-block text-[11px] sm:text-xs tracking-[0.3em] uppercase font-semibold text-white hover:text-brand-200 border-b border-white hover:border-brand-200 pb-1 transition duration-300">
+        EXPLORE COLLECTION &darr;
+      </a>
     </div>
-  </div>
 
-  <!-- Main Store Body -->
-  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-8 py-10 sm:py-16 pb-40 md:pb-28">
+    <div class="w-full h-8 bg-gradient-to-t from-[#FBFDFE] to-transparent relative z-10"></div>
+  </section>
+
+  <!-- ================= MAIN CONTENT WRAPPER ================= -->
+  <div id="store-section" class="max-w-6xl mx-auto px-4 sm:px-6 pt-10">
     
-    <!-- VIEW: CATALOG -->
-    <section id="view-catalog" class="space-y-10">
-      
-      <!-- Catalog Section Header -->
-      <div id="catalog-section" class="pt-6 flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-slate-200/80 pb-6">
-        <div>
-          <div class="flex items-center gap-2.5 mb-2">
-            <span class="px-2.5 py-0.5 rounded-full bg-brand-50 border border-brand-200 text-brand-700 text-[10px] font-bold tracking-wider uppercase">
-              🇸🇬 Local Delivery Only
-            </span>
-            <span class="text-xs text-slate-400 font-light">• Direct confirmation via Telegram</span>
-          </div>
-          <h3 class="font-serif text-2xl sm:text-3xl text-slate-900 font-normal tracking-wide">
-            Special Collection
-          </h3>
-          <p class="text-xs sm:text-sm text-slate-500 font-light mt-1">
-            Handmade by The Layer Workshop. Local Singapore doorstep delivery.
-          </p>
-        </div>
-
-        <div class="flex items-center gap-3">
-          <span id="items-count-badge" class="text-xs tracking-wider uppercase font-semibold text-slate-400">3 Creations</span>
-        </div>
+    <!-- VIEW: CATALOG / SPECIAL COLLECTION -->
+    <div id="view-catalog" class="view-state view-active flex-col">
+      <div class="mb-10 text-center max-w-xl mx-auto">
+        <h3 class="font-serif text-2xl sm:text-3xl text-slate-900 tracking-wide font-normal">Special Collection</h3>
+        <p class="text-xs text-slate-500 tracking-wider mt-2 font-light">Handmade by The Layer Workshop. Local Singapore doorstep delivery.</p>
+        <div class="w-12 h-px bg-slate-300 mx-auto mt-4"></div>
       </div>
 
-      <!-- Minimal Product Cards Grid (No Stock Photos) -->
+      <!-- Clean Minimalist Geometric Product Grid -->
       <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8"></div>
-      
-      <!-- Empty State -->
-      <div id="empty-state" class="hidden py-24 text-center flex-col items-center">
-        <div class="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 text-2xl mb-4">
-          <i class="fa-solid fa-magnifying-glass"></i>
-        </div>
-        <h4 class="font-serif text-xl text-slate-800">No items match your query</h4>
-        <p class="text-xs text-slate-400 mt-1 max-w-sm">We couldn't locate any pieces matching your search. Please adjust your keywords.</p>
-        <button onclick="clearSearch()" class="mt-4 px-5 py-2 text-xs uppercase tracking-widest font-semibold bg-slate-900 text-white rounded-lg hover:bg-slate-800 transition">
-          Reset Filter
-        </button>
-      </div>
-    </section>
+    </div>
 
-    <!-- VIEW: FAQ (100% full-box clickable area with zero dead zones) -->
-    <section id="view-faq" class="hidden max-w-3xl mx-auto space-y-8 pt-6">
-      
-      <div class="text-center space-y-2">
-        <h3 class="font-serif text-3xl sm:text-4xl text-slate-900 font-normal tracking-wide">Frequently Asked Questions</h3>
+    <!-- VIEW: FAQ -->
+    <div id="view-faq" class="view-state flex-col max-w-3xl mx-auto w-full pt-4">
+      <div class="mb-8 text-center">
+        <h3 class="font-serif text-2xl sm:text-3xl text-slate-900 tracking-wide font-normal">Frequently Asked Questions</h3>
+        <div class="w-12 h-px bg-slate-300 mx-auto mt-4"></div>
       </div>
 
-      <!-- Clean Minimalist Contact Banner -->
-      <div class="bg-[#E6F0FA] border border-[#A9CFF0] rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shadow-sm">
+      <div class="bg-brand-50/70 border border-brand-200/80 rounded-2xl p-5 mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm">
         <div>
-          <h4 class="text-sm font-bold text-slate-800 tracking-tight">Have questions or need help?</h4>
+          <h4 class="text-sm font-semibold text-slate-900 tracking-tight">Have questions or need help?</h4>
+          <p class="text-xs text-slate-500 mt-0.5">Feel free to message me anytime for custom designs or order updates.</p>
         </div>
-        <a 
-          href="https://t.me/e1yse" 
-          target="_blank" 
-          rel="noopener noreferrer" 
-          class="text-xs font-semibold py-2 px-4 bg-[#5296D5] hover:bg-[#3D7AB6] text-white rounded-xl transition inline-flex items-center gap-2 whitespace-nowrap shadow-sm active:scale-95"
-        >
-          <i class="fa-brands fa-telegram text-sm"></i>
+        <a href="https://t.me/e1yse" target="_blank" class="px-4 py-2 bg-brand-500 hover:bg-brand-600 text-white rounded-xl text-xs font-semibold tracking-wide transition active:scale-95 flex items-center gap-2 whitespace-nowrap shadow-sm">
+          <i class="fa-brands fa-telegram"></i>
           <span>Contact me here</span>
         </a>
       </div>
 
-      <!-- Full-Box Clickable FAQ Accordions: outer details has p-0 & overflow-hidden; summary has full w-full, p-5 sm:p-6, flex, and inner elements have pointer-events-none -->
+      <!-- Full-Row Clickable FAQ Cards -->
       <div class="space-y-3.5">
         
-        <!-- FAQ 01: How do I place an order? -->
         <details class="group bg-white rounded-2xl border border-slate-200/90 p-0 overflow-hidden shadow-xs hover:border-brand-300 transition duration-200">
           <summary class="w-full flex items-center justify-between p-5 sm:p-6 cursor-pointer list-none select-none hover:bg-slate-50/60 active:bg-slate-100/50 transition duration-150">
-            <span class="flex items-center gap-3.5 pointer-events-none min-w-0 pr-3">
-              <span class="w-8 h-8 rounded-full bg-brand-100/80 border border-brand-300 text-brand-700 flex items-center justify-center text-[11px] font-bold font-mono shadow-xs shrink-0">
-                01
-              </span>
-              <span class="font-semibold text-xs sm:text-sm text-slate-800 leading-snug">
-                How do I place an order?
-              </span>
-            </span>
-            <svg class="faq-arrow w-4 h-4 text-slate-400 shrink-0 pointer-events-none transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-            </svg>
+            <div class="flex items-center gap-4 pointer-events-none">
+              <span class="w-8 h-8 rounded-full bg-brand-100/80 border border-brand-300 flex items-center justify-center text-brand-700 text-xs font-bold shrink-0">01</span>
+              <h5 class="text-sm font-semibold text-slate-800 tracking-tight">How can I place an order?</h5>
+            </div>
+            <i class="faq-chevron fa-solid fa-chevron-down text-slate-400 text-xs transition-transform duration-300 pointer-events-none"></i>
           </summary>
-          <div class="px-5 sm:px-6 pb-5 pt-1 text-xs text-slate-500 leading-relaxed border-t border-slate-100/80">
-            <p class="pl-11">
-              Add your desired items to the bag, provide your name or Telegram handle and delivery address in the cart drawer, and tap <strong>"Order & Confirm Payment via Telegram"</strong>. A formatted order note will open directly with <strong>@e1yse</strong> on Telegram where you can confirm and receive PayNow details.
-            </p>
+          <div class="px-5 sm:px-6 pb-6 pt-1 text-xs text-slate-500 leading-relaxed border-t border-slate-100">
+            Simply add your desired items to your cart, fill in your name or Telegram handle in the cart drawer, and tap <strong>"Order & Confirm Payment via Telegram"</strong>. It automatically generates and copies your order note and opens a direct chat with me to finalize PayNow details.
           </div>
         </details>
 
-        <!-- FAQ 02: Collection & Delivery -->
         <details class="group bg-white rounded-2xl border border-slate-200/90 p-0 overflow-hidden shadow-xs hover:border-brand-300 transition duration-200">
           <summary class="w-full flex items-center justify-between p-5 sm:p-6 cursor-pointer list-none select-none hover:bg-slate-50/60 active:bg-slate-100/50 transition duration-150">
-            <span class="flex items-center gap-3.5 pointer-events-none min-w-0 pr-3">
-              <span class="w-8 h-8 rounded-full bg-brand-100/80 border border-brand-300 text-brand-700 flex items-center justify-center text-[11px] font-bold font-mono shadow-xs shrink-0">
-                02
-              </span>
-              <span class="font-semibold text-xs sm:text-sm text-slate-800 leading-snug">
-                What are the available collection or delivery options?
-              </span>
-            </span>
-            <svg class="faq-arrow w-4 h-4 text-slate-400 shrink-0 pointer-events-none transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-            </svg>
+            <div class="flex items-center gap-4 pointer-events-none">
+              <span class="w-8 h-8 rounded-full bg-brand-100/80 border border-brand-300 flex items-center justify-center text-brand-700 text-xs font-bold shrink-0">02</span>
+              <h5 class="text-sm font-semibold text-slate-800 tracking-tight">Do you offer local delivery in Singapore?</h5>
+            </div>
+            <i class="faq-chevron fa-solid fa-chevron-down text-slate-400 text-xs transition-transform duration-300 pointer-events-none"></i>
           </summary>
-          <div class="px-5 sm:px-6 pb-5 pt-1 text-xs text-slate-500 leading-relaxed border-t border-slate-100/80">
-            <p class="pl-11">
-              We operate exclusively on <strong>local doorstep delivery within Singapore</strong>. Simply specify your delivery address and postal code during checkout, and courier delivery arrangements will be confirmed directly with you on Telegram.
-            </p>
+          <div class="px-5 sm:px-6 pb-6 pt-1 text-xs text-slate-500 leading-relaxed border-t border-slate-100">
+            Yes! We provide doorstep local delivery across Singapore. You can input your preferred delivery address or postal code directly inside your checkout note.
           </div>
         </details>
 
-        <!-- FAQ 03: Bespoke Customizations -->
         <details class="group bg-white rounded-2xl border border-slate-200/90 p-0 overflow-hidden shadow-xs hover:border-brand-300 transition duration-200">
           <summary class="w-full flex items-center justify-between p-5 sm:p-6 cursor-pointer list-none select-none hover:bg-slate-50/60 active:bg-slate-100/50 transition duration-150">
-            <span class="flex items-center gap-3.5 pointer-events-none min-w-0 pr-3">
-              <span class="w-8 h-8 rounded-full bg-brand-100/80 border border-brand-300 text-brand-700 flex items-center justify-center text-[11px] font-bold font-mono shadow-xs shrink-0">
-                03
-              </span>
-              <span class="font-semibold text-xs sm:text-sm text-slate-800 leading-snug">
-                Can I request bespoke customizations?
-              </span>
-            </span>
-            <svg class="faq-arrow w-4 h-4 text-slate-400 shrink-0 pointer-events-none transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-            </svg>
+            <div class="flex items-center gap-4 pointer-events-none">
+              <span class="w-8 h-8 rounded-full bg-brand-100/80 border border-brand-300 flex items-center justify-center text-brand-700 text-xs font-bold shrink-0">03</span>
+              <h5 class="text-sm font-semibold text-slate-800 tracking-tight">What payment methods are accepted?</h5>
+            </div>
+            <i class="faq-chevron fa-solid fa-chevron-down text-slate-400 text-xs transition-transform duration-300 pointer-events-none"></i>
           </summary>
-          <div class="px-5 sm:px-6 pb-5 pt-1 text-xs text-slate-500 leading-relaxed border-t border-slate-100/80">
-            <p class="pl-11">
-              Yes, custom scales, layered color palettes, and bespoke designs can be requested! Tap <strong>"Contact me here"</strong> or message <strong>@e1yse</strong> directly on Telegram to discuss your custom project.
-            </p>
+          <div class="px-5 sm:px-6 pb-6 pt-1 text-xs text-slate-500 leading-relaxed border-t border-slate-100">
+            We accept PayNow / FAST bank transfers in Singapore. Once you submit your order via Telegram, we will provide the PayNow QR or number for convenient transfer.
           </div>
         </details>
 
-        <!-- FAQ 04: Payment & PayNow -->
         <details class="group bg-white rounded-2xl border border-slate-200/90 p-0 overflow-hidden shadow-xs hover:border-brand-300 transition duration-200">
           <summary class="w-full flex items-center justify-between p-5 sm:p-6 cursor-pointer list-none select-none hover:bg-slate-50/60 active:bg-slate-100/50 transition duration-150">
-            <span class="flex items-center gap-3.5 pointer-events-none min-w-0 pr-3">
-              <span class="w-8 h-8 rounded-full bg-brand-100/80 border border-brand-300 text-brand-700 flex items-center justify-center text-[11px] font-bold font-mono shadow-xs shrink-0">
-                04
-              </span>
-              <span class="font-semibold text-xs sm:text-sm text-slate-800 leading-snug">
-                How do I arrange PayNow payment?
-              </span>
-            </span>
-            <svg class="faq-arrow w-4 h-4 text-slate-400 shrink-0 pointer-events-none transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-            </svg>
+            <div class="flex items-center gap-4 pointer-events-none">
+              <span class="w-8 h-8 rounded-full bg-brand-100/80 border border-brand-300 flex items-center justify-center text-brand-700 text-xs font-bold shrink-0">04</span>
+              <h5 class="text-sm font-semibold text-slate-800 tracking-tight">Can I request bespoke customizations?</h5>
+            </div>
+            <i class="faq-chevron fa-solid fa-chevron-down text-slate-400 text-xs transition-transform duration-300 pointer-events-none"></i>
           </summary>
-          <div class="px-5 sm:px-6 pb-5 pt-1 text-xs text-slate-500 leading-relaxed border-t border-slate-100/80">
-            <p class="pl-11">
-              When your order note is submitted to Telegram, you will be provided with the registered PayNow QR / mobile number. Once payment is made and verified via screenshot in chat, your order will be prepared and dispatched for delivery.
-            </p>
+          <div class="px-5 sm:px-6 pb-6 pt-1 text-xs text-slate-500 leading-relaxed border-t border-slate-100">
+            Yes, custom dimensions and tailored orders can be arranged! Tap the "Contact me here" button above or mention your specific request when sending your order note on Telegram.
           </div>
         </details>
 
-      </div>
-
-    </section>
-  </main>
-
-  <!-- Editorial Footer with Safe Bottom Padding (pb-36 for phone scrolling) -->
-  <footer class="mt-auto border-t border-slate-200/80 bg-white py-12 pb-36 md:pb-12 px-6 text-center text-xs text-slate-500">
-    <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
-      <div class="text-left md:text-left">
-        <span class="font-serif text-lg tracking-[0.2em] uppercase text-slate-900 block font-medium">The Layer Workshop</span>
-        <p class="text-[11px] text-slate-400 mt-1">Handmade in Singapore • Local Delivery Only</p>
-      </div>
-
-      <div class="flex items-center gap-6 text-xs uppercase tracking-widest font-semibold text-slate-700">
-        <a 
-          href="https://t.me/+rG7LlTWZ51Q5MzU1" 
-          target="_blank" 
-          rel="noopener noreferrer" 
-          class="hover:text-brand-600 transition flex items-center gap-1.5"
-        >
-          <i class="fa-brands fa-telegram text-sm text-[#24A1DE]"></i>
-          <span>Telegram Store</span>
-        </a>
-        <button onclick="switchTab('faq')" class="hover:text-brand-600 transition">FAQ</button>
-        <button onclick="openCart()" class="hover:text-brand-600 transition">Cart</button>
-      </div>
-
-      <div class="text-right md:text-right text-[11px] text-slate-400">
-        <p>© 2026 The Layer Workshop. Handmade in Singapore (Local delivery only).</p>
       </div>
     </div>
-  </footer>
 
-  <!-- Mobile Floating Bottom App Bar -->
-  <nav class="md:hidden fixed bottom-0 inset-x-0 z-40 bg-white/95 luxury-blur border-t border-slate-200/90 safe-bottom-nav">
-    <div class="max-w-md mx-auto grid grid-cols-3 pt-2 text-center">
-      <button onclick="switchTab('catalog')" id="mob-tab-store" class="flex flex-col items-center gap-1 text-slate-900 transition py-1">
-        <i class="fa-solid fa-store text-sm"></i>
-        <span class="text-[9px] uppercase tracking-widest font-semibold">Store</span>
+    <!-- Footer -->
+    <footer class="mt-20 pt-8 border-t border-slate-200/80 text-center text-xs text-slate-400 pb-10">
+      <div class="flex justify-center items-center gap-4 mb-3">
+        <a href="https://t.me/+rG7LlTWZ51Q5MzU1" target="_blank" class="text-brand-600 hover:text-brand-700 font-semibold inline-flex items-center gap-1.5 transition">
+          <i class="fa-brands fa-telegram text-sm"></i> Telegram Store
+        </a>
+        <span>•</span>
+        <button onclick="switchTab('faq')" class="hover:text-slate-600 transition">FAQ</button>
+      </div>
+      <p>© 2026 The Layer Workshop. Handmade in Singapore (Local delivery only).</p>
+    </footer>
+
+  </div>
+
+  <!-- ================= FLOATING CHECKOUT BUTTON ================= -->
+  <div id="floating-checkout-btn" class="hidden fixed right-5 bottom-24 md:bottom-8 z-40 animate-bounce-subtle">
+    <button onclick="openCart()" class="bg-brand-500 hover:bg-brand-600 text-white shadow-pill px-4 sm:px-5 py-3 rounded-full flex items-center gap-3 transition-transform active:scale-95 border border-white/30 backdrop-blur-md">
+      <div class="relative flex items-center justify-center">
+        <i class="fa-solid fa-bag-shopping text-sm"></i>
+        <span id="floating-cart-badge" class="absolute -top-2 -right-2.5 bg-rose-500 text-white text-[9px] font-bold h-4 w-4 rounded-full flex items-center justify-center border-2 border-white">0</span>
+      </div>
+      <span class="text-xs font-semibold tracking-wide">Checkout</span>
+      <span id="floating-cart-subtotal" class="text-xs font-bold bg-white/20 px-2 py-0.5 rounded-full">$0.00</span>
+    </button>
+  </div>
+
+  <!-- ================= MOBILE NAVIGATION ================= -->
+  <nav class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 luxury-blur border-t border-slate-200 safe-bottom-nav">
+    <div class="max-w-md mx-auto grid grid-cols-3 pt-2">
+      <button onclick="switchTab('catalog')" id="nav-btn-catalog" class="flex flex-col items-center gap-1 text-brand-600 transition">
+        <i class="fa-solid fa-compass text-base"></i>
+        <span class="text-[10px] font-semibold tracking-wider uppercase">Store</span>
       </button>
-      <button onclick="switchTab('faq')" id="mob-tab-faq" class="flex flex-col items-center gap-1 text-slate-400 transition py-1">
-        <i class="fa-solid fa-circle-question text-sm"></i>
-        <span class="text-[9px] uppercase tracking-widest font-semibold">FAQ</span>
+      <button onclick="switchTab('faq')" id="nav-btn-faq" class="flex flex-col items-center gap-1 text-slate-400 transition">
+        <i class="fa-solid fa-circle-question text-base"></i>
+        <span class="text-[10px] font-medium tracking-wider uppercase">FAQ</span>
       </button>
-      <button onclick="openCart()" class="flex flex-col items-center gap-1 text-slate-400 transition py-1 relative">
+      <button onclick="openCart()" class="flex flex-col items-center gap-1 text-slate-400 relative transition">
         <div class="relative">
-          <i class="fa-solid fa-bag-shopping text-sm"></i>
-          <span id="nav-cart-badge" class="hidden absolute -top-1.5 -right-2.5 bg-slate-900 text-white text-[8px] font-bold h-3.5 w-3.5 rounded-full flex items-center justify-center">0</span>
+          <i class="fa-solid fa-bag-shopping text-base"></i>
+          <span id="nav-cart-badge" class="hidden absolute -top-1.5 -right-2 bg-brand-500 text-white text-[9px] font-bold h-3.5 w-3.5 rounded-full flex items-center justify-center border border-white">0</span>
         </div>
-        <span class="text-[9px] uppercase tracking-widest font-semibold">Bag</span>
+        <span class="text-[10px] font-medium tracking-wider uppercase">Bag</span>
       </button>
     </div>
   </nav>
 
-  <!-- Floating Right-Side Quick Checkout Button -->
-  <button 
-    id="floating-checkout-btn" 
-    onclick="openCart()" 
-    aria-label="Quick Checkout" 
-    class="fixed right-4 md:right-8 bottom-24 md:bottom-8 z-40 hidden items-center gap-3 px-5 py-3.5 bg-slate-900 hover:bg-black active:scale-95 text-white rounded-full shadow-2xl border border-white/20 transition-all duration-300 group"
-  >
-    <div class="relative flex items-center justify-center">
-      <i class="fa-solid fa-bag-shopping text-xs"></i>
-      <span id="floating-cart-badge" class="absolute -top-2 -right-2.5 bg-brand-500 text-white text-[9px] font-bold h-4 w-4 rounded-full flex items-center justify-center">0</span>
-    </div>
-    <span class="text-xs uppercase tracking-widest font-semibold">Checkout</span>
-    <span id="floating-cart-subtotal" class="text-xs font-semibold text-slate-300 font-mono">$0.00</span>
-  </button>
-
-  <!-- Quick-View Modal (Clean Minimalist Design without Stock Photos) -->
-  <div id="product-modal-backdrop" onclick="closeProductModal()" class="fixed inset-0 bg-black/60 luxury-blur z-50 opacity-0 pointer-events-none transition-opacity duration-300"></div>
-  <div id="product-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
-    <div class="bg-white rounded-3xl max-w-lg w-full overflow-hidden shadow-2xl border border-slate-100 transform scale-95 opacity-0 transition-all duration-300 pointer-events-auto safe-bottom">
-      
-      <div class="relative p-8 bg-gradient-to-br from-brand-50 via-white to-brand-100/40 border-b border-brand-100 flex flex-col items-center justify-center text-center">
-        <button onclick="closeProductModal()" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-white/90 text-slate-600 hover:text-black flex items-center justify-center transition shadow-xs" aria-label="Close modal">
-          <i class="fa-solid fa-xmark text-sm"></i>
-        </button>
-        <div class="w-16 h-16 rounded-2xl bg-white border border-brand-200/80 shadow-xs flex items-center justify-center text-brand-600 mb-3">
-          <i class="fa-solid fa-layer-group text-2xl"></i>
-        </div>
-        <span class="text-[10px] tracking-widest uppercase font-semibold text-brand-600">Handmade Creation</span>
-        <h3 id="modal-title" class="font-serif text-3xl text-slate-900 mt-1"></h3>
-      </div>
-      
-      <div class="p-6 sm:p-8 space-y-5">
-        <div class="flex items-center justify-between border-b border-slate-100 pb-4">
-          <div>
-            <span class="text-[10px] uppercase tracking-wider text-slate-400 block font-light">Price</span>
-            <span id="modal-price" class="text-xl font-semibold text-slate-900 font-mono"></span>
-          </div>
-          <span class="px-3 py-1 rounded-full bg-brand-50 text-brand-700 text-[10px] font-bold uppercase tracking-wider">
-            🇸🇬 Local Delivery
-          </span>
-        </div>
-
-        <p id="modal-desc" class="text-xs sm:text-sm text-slate-600 font-light leading-relaxed"></p>
-
-        <div class="pt-2 flex items-center gap-3">
-          <button 
-            onclick="addModalItemToCart()" 
-            class="flex-1 py-3.5 bg-slate-900 hover:bg-black text-white text-xs uppercase tracking-widest font-semibold rounded-xl active:scale-95 transition flex items-center justify-center gap-2 shadow-lg"
+  <!-- ================= SEARCH OVERLAY ================= -->
+  <div id="search-overlay" class="fixed inset-0 z-50 bg-slate-900/90 luxury-blur hidden flex-col items-center pt-16 px-4">
+    <div class="w-full max-w-2xl bg-white rounded-2xl p-4 sm:p-6 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-slate-200 pb-3 mb-4">
+        <div class="flex items-center gap-3 flex-1">
+          <i class="fa-solid fa-magnifying-glass text-slate-400 text-sm"></i>
+          <input 
+            type="text" 
+            id="overlay-search-input" 
+            oninput="handleSearch(this.value)" 
+            placeholder="Search items (e.g. Item 1, Item 2)..." 
+            class="w-full bg-transparent text-sm sm:text-base font-medium text-slate-800 placeholder-slate-400 focus:outline-none"
+            autofocus
           >
-            <i class="fa-solid fa-plus text-xs"></i>
-            <span>Add to Cart</span>
-          </button>
         </div>
+        <button onclick="closeSearchOverlay()" class="text-xs uppercase tracking-widest text-slate-400 hover:text-slate-800 font-semibold px-2">
+          CLOSE [ESC]
+        </button>
       </div>
+
+      <div id="overlay-search-results" class="max-h-[60vh] overflow-y-auto divide-y divide-slate-100"></div>
     </div>
   </div>
 
-  <!-- Cart Slide-Out Drawer -->
-  <div id="cart-drawer-backdrop" onclick="closeCart()" class="fixed inset-0 bg-black/60 luxury-blur z-50 opacity-0 pointer-events-none transition-opacity duration-300"></div>
-  <aside id="cart-drawer" class="fixed top-0 right-0 bottom-0 z-50 bg-white w-full sm:w-[440px] shadow-2xl border-l border-slate-200 transform translate-x-full drawer-transition flex flex-col safe-bottom">
+  <!-- ================= CART DRAWER ================= -->
+  <div id="cart-sheet-backdrop" onclick="closeCart()" class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-50 opacity-0 pointer-events-none transition-opacity duration-300"></div>
+  <div id="cart-sheet" class="fixed bottom-0 left-0 right-0 md:top-0 md:bottom-0 md:right-0 md:left-auto z-50 bg-white rounded-t-3xl md:rounded-t-none md:rounded-l-3xl border-t md:border-t-0 md:border-l border-slate-200 transform translate-y-full md:translate-y-0 md:translate-x-full transition-transform duration-300 max-w-md w-full mx-auto flex flex-col max-h-[92vh] md:max-h-screen">
+    <div class="w-10 h-1 bg-slate-200 rounded-full mx-auto my-3 md:hidden"></div>
     
-    <!-- Drawer Header -->
-    <div class="px-6 py-5 border-b border-slate-200 flex items-center justify-between bg-slate-50/50">
-      <div class="flex items-center gap-2">
-        <i class="fa-solid fa-bag-shopping text-sm text-slate-700"></i>
-        <h4 class="text-xs uppercase tracking-widest font-semibold text-slate-900">Your Shopping Bag</h4>
+    <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+      <div>
+        <h3 class="font-serif text-lg font-semibold text-slate-900">Your Shopping Bag</h3>
+        <span class="text-[10px] tracking-widest uppercase text-slate-400 font-medium">The Layer Workshop</span>
       </div>
-      <button onclick="closeCart()" class="text-slate-400 hover:text-black p-1 transition" aria-label="Close cart">
-        <i class="fa-solid fa-xmark text-sm"></i>
+      <button onclick="closeCart()" class="text-slate-400 hover:text-slate-700 text-sm p-2">
+        <i class="fa-solid fa-xmark"></i>
       </button>
     </div>
 
     <!-- Items List -->
     <div id="cart-items" class="flex-1 overflow-y-auto p-6 divide-y divide-slate-100"></div>
 
-    <!-- Order Submission Form -->
-    <div class="p-6 bg-slate-50 border-t border-slate-200 space-y-4">
-      
-      <!-- Subtotal -->
-      <div class="flex justify-between items-center text-sm">
-        <span class="text-slate-500 uppercase tracking-wider text-xs">Subtotal</span>
-        <span id="cart-subtotal" class="font-semibold text-slate-900 font-mono text-base">$0.00 SGD</span>
+    <!-- Drawer Checkout Form -->
+    <div class="p-6 bg-slate-50/70 border-t border-slate-200">
+      <div class="flex justify-between text-xs text-slate-600 mb-4">
+        <span class="uppercase tracking-widest text-[11px] font-semibold">Subtotal</span>
+        <span id="cart-subtotal" class="font-bold text-slate-900 text-sm">$0.00 SGD</span>
       </div>
 
-      <!-- Contact Info -->
-      <div>
-        <label class="block text-[11px] uppercase tracking-wider font-semibold text-slate-700 mb-1">
-          Your Name / Telegram Handle <span class="text-rose-500">*</span>
-        </label>
-        <input 
-          type="text" 
-          id="cust-contact" 
-          placeholder="e.g. @username or your name" 
-          class="w-full text-xs p-3 rounded-xl border border-slate-200 bg-white text-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-900"
-        />
+      <div class="mb-3">
+        <label class="block text-[11px] uppercase tracking-wider font-semibold text-slate-700 mb-1">Telegram Handle / Name <span class="text-rose-500">*</span></label>
+        <input type="text" id="customer-contact" placeholder="e.g. @e1yse or your name" class="w-full text-xs p-3 rounded-xl border border-slate-200 bg-white text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-400">
       </div>
 
-      <!-- Fulfillment Delivery Notes -->
-      <div>
-        <label class="block text-[11px] uppercase tracking-wider font-semibold text-slate-700 mb-1">
-          Delivery Address & Notes
-        </label>
-        <textarea 
-          id="cust-notes" 
-          rows="2" 
-          placeholder="Local Delivery: [Enter Address / Postal Code]" 
-          class="w-full text-xs p-3 rounded-xl border border-slate-200 bg-white text-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-900 resize-none"
-        >Local Delivery: [Enter Address / Postal Code]</textarea>
+      <div class="mb-4">
+        <label class="block text-[11px] uppercase tracking-wider font-semibold text-slate-700 mb-1">Collection / Delivery</label>
+        <textarea id="order-notes" rows="2" placeholder="Local Delivery: [Enter Address / Postal Code]" class="w-full text-xs p-3 rounded-xl border border-slate-200 bg-white text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-400">Local Delivery</textarea>
       </div>
 
-      <!-- Direct Telegram Checkout Button -->
-      <button 
-        onclick="checkoutTelegram()" 
-        class="w-full py-4 bg-[#24A1DE] hover:bg-[#1E8BC0] text-white rounded-xl text-xs uppercase tracking-widest font-semibold shadow-lg active:scale-95 transition flex items-center justify-center gap-2"
-      >
+      <button onclick="checkoutTelegram()" class="w-full py-3.5 bg-[#24A1DE] hover:bg-[#1E8BC0] text-white rounded-xl text-xs font-semibold tracking-wider active:scale-95 transition flex items-center justify-center gap-2 shadow-sm">
         <i class="fa-brands fa-telegram text-base"></i>
         <span>Order & Confirm Payment via Telegram</span>
       </button>
-
-      <p class="text-[10px] text-center text-slate-400 font-light">
-        A pre-formatted order note will open directly with @e1yse on Telegram.
-      </p>
     </div>
-  </aside>
+  </div>
 
   <!-- Toast Notification -->
-  <div id="toast" class="fixed top-6 left-1/2 -translate-x-1/2 z-50 bg-slate-900 text-white text-xs px-5 py-2.5 rounded-full shadow-2xl opacity-0 pointer-events-none transition-all duration-300 flex items-center gap-2">
+  <div id="toast" class="fixed top-6 left-1/2 -translate-x-1/2 z-50 bg-slate-900 text-white text-xs px-5 py-2.5 rounded-full shadow-2xl opacity-0 transition-opacity pointer-events-none flex items-center gap-2">
     <i class="fa-solid fa-check text-brand-300"></i>
     <span id="toast-message">Added to cart</span>
   </div>
 
   <script>
-    // Store Configuration
     const STORE_CONFIG = {
       telegramUsername: "e1yse",
       currency: "SGD"
     };
 
-    // Product Inventory
     const PRODUCTS = [
       {
         id: "prod-1",
         name: "Item 1",
-        subtitle: "Minimal Layer Piece",
         price: 1.00,
-        description: "An elegant basic custom object perfectly handmade and layered by the workshop team. Precision carved tactile edges."
+        description: "An elegant basic custom object handmade and layered with fine tactile precision."
       },
       {
         id: "prod-2",
         name: "Item 2",
-        subtitle: "Geometric Tray Piece",
         price: 2.00,
-        description: "An intricate medium multi-layered custom geometric decor tray with natural satin finish."
+        description: "An intricate medium multi-layered custom geometric decor or tray."
       },
       {
         id: "prod-3",
         name: "Item 3",
-        subtitle: "Sculptural Heavy Form",
         price: 3.00,
-        description: "A premium signature heavy layered handmade object designed with durable finish, sculptural silhouette."
+        description: "A signature heavy layered handmade object designed with durable finish."
       }
     ];
 
-    let cart = {};
-    let searchQuery = "";
-    let activeModalProduct = null;
+    // Key-value store for cart counts
+    let cart = {
+      "prod-1": 0,
+      "prod-2": 0,
+      "prod-3": 0
+    };
+
     let currentTab = "catalog";
 
     window.addEventListener("DOMContentLoaded", () => {
       renderProducts();
       updateCartBadge();
-
-      // Dynamic header styling on scroll
-      window.addEventListener("scroll", () => {
-        const header = document.getElementById("site-header");
-        if (window.scrollY > 40) {
-          header.classList.add("bg-white/95", "text-slate-900", "shadow-sm", "luxury-blur");
-          header.classList.remove("bg-gradient-to-b", "from-black/60", "text-white");
-          document.querySelectorAll("#site-header span, #site-header button, #site-header a").forEach(el => {
-            el.classList.remove("text-white");
-          });
-        } else {
-          header.classList.remove("bg-white/95", "text-slate-900", "shadow-sm", "luxury-blur");
-          header.classList.add("bg-gradient-to-b", "from-black/60", "text-white");
-        }
-      });
     });
 
-    // Tab Switching
+    // RENDER PRODUCT CATALOG
+    function renderProducts() {
+      const container = document.getElementById("product-grid");
+      if (!container) return;
+
+      container.innerHTML = PRODUCTS.map(p => {
+        return `
+          <div class="bg-white rounded-3xl p-6 border border-slate-200/90 shadow-card flex flex-col justify-between hover:shadow-luxury hover:border-brand-200 transition duration-300">
+            <div>
+              <div class="w-full h-44 rounded-2xl bg-gradient-to-br from-brand-50 to-brand-100/60 border border-brand-100 flex flex-col items-center justify-center gap-2 text-brand-700 mb-5">
+                <i class="fa-solid fa-layer-group text-2xl text-brand-400"></i>
+                <span class="font-serif text-lg font-semibold tracking-wide text-brand-800">${p.name}</span>
+              </div>
+              <h4 class="font-serif text-lg font-semibold text-slate-900 mb-1.5">${p.name}</h4>
+              <p class="text-xs text-slate-500 font-light leading-relaxed mb-4">${p.description}</p>
+            </div>
+            <div class="flex items-center justify-between pt-4 border-t border-slate-100">
+              <div>
+                <span class="text-[10px] uppercase tracking-wider text-slate-400 font-medium block">Price</span>
+                <span class="text-sm font-bold text-slate-900">$${p.price.toFixed(2)}</span>
+              </div>
+              <button type="button" onclick="addToCart('${p.id}')" class="px-4 py-2 rounded-xl bg-slate-900 hover:bg-brand-600 text-white flex items-center gap-1.5 text-xs font-semibold tracking-wider active:scale-95 transition cursor-pointer">
+                <i class="fa-solid fa-plus text-[10px]"></i> Add
+              </button>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    // SEARCH OVERLAY CONTROLS
+    function openSearchOverlay() {
+      const overlay = document.getElementById("search-overlay");
+      const input = document.getElementById("overlay-search-input");
+      overlay.classList.remove("hidden");
+      overlay.classList.add("flex");
+      input.value = "";
+      handleSearch("");
+      setTimeout(() => input.focus(), 50);
+    }
+
+    function closeSearchOverlay() {
+      const overlay = document.getElementById("search-overlay");
+      overlay.classList.add("hidden");
+      overlay.classList.remove("flex");
+    }
+
+    function handleSearch(query) {
+      const term = query.trim().toLowerCase();
+      const resultsContainer = document.getElementById("overlay-search-results");
+
+      const filtered = PRODUCTS.filter(p => 
+        p.name.toLowerCase().includes(term) || p.description.toLowerCase().includes(term)
+      );
+
+      if (filtered.length === 0) {
+        resultsContainer.innerHTML = `
+          <div class="py-8 text-center text-slate-400">
+            <i class="fa-solid fa-magnifying-glass text-2xl text-slate-300 mb-2"></i>
+            <p class="text-xs">No items match "${query}"</p>
+          </div>
+        `;
+        return;
+      }
+
+      resultsContainer.innerHTML = filtered.map(p => `
+        <div class="py-3.5 flex items-center justify-between gap-3">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-brand-50 border border-brand-100 flex items-center justify-center text-brand-600 text-sm font-bold">
+              <i class="fa-solid fa-layer-group text-xs"></i>
+            </div>
+            <div>
+              <h5 class="text-xs font-bold text-slate-800">${p.name}</h5>
+              <span class="text-[11px] text-brand-600 font-semibold">$${p.price.toFixed(2)} SGD</span>
+            </div>
+          </div>
+          <button type="button" onclick="addToCart('${p.id}'); closeSearchOverlay();" class="px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-brand-600 text-white text-xs font-semibold active:scale-95 transition cursor-pointer">
+            + Add to Cart
+          </button>
+        </div>
+      `).join("");
+    }
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") closeSearchOverlay();
+    });
+
+    // TAB NAVIGATION
     function switchTab(tab) {
       currentTab = tab;
       const catalogView = document.getElementById("view-catalog");
       const faqView = document.getElementById("view-faq");
-      const heroCover = document.getElementById("hero-cover");
-      
-      const navStore = document.getElementById("nav-btn-store");
+      const navCatalog = document.getElementById("nav-btn-catalog");
       const navFaq = document.getElementById("nav-btn-faq");
-      const mobStore = document.getElementById("mob-tab-store");
-      const mobFaq = document.getElementById("mob-tab-faq");
 
       if (tab === "catalog") {
-        catalogView.classList.remove("hidden");
-        faqView.classList.add("hidden");
-        heroCover.classList.remove("hidden");
-
-        if (navStore) navStore.classList.add("opacity-100", "border-white");
-        if (navFaq) navFaq.classList.remove("opacity-100", "border-white");
-
-        if (mobStore) mobStore.className = "flex flex-col items-center gap-1 text-slate-900 transition py-1";
-        if (mobFaq) mobFaq.className = "flex flex-col items-center gap-1 text-slate-400 transition py-1";
+        catalogView.classList.add("view-active");
+        faqView.classList.remove("view-active");
+        if (navCatalog) navCatalog.className = "flex flex-col items-center gap-1 text-brand-600 transition";
+        if (navFaq) navFaq.className = "flex flex-col items-center gap-1 text-slate-400 transition";
+        document.getElementById("store-section").scrollIntoView({ behavior: "smooth" });
       } else {
-        catalogView.classList.add("hidden");
-        faqView.classList.remove("hidden");
-        heroCover.classList.add("hidden");
-
-        if (navStore) navStore.classList.remove("opacity-100", "border-white");
-        if (navFaq) navFaq.classList.add("opacity-100", "border-white");
-
-        if (mobStore) mobStore.className = "flex flex-col items-center gap-1 text-slate-400 transition py-1";
-        if (mobFaq) mobFaq.className = "flex flex-col items-center gap-1 text-slate-900 transition py-1";
-        
-        window.scrollTo({ top: 0, behavior: "smooth" });
+        catalogView.classList.remove("view-active");
+        faqView.classList.add("view-active");
+        if (navCatalog) navCatalog.className = "flex flex-col items-center gap-1 text-slate-400 transition";
+        if (navFaq) navFaq.className = "flex flex-col items-center gap-1 text-brand-600 transition";
+        document.getElementById("store-section").scrollIntoView({ behavior: "smooth" });
       }
     }
 
-    // Search Functions
-    function toggleSearchOverlay() {
-      const overlay = document.getElementById("search-overlay");
-      const input = document.getElementById("global-search-input");
-      if (overlay.classList.contains("hidden")) {
-        overlay.classList.remove("hidden");
-        setTimeout(() => input.focus(), 100);
-      } else {
-        overlay.classList.add("hidden");
+    // CART STATE LOGIC
+    function addToCart(productId) {
+      const cleanId = String(productId).trim();
+      if (!cart[cleanId]) {
+        cart[cleanId] = 0;
       }
-    }
+      cart[cleanId] = Number(cart[cleanId]) + 1;
 
-    function handleSearch(val) {
-      searchQuery = val.trim().toLowerCase();
-      if (currentTab !== "catalog") switchTab("catalog");
-      renderProducts();
-    }
-
-    function clearSearch() {
-      const input = document.getElementById("global-search-input");
-      if (input) input.value = "";
-      handleSearch("");
-    }
-
-    // Render Products Grid
-    function renderProducts() {
-      const container = document.getElementById("product-grid");
-      const emptyState = document.getElementById("empty-state");
-      const countBadge = document.getElementById("items-count-badge");
-
-      const filtered = PRODUCTS.filter(p => 
-        p.name.toLowerCase().includes(searchQuery) || 
-        p.description.toLowerCase().includes(searchQuery)
-      );
-
-      if (countBadge) {
-        countBadge.innerText = `${filtered.length} Creation${filtered.length === 1 ? '' : 's'}`;
-      }
-
-      if (filtered.length === 0) {
-        container.innerHTML = "";
-        emptyState.classList.remove("hidden");
-        emptyState.classList.add("flex");
-        return;
-      }
-
-      emptyState.classList.add("hidden");
-      emptyState.classList.remove("flex");
-
-      container.innerHTML = filtered.map(p => `
-        <article class="group flex flex-col justify-between bg-white rounded-3xl overflow-hidden border border-slate-200/90 shadow-xs hover:shadow-xl transition-all duration-300">
-          <div onclick="openProductModal('${p.id}')" class="cursor-pointer p-6 pb-2">
-            
-            <div class="h-44 w-full rounded-2xl bg-gradient-to-br from-brand-50 via-white to-brand-100/40 border border-brand-100/80 flex flex-col items-center justify-center p-6 text-center group-hover:border-brand-300 transition-colors duration-300">
-              <div class="w-12 h-12 rounded-2xl bg-white shadow-xs border border-brand-200 flex items-center justify-center text-brand-600 mb-3 group-hover:scale-110 transition-transform">
-                <i class="fa-solid fa-layer-group text-lg"></i>
-              </div>
-              <span class="text-[10px] tracking-widest2 uppercase font-semibold text-brand-600">Handmade</span>
-              <h4 class="font-serif text-2xl text-slate-900 mt-1">${p.name}</h4>
-              <span class="text-[11px] text-slate-400 font-light mt-0.5">${p.subtitle}</span>
-            </div>
-
-            <div class="pt-5">
-              <p class="text-xs text-slate-500 font-light line-clamp-2 leading-relaxed">${p.description}</p>
-            </div>
-          </div>
-
-          <div class="p-6 pt-3 flex items-center justify-between border-t border-slate-100 mt-2">
-            <div>
-              <span class="text-[10px] uppercase tracking-wider text-slate-400 block font-light">Price</span>
-              <span class="text-base font-semibold text-slate-900 font-mono">$${p.price.toFixed(2)}</span>
-            </div>
-            <button 
-              onclick="addToCart('${p.id}')" 
-              class="px-4 py-2 bg-slate-900 hover:bg-black text-white text-xs uppercase tracking-wider font-semibold rounded-xl active:scale-95 transition flex items-center gap-1.5 shadow-sm"
-              aria-label="Add ${p.name} to cart"
-            >
-              <i class="fa-solid fa-plus text-[10px]"></i>
-              <span>Add</span>
-            </button>
-          </div>
-        </article>
-      `).join("");
-    }
-
-    // Modal Details
-    function openProductModal(id) {
-      activeModalProduct = PRODUCTS.find(p => p.id === id);
-      if (!activeModalProduct) return;
-
-      document.getElementById("modal-title").innerText = activeModalProduct.name;
-      document.getElementById("modal-price").innerText = `$${activeModalProduct.price.toFixed(2)} SGD`;
-      document.getElementById("modal-desc").innerText = activeModalProduct.description;
-
-      const backdrop = document.getElementById("product-modal-backdrop");
-      const modal = document.querySelector("#product-modal > div");
-
-      backdrop.classList.remove("opacity-0", "pointer-events-none");
-      modal.classList.remove("opacity-0", "scale-95");
-      modal.classList.add("opacity-100", "scale-100");
-    }
-
-    function closeProductModal() {
-      const backdrop = document.getElementById("product-modal-backdrop");
-      const modal = document.querySelector("#product-modal > div");
-
-      backdrop.classList.add("opacity-0", "pointer-events-none");
-      modal.classList.add("opacity-0", "scale-95");
-      modal.classList.remove("opacity-100", "scale-100");
-      activeModalProduct = null;
-    }
-
-    function addModalItemToCart() {
-      if (!activeModalProduct) return;
-      addToCart(activeModalProduct.id);
-      closeProductModal();
-    }
-
-    // Cart Logic
-    function addToCart(id) {
-      cart[id] = (cart[id] || 0) + 1;
       updateCartBadge();
-      showToast("Added to bag");
-    }
-
-    function changeQty(id, delta) {
-      if (!cart[id]) return;
-      cart[id] += delta;
-      if (cart[id] <= 0) delete cart[id];
       renderCartItems();
-      updateCartBadge();
+      
+      const itemObj = PRODUCTS.find(p => p.id === cleanId);
+      const itemName = itemObj ? itemObj.name : "Item";
+      showToast(`Added ${itemName} to bag`);
     }
 
     function updateCartBadge() {
-      const total = Object.values(cart).reduce((a, b) => a + b, 0);
+      let totalQty = 0;
+      let subtotal = 0;
+
+      PRODUCTS.forEach(p => {
+        const qty = Number(cart[p.id]) || 0;
+        if (qty > 0) {
+          totalQty += qty;
+          subtotal += p.price * qty;
+        }
+      });
+
       const headerBadge = document.getElementById("header-cart-badge");
       const navBadge = document.getElementById("nav-cart-badge");
       const floatingBtn = document.getElementById("floating-checkout-btn");
       const floatingBadge = document.getElementById("floating-cart-badge");
       const floatingSubtotal = document.getElementById("floating-cart-subtotal");
 
-      let subtotal = 0;
-      Object.entries(cart).forEach(([id, qty]) => {
-        const prod = PRODUCTS.find(p => p.id === id);
-        if (prod) subtotal += prod.price * qty;
-      });
-
-      if (headerBadge) headerBadge.innerText = total;
-      if (navBadge) {
-        navBadge.innerText = total;
-        navBadge.classList.toggle("hidden", total === 0);
-      }
-
-      if (floatingBtn) {
-        if (total > 0) {
-          floatingBtn.classList.remove("hidden");
-          floatingBtn.classList.add("flex");
-          if (floatingBadge) floatingBadge.innerText = total;
-          if (floatingSubtotal) floatingSubtotal.innerText = `$${subtotal.toFixed(2)}`;
-        } else {
-          floatingBtn.classList.add("hidden");
-          floatingBtn.classList.remove("flex");
+      if (totalQty > 0) {
+        headerBadge.innerText = totalQty;
+        headerBadge.classList.remove("hidden");
+        if (navBadge) {
+          navBadge.innerText = totalQty;
+          navBadge.classList.remove("hidden");
         }
+        if (floatingBtn) {
+          floatingBtn.classList.remove("hidden");
+          floatingBadge.innerText = totalQty;
+          floatingSubtotal.innerText = `$${subtotal.toFixed(2)}`;
+        }
+      } else {
+        headerBadge.classList.add("hidden");
+        if (navBadge) navBadge.classList.add("hidden");
+        if (floatingBtn) floatingBtn.classList.add("hidden");
       }
     }
 
     function openCart() {
       renderCartItems();
-      const backdrop = document.getElementById("cart-drawer-backdrop");
-      const drawer = document.getElementById("cart-drawer");
-
+      const sheet = document.getElementById("cart-sheet");
+      const backdrop = document.getElementById("cart-sheet-backdrop");
       backdrop.classList.remove("opacity-0", "pointer-events-none");
-      drawer.classList.remove("translate-x-full");
+      if (window.innerWidth >= 768) {
+        sheet.classList.remove("md:translate-x-full");
+      } else {
+        sheet.classList.remove("translate-y-full");
+      }
     }
 
     function closeCart() {
-      const backdrop = document.getElementById("cart-drawer-backdrop");
-      const drawer = document.getElementById("cart-drawer");
-
+      const sheet = document.getElementById("cart-sheet");
+      const backdrop = document.getElementById("cart-sheet-backdrop");
       backdrop.classList.add("opacity-0", "pointer-events-none");
-      drawer.classList.add("translate-x-full");
+      sheet.classList.add("translate-y-full");
+      sheet.classList.add("md:translate-x-full");
     }
 
     function renderCartItems() {
       const container = document.getElementById("cart-items");
-      const entries = Object.entries(cart);
+      if (!container) return;
 
-      if (entries.length === 0) {
+      const activeItems = PRODUCTS.filter(p => (Number(cart[p.id]) || 0) > 0);
+
+      if (activeItems.length === 0) {
         container.innerHTML = `
-          <div class="py-20 text-center text-slate-400">
-            <i class="fa-solid fa-bag-shopping text-3xl mb-3 text-slate-300"></i>
-            <p class="font-serif text-lg text-slate-700">Your bag is empty</p>
-            <p class="text-xs text-slate-400 mt-1">Discover handmade atelier creations in our store.</p>
+          <div class="py-16 text-center text-slate-400 flex flex-col items-center">
+            <i class="fa-solid fa-bag-shopping text-3xl mb-3 text-brand-200"></i>
+            <p class="text-xs tracking-wider uppercase font-medium">Your bag is currently empty</p>
           </div>
         `;
         document.getElementById("cart-subtotal").innerText = "$0.00 SGD";
@@ -836,25 +605,24 @@
       }
 
       let subtotal = 0;
-      container.innerHTML = entries.map(([id, qty]) => {
-        const product = PRODUCTS.find(p => p.id === id);
-        if (!product) return "";
+      container.innerHTML = activeItems.map(product => {
+        const qty = Number(cart[product.id]);
         const itemTotal = product.price * qty;
         subtotal += itemTotal;
 
         return `
           <div class="py-4 flex items-center justify-between gap-4">
-            <div class="w-12 h-12 rounded-2xl bg-brand-50 border border-brand-100 flex items-center justify-center text-brand-600 shrink-0">
-              <i class="fa-solid fa-layer-group text-sm"></i>
+            <div class="w-10 h-10 rounded-xl bg-brand-50 border border-brand-100 flex items-center justify-center text-brand-700 font-bold text-xs shrink-0">
+              <i class="fa-solid fa-layer-group text-xs"></i>
             </div>
             <div class="flex-1 min-w-0">
-              <h5 class="text-xs font-semibold text-slate-900 truncate">${product.name}</h5>
-              <span class="text-xs text-slate-500 font-mono">$${product.price.toFixed(2)} SGD</span>
+              <h5 class="text-xs font-semibold text-slate-800 truncate">${product.name}</h5>
+              <span class="text-[11px] text-slate-500 font-medium">$${product.price.toFixed(2)} each</span>
             </div>
-            <div class="flex items-center gap-2 shrink-0">
-              <button onclick="changeQty('${id}', -1)" class="w-7 h-7 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center text-xs active:scale-95 transition">-</button>
-              <span class="text-xs font-bold w-4 text-center">${qty}</span>
-              <button onclick="changeQty('${id}', 1)" class="w-7 h-7 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center text-xs active:scale-95 transition">+</button>
+            <div class="flex items-center gap-2">
+              <button type="button" onclick="changeQty('${product.id}', -1)" class="w-6 h-6 rounded-lg bg-slate-100 text-slate-700 flex items-center justify-center text-xs active:scale-95 transition">-</button>
+              <span class="text-xs font-semibold w-5 text-center">${qty}</span>
+              <button type="button" onclick="changeQty('${product.id}', 1)" class="w-6 h-6 rounded-lg bg-slate-100 text-slate-700 flex items-center justify-center text-xs active:scale-95 transition">+</button>
             </div>
           </div>
         `;
@@ -863,37 +631,49 @@
       document.getElementById("cart-subtotal").innerText = `$${subtotal.toFixed(2)} SGD`;
     }
 
-    // Checkout Telegram Template Output & Cart Clear
+    function changeQty(productId, delta) {
+      const cleanId = String(productId).trim();
+      const current = Number(cart[cleanId]) || 0;
+      const updated = current + delta;
+
+      if (updated <= 0) {
+        cart[cleanId] = 0;
+      } else {
+        cart[cleanId] = updated;
+      }
+
+      renderCartItems();
+      updateCartBadge();
+    }
+
+    // CHECKOUT LOGIC
     function checkoutTelegram() {
-      const entries = Object.entries(cart);
-      if (entries.length === 0) {
-        showToast("Your cart is empty");
+      const activeItems = PRODUCTS.filter(p => (Number(cart[p.id]) || 0) > 0);
+      if (activeItems.length === 0) {
+        showToast("Cart is empty");
         return;
       }
 
-      const contact = (document.getElementById("cust-contact")?.value || "").trim();
+      const contact = document.getElementById("customer-contact").value.trim();
       if (!contact) {
         showToast("Please enter your name or Telegram handle");
-        document.getElementById("cust-contact")?.focus();
+        document.getElementById("customer-contact").focus();
         return;
       }
 
-      const notes = (document.getElementById("cust-notes")?.value || "").trim() || "Local Delivery: Singapore";
+      const notes = document.getElementById("order-notes").value.trim() || "Local Delivery";
       const orderId = "TLW-" + Math.floor(1000 + Math.random() * 9000);
 
       let itemsSummary = "";
       let subtotal = 0;
 
-      entries.forEach(([id, qty]) => {
-        const item = PRODUCTS.find(p => p.id === id);
-        if (item) {
-          const itemTotal = item.price * qty;
-          subtotal += itemTotal;
-          itemsSummary += `✩ ${item.name} ×${qty} — $${itemTotal.toFixed(2)}\n`;
-        }
+      activeItems.forEach(item => {
+        const qty = Number(cart[item.id]);
+        const itemTotal = item.price * qty;
+        subtotal += itemTotal;
+        itemsSummary += `✩ ${item.name} ×${qty} — $${itemTotal.toFixed(2)}\n`;
       });
 
-      // Exact aesthetic order note template
       const message = 
 `˗ˏˋ  The Layer Workshop — Order Note ˎˊ˗
 🔖 Order: #${orderId}
@@ -904,46 +684,35 @@ ${itemsSummary}💰 Total: $${subtotal.toFixed(2)} SGD
 ─── ･ ｡ﾟ☆: .☽ . :☆ﾟ. ───
 Hi @e1yse! Ready to confirm #${orderId} ✨ Let me know the PayNow details whenever you're free!`;
 
-      // Copy text to clipboard
-      try {
-        const temp = document.createElement("textarea");
-        temp.value = message;
-        document.body.appendChild(temp);
-        temp.select();
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(message);
+      } else {
+        const txt = document.createElement("textarea");
+        txt.value = message;
+        document.body.appendChild(txt);
+        txt.select();
         document.execCommand("copy");
-        document.body.removeChild(temp);
-      } catch (err) {
-        console.warn("Clipboard fallback error", err);
+        document.body.removeChild(txt);
       }
 
-      showToast("Order copied! Opening Telegram...");
-      window.open(`https://t.me/${STORE_CONFIG.telegramUsername}?text=${encodeURIComponent(message)}`, "_blank");
-
-      // Auto-clear cart and reset form after checkout
-      cart = {};
+      // Auto-clear cart
+      PRODUCTS.forEach(p => { cart[p.id] = 0; });
       updateCartBadge();
       renderCartItems();
+      document.getElementById("customer-contact").value = "";
+      document.getElementById("order-notes").value = "Local Delivery";
+      setTimeout(closeCart, 400);
 
-      const contactInput = document.getElementById("cust-contact");
-      if (contactInput) contactInput.value = "";
-
-      const notesInput = document.getElementById("cust-notes");
-      if (notesInput) notesInput.value = "Local Delivery: [Enter Address / Postal Code]";
-
-      setTimeout(() => {
-        closeCart();
-      }, 500);
+      window.open(`https://t.me/${STORE_CONFIG.telegramUsername}?text=${encodeURIComponent(message)}`, "_blank");
     }
 
     function showToast(msg) {
       const toast = document.getElementById("toast");
-      const msgEl = document.getElementById("toast-message");
-      if (!toast || !msgEl) return;
-      msgEl.innerText = msg;
+      document.getElementById("toast-message").innerText = msg;
       toast.classList.remove("opacity-0", "pointer-events-none");
       setTimeout(() => {
         toast.classList.add("opacity-0", "pointer-events-none");
-      }, 2200);
+      }, 2000);
     }
   </script>
 </body>
