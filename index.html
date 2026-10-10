@@ -64,6 +64,16 @@
     .view-state { display: none; }
     .view-active { display: flex; }
 
+    /* Hide spin buttons on number inputs for clean luxury aesthetic */
+    input[type=number]::-webkit-inner-spin-button, 
+    input[type=number]::-webkit-outer-spin-button { 
+      -webkit-appearance: none; 
+      margin: 0; 
+    }
+    input[type=number] {
+      -moz-appearance: textfield;
+    }
+
     /* Native Details and Summary reset: removes dead zones and default browser markers */
     details summary::-webkit-details-marker,
     details summary::marker {
@@ -482,7 +492,8 @@
 
     // CART STATE CONTROLS (BY NUMERIC INDEX)
     function addItemByIndex(idx) {
-      cartQuantities[idx] = (cartQuantities[idx] || 0) + 1;
+      const current = cartQuantities[idx] || 0;
+      cartQuantities[idx] = Math.min(99, current + 1);
       updateCartBadge();
       renderCartItems();
       showToast(`Added ${PRODUCTS[idx].name} to bag`);
@@ -490,9 +501,58 @@
 
     function changeQtyByIndex(idx, delta) {
       const current = cartQuantities[idx] || 0;
-      const updated = current + delta;
-      cartQuantities[idx] = updated < 0 ? 0 : updated;
+      let updated = current + delta;
+      if (updated > 99) updated = 99;
+      if (updated < 0) updated = 0;
+      cartQuantities[idx] = updated;
 
+      updateCartBadge();
+      renderCartItems();
+    }
+
+    function setQtyDirectly(idx, rawValue) {
+      let parsed = parseInt(rawValue, 10);
+      if (isNaN(parsed) || parsed < 0) parsed = 0;
+      if (parsed > 99) parsed = 99;
+      cartQuantities[idx] = parsed;
+
+      updateCartBadge();
+      renderCartItems();
+    }
+
+    function handleQtyInputLive(idx, inputElement) {
+      let val = inputElement.value;
+      if (val === "") return; // Allow user to backspace before typing
+      let parsed = parseInt(val, 10);
+      if (isNaN(parsed)) parsed = 1;
+      if (parsed > 99) {
+        parsed = 99;
+        inputElement.value = 99;
+      }
+      if (parsed < 1) parsed = 1;
+
+      cartQuantities[idx] = parsed;
+      updateCartBadge();
+
+      // Update live subtotal in drawer without resetting input focus
+      let subtotal = 0;
+      cartQuantities.forEach((qty, i) => {
+        if (qty > 0) subtotal += PRODUCTS[i].price * qty;
+      });
+      const subtotalEl = document.getElementById("cart-subtotal");
+      if (subtotalEl) subtotalEl.innerText = `$${subtotal.toFixed(2)} SGD`;
+    }
+
+    function handleQtyBlur(idx, inputElement) {
+      let val = inputElement.value.trim();
+      let parsed = parseInt(val, 10);
+      if (isNaN(parsed) || parsed <= 0) {
+        cartQuantities[idx] = 0;
+      } else if (parsed > 99) {
+        cartQuantities[idx] = 99;
+      } else {
+        cartQuantities[idx] = parsed;
+      }
       updateCartBadge();
       renderCartItems();
     }
@@ -573,21 +633,35 @@
               <h5 class="text-xs font-semibold text-slate-800 truncate">${product.name}</h5>
               <span class="text-[11px] text-slate-500 font-medium">$${product.price.toFixed(2)} each</span>
             </div>
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-1.5 bg-slate-50 border border-slate-200/80 rounded-xl p-1">
               <button 
                 type="button" 
                 data-action="qty-change" 
                 data-product-index="${idx}" 
                 data-delta="-1" 
-                class="w-6 h-6 rounded-lg bg-slate-100 text-slate-700 flex items-center justify-center text-xs active:scale-95 transition cursor-pointer"
+                class="w-6 h-6 rounded-lg bg-white border border-slate-200 text-slate-700 flex items-center justify-center text-xs active:scale-90 hover:bg-slate-100 transition cursor-pointer shadow-xs"
+                title="Decrease"
               >-</button>
-              <span class="text-xs font-semibold w-5 text-center">${qty}</span>
+              <input 
+                type="number" 
+                min="1" 
+                max="99" 
+                value="${qty}" 
+                onclick="this.select()"
+                onfocus="this.select()"
+                oninput="handleQtyInputLive(${idx}, this)"
+                onblur="handleQtyBlur(${idx}, this)"
+                onkeydown="if(event.key === 'Enter') { this.blur(); }"
+                class="w-8 h-6 text-center text-xs font-semibold text-slate-800 bg-transparent focus:bg-white focus:outline-none focus:ring-1 focus:ring-brand-400 rounded-md transition"
+                aria-label="Quantity for ${product.name}"
+              />
               <button 
                 type="button" 
                 data-action="qty-change" 
                 data-product-index="${idx}" 
                 data-delta="1" 
-                class="w-6 h-6 rounded-lg bg-slate-100 text-slate-700 flex items-center justify-center text-xs active:scale-95 transition cursor-pointer"
+                class="w-6 h-6 rounded-lg bg-white border border-slate-200 text-slate-700 flex items-center justify-center text-xs active:scale-90 hover:bg-slate-100 transition cursor-pointer shadow-xs"
+                title="Increase"
               >+</button>
             </div>
           </div>
