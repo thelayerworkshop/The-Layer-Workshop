@@ -431,48 +431,30 @@
 
       <div class="bg-white rounded-3xl p-6 sm:p-10 border border-slate-200/90 shadow-card flex flex-col md:flex-row gap-8 lg:gap-12 items-start">
         
-        <!-- Left: Upload Box Area -->
+        <!-- Left: Reference Photos & Sketches Card -->
         <div class="w-full md:w-1/2">
-          <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-2">Upload Reference / Photo (Optional)</label>
-          <div 
-            id="dropzone"
-            onclick="document.getElementById('custom-file-input').click()"
-            class="relative w-full aspect-square rounded-2xl border-2 border-dashed border-slate-300 hover:border-brand-400 bg-slate-50/70 hover:bg-brand-50/30 transition duration-200 flex flex-col items-center justify-center p-6 text-center cursor-pointer overflow-hidden group"
-          >
-            <input 
-              type="file" 
-              id="custom-file-input" 
-              accept="image/*,.stl,.obj,.png,.jpg,.jpeg" 
-              class="hidden" 
-              onchange="handleFileUpload(event)"
-            />
-
-            <!-- Empty Dropzone State -->
-            <div id="dropzone-empty" class="flex flex-col items-center justify-center">
-              <div class="w-14 h-14 rounded-2xl bg-white shadow-sm border border-slate-200 flex items-center justify-center text-brand-600 mb-3 group-hover:scale-105 transition-transform">
-                <i class="fa-solid fa-cloud-arrow-up text-xl"></i>
-              </div>
-              <span class="text-xs font-bold text-slate-800 mb-1">Click or Drag & Drop image here</span>
-              <p class="text-[11px] text-slate-400 max-w-[210px] leading-relaxed">Upload sketches, portraits, models, or reference photos (PNG, JPG, STL)</p>
+          <span class="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-2">REFERENCE PHOTOS & SKETCHES</span>
+          <div class="relative w-full aspect-square rounded-3xl overflow-hidden bg-gradient-to-br from-[#141b26] via-[#1a2332] to-[#2b374a] p-8 flex flex-col items-center justify-center text-center text-white shadow-inner select-none border border-slate-800">
+            <!-- Paperclip Icon Box -->
+            <div class="w-16 h-16 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 flex items-center justify-center text-slate-200 mb-5 shadow-sm">
+              <i class="fa-solid fa-paperclip text-2xl -rotate-45"></i>
             </div>
+            
+            <h3 class="font-serif text-2xl font-normal tracking-wide text-white mb-2.5">Send Photos in Chat</h3>
+            
+            <p class="text-xs text-slate-300 font-light leading-relaxed max-w-[280px] mb-6">
+              Please attach your reference photos, sketches, or 3D files directly in <strong class="text-white font-semibold">Telegram</strong> or <strong class="text-white font-semibold">WhatsApp</strong> when you message me after checkout!
+            </p>
 
-            <!-- Uploaded Image Preview State -->
-            <div id="dropzone-preview" class="hidden absolute inset-0 w-full h-full bg-slate-900">
-              <img id="preview-img" src="" alt="Uploaded reference" class="w-full h-full object-cover" />
-              <div class="absolute inset-0 bg-black/40 flex flex-col items-center justify-center text-white p-4">
-                <span id="preview-filename" class="text-xs font-mono font-medium truncate max-w-full px-3 py-1 bg-black/60 rounded-lg mb-2">file.jpg</span>
-                <button 
-                  type="button" 
-                  onclick="event.stopPropagation(); removeUploadedFile();" 
-                  class="px-3 py-1.5 bg-rose-500 hover:bg-rose-600 text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 shadow-sm active:scale-95 transition"
-                >
-                  <i class="fa-solid fa-trash-can text-[10px]"></i>
-                  <span>Remove / Change</span>
-                </button>
-              </div>
+            <!-- Attach Badge Button -->
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/15 border border-white/20 text-[10px] uppercase tracking-[0.2em] font-semibold text-slate-200 backdrop-blur-sm">
+              <i class="fa-solid fa-camera text-xs"></i>
+              <span>Attach After Checkout</span>
             </div>
           </div>
-          <p class="text-[10px] text-slate-400 mt-2 text-center">* You can also attach high-resolution files directly in Telegram/WhatsApp during order confirmation.</p>
+          <p class="text-[11px] text-slate-400 mt-3 text-center leading-relaxed">
+            No uploading needed here—just type your instructions and attach your photos when you confirm your order.
+          </p>
         </div>
 
         <!-- Right: Specifications & Comment -->
@@ -596,7 +578,7 @@
             <i class="faq-chevron fa-solid fa-chevron-down text-slate-400 text-xs transition-transform duration-300 pointer-events-none"></i>
           </summary>
           <div class="px-5 sm:px-6 pb-6 pt-1 text-xs text-slate-500 leading-relaxed border-t border-slate-100">
-            Yes, custom dimensions and tailored orders can be arranged! You can place a Custom Order directly on the storefront with your reference image and notes, or tap "Contact me here" to discuss.
+            Yes, custom dimensions and tailored orders can be arranged! You can place a Custom Order directly on the storefront with your notes, or tap "Contact me here" to discuss.
           </div>
         </details>
       </div>
@@ -743,7 +725,6 @@
     let selectedOptionIndex = 0;
     let selectedColourIndex = 1; // Default to White
     let detailQuantity = 1;
-    let customUploadedFile = null;
 
     // Cart contains array of added items
     let cart = [];
@@ -807,7 +788,7 @@
           </div>
         </div>
 
-        <!-- Product 2: Custom Order (Clean styling, no Artisan Commission or Bespoke 3D Prints badges) -->
+        <!-- Product 2: Custom Order -->
         <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/90 shadow-card hover:shadow-luxury hover:border-brand-200 transition duration-300 flex flex-col justify-between cursor-pointer" onclick="openCustomOrderSubpage()">
           <div>
             <div class="relative w-full aspect-square rounded-2xl overflow-hidden mb-6 bg-slate-900 flex flex-col items-center justify-center p-8 text-center text-white group shadow-inner">
@@ -902,8 +883,8 @@
 
         return `
           <button 
-            type="button"
-            onclick="selectColour(${idx})"
+            type="button" 
+            onclick="selectColour(${idx})" 
             class="px-4 py-2 rounded-full border text-xs sm:text-sm font-medium transition cursor-pointer active:scale-95 flex items-center gap-2 ${activeClass}"
           >
             <span class="w-2.5 h-2.5 rounded-full inline-block" style="background-color: ${col.dotBg}; border: 1px solid ${col.border};"></span>
@@ -992,46 +973,11 @@
       renderCartItems();
     }
 
-    // CUSTOM ORDER FILE HANDLING
-    function handleFileUpload(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-
-      customUploadedFile = file;
-      const dropzoneEmpty = document.getElementById("dropzone-empty");
-      const dropzonePreview = document.getElementById("dropzone-preview");
-      const previewImg = document.getElementById("preview-img");
-      const previewFilename = document.getElementById("preview-filename");
-
-      if (file.type.startsWith("image/")) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          previewImg.src = e.target.result;
-          previewImg.classList.remove("hidden");
-          dropzoneEmpty.classList.add("hidden");
-          dropzonePreview.classList.remove("hidden");
-          previewFilename.innerText = file.name;
-        };
-        reader.readAsDataURL(file);
-      } else {
-        previewImg.classList.add("hidden");
-        dropzoneEmpty.classList.add("hidden");
-        dropzonePreview.classList.remove("hidden");
-        previewFilename.innerText = file.name;
-      }
-    }
-
-    function removeUploadedFile() {
-      customUploadedFile = null;
-      document.getElementById("custom-file-input").value = "";
-      document.getElementById("dropzone-empty").classList.remove("hidden");
-      document.getElementById("dropzone-preview").classList.add("hidden");
-    }
-
+    // CUSTOM ORDER SUBMISSION
     function addCustomOrderToBag() {
       const notes = document.getElementById("custom-instructions").value.trim();
-      if (!notes && !customUploadedFile) {
-        showToast("Please provide customization instructions or an image");
+      if (!notes) {
+        showToast("Please provide your customization notes");
         document.getElementById("custom-instructions").focus();
         return;
       }
@@ -1042,13 +988,11 @@
         price: 0.00,
         qty: 1,
         isCustom: true,
-        instructions: notes || "Reference file attached",
-        fileName: customUploadedFile ? customUploadedFile.name : null
+        instructions: notes
       });
 
       showToast("Custom order added to your bag");
       document.getElementById("custom-instructions").value = "";
-      removeUploadedFile();
       updateCartBadge();
       renderCartItems();
       openCart();
@@ -1116,7 +1060,7 @@
           : `<i class="fa-solid fa-ghost text-xs"></i>`;
 
         const details = item.isCustom 
-          ? `<div class="text-[11px] text-slate-500 font-medium">Quote upon review ${item.fileName ? '• 📎 ' + item.fileName : ''}</div><div class="text-[10px] text-slate-400 italic truncate max-w-[200px] mt-0.5">"${item.instructions}"</div>`
+          ? `<div class="text-[11px] text-slate-500 font-medium">Quote upon review</div><div class="text-[10px] text-slate-400 italic truncate max-w-[200px] mt-0.5">"${item.instructions}"</div>`
           : `<span class="text-[11px] text-slate-500 font-medium">$${item.price.toFixed(2)} each</span>`;
 
         const quantityControls = item.isCustom ? `
@@ -1190,7 +1134,6 @@
     function switchTab(tab) {
       currentTab = tab;
       
-      // Explicitly clear overflow-hidden to prevent scroll freezing
       document.body.classList.remove("overflow-hidden");
       document.documentElement.classList.remove("overflow-hidden");
 
@@ -1411,7 +1354,7 @@
       cart.forEach((item) => {
         if (item.isCustom) {
           hasCustom = true;
-          itemsSummary += `✩ Custom Order (${item.instructions})${item.fileName ? ' [Ref: ' + item.fileName + ']' : ''} — Quote Upon Review\n`;
+          itemsSummary += `✩ Custom Order (${item.instructions}) — Quote Upon Review\n  📎 (Remember to attach your reference pictures in this chat!)\n`;
         } else {
           const itemTotal = item.price * item.qty;
           subtotal += itemTotal;
