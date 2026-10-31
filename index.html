@@ -66,8 +66,8 @@
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
     }
-    .view-state { display: none; }
-    .view-active { display: flex; }
+    .view-state { display: none !important; }
+    .view-active { display: flex !important; }
 
     /* Number inputs without browser arrows */
     input[type=number]::-webkit-inner-spin-button, 
@@ -102,15 +102,15 @@
   <!-- ================= LUXURY EDITORIAL HERO COVER ================= -->
   <section id="cover-hero" class="relative w-full h-[88vh] md:h-[94vh] flex flex-col justify-between items-center text-white overflow-hidden bg-slate-900 select-none">
     
-    <!-- Background Cover Image with dark vignette -->
-    <div class="absolute inset-0 z-0">
+    <!-- Background Cover Image with dark vignette & inline fallback -->
+    <div class="absolute inset-0 z-0 bg-[#0c131f]">
       <img 
         src="https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&w=2000&q=80" 
         alt="The Layer Workshop Atelier" 
         class="w-full h-full object-cover object-center scale-105 transform motion-safe:animate-[pulse_10s_ease-in-out_infinite]"
+        onerror="this.style.display='none'"
       />
-      <div class="absolute inset-0 bg-gradient-to-b from-black/65 via-black/30 to-black/85"></div>
-      <div class="absolute inset-0 bg-radial-gradient from-transparent via-transparent to-black/50"></div>
+      <div class="absolute inset-0 bg-gradient-to-b from-black/75 via-black/35 to-black/90"></div>
     </div>
 
     <!-- Top Luxury Navigation Bar with Hamburger Icon -->
@@ -210,7 +210,7 @@
           <input 
             type="text" 
             id="drawer-search-input" 
-            placeholder="Search items or characters..." 
+            placeholder="Search figurines, dragon egg, custom..." 
             class="w-full bg-transparent text-xs sm:text-sm font-medium text-slate-800 placeholder-slate-400 focus:outline-none"
             oninput="handleDrawerSearch(this.value)"
           />
@@ -290,7 +290,7 @@
   <main id="store-section" class="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 pt-10">
     
     <!-- VIEW 1: CATALOG / SPECIAL COLLECTION (GRID OF 3 ITEMS) -->
-    <section id="view-catalog" class="view-state view-active flex-col">
+    <section id="view-catalog" class="view-state view-active flex flex-col">
       <div class="mb-10 text-center max-w-xl mx-auto">
         <h3 class="font-serif text-2xl sm:text-3xl text-slate-900 tracking-wide font-normal">Special Collection</h3>
         <p class="text-xs text-slate-500 tracking-wider mt-2 font-light">Handmade by The Layer Workshop. Local Singapore doorstep delivery.</p>
@@ -304,7 +304,7 @@
     </section>
 
     <!-- VIEW 2: DEDICATED HALLOWEEN PRODUCT SUB-PAGE -->
-    <section id="view-product-detail" class="view-state flex-col max-w-4xl mx-auto w-full pt-2">
+    <section id="view-product-detail" class="view-state flex flex-col max-w-4xl mx-auto w-full pt-2">
       <div class="mb-6">
         <button 
           type="button" 
@@ -320,14 +320,14 @@
         
         <!-- Left: Product Image Preview -->
         <div class="w-full md:w-1/2">
-          <div class="relative w-full aspect-square rounded-2xl overflow-hidden bg-slate-900 group shadow-inner">
+          <div class="relative w-full aspect-square rounded-2xl overflow-hidden bg-slate-900 group shadow-inner flex items-center justify-center">
             <img 
               id="detail-product-img"
-              src="image/halloween.jpg" 
+              src="/image/halloween.jpg" 
               alt="Halloween Figurines Preview" 
               class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out" 
               loading="lazy"
-              onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'w-full h-full bg-slate-800 flex flex-col items-center justify-center text-white text-center p-6\'><i class=\'fa-solid fa-ghost text-4xl text-brand-300 mb-3\'></i><span class=\'font-serif text-base tracking-widest block mb-1\'>Halloween Figurines</span><span class=\'text-[11px] text-slate-400 font-mono\'>halloween_2.jpg</span></div>';"
+              onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'w-full h-full bg-slate-800 flex flex-col items-center justify-center text-white text-center p-6\'><i class=\'fa-solid fa-ghost text-5xl text-brand-300 mb-3\'></i><span class=\'font-serif text-lg tracking-widest block mb-1\'>Halloween Figurines</span><span class=\'text-[11px] text-slate-400 font-mono\'>Handcrafted Collectibles</span></div>';"
             />
             <div class="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/10 pointer-events-none"></div>
           </div>
@@ -348,7 +348,7 @@
             </div>
 
             <p class="text-xs text-slate-500 font-light leading-relaxed mb-6">
-              A bespoke series of tactile spooky figurines, printed with layered precision in matte stone finish. Select your character, preferred colour, or choose the full collection set.
+              A bespoke series of tactile spooky figurines, printed with layered precision in matte finish. Select your character, preferred colour, or choose the full collection set.
             </p>
 
             <!-- Pill Button Character Selector -->
@@ -413,8 +413,108 @@
       </div>
     </section>
 
-    <!-- VIEW 3: DEDICATED CUSTOM ORDER SUB-PAGE -->
-    <section id="view-custom-order" class="view-state flex-col max-w-4xl mx-auto w-full pt-2">
+    <!-- VIEW 3: DEDICATED DRAGON EGG FIDGET TOY SUB-PAGE -->
+    <section id="view-dragon-egg-detail" class="view-state flex flex-col max-w-4xl mx-auto w-full pt-2">
+      <div class="mb-6">
+        <button 
+          type="button" 
+          onclick="switchTab('catalog')" 
+          class="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-slate-500 hover:text-slate-900 transition cursor-pointer group"
+        >
+          <i class="fa-solid fa-arrow-left text-[11px] group-hover:-translate-x-1 transition-transform"></i>
+          <span>Back to Collection</span>
+        </button>
+      </div>
+
+      <div class="bg-white rounded-3xl p-6 sm:p-10 border border-slate-200/90 shadow-card flex flex-col md:flex-row gap-8 lg:gap-12 items-start">
+        
+        <!-- Left: Product Image Preview -->
+        <div class="w-full md:w-1/2">
+          <div class="relative w-full aspect-square rounded-2xl overflow-hidden bg-slate-900 group shadow-inner flex items-center justify-center">
+            <img 
+              id="detail-dragon-egg-img"
+              src="image/dragon egg.jpg" 
+              alt="Dragon Egg Fidget Toy Preview" 
+              class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out" 
+              loading="lazy"
+              onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'w-full h-full bg-slate-800 flex flex-col items-center justify-center text-white text-center p-6\'><i class=\'fa-solid fa-egg text-5xl text-brand-300 mb-3\'></i><span class=\'font-serif text-lg tracking-widest block mb-1\'>Dragon Egg Fidget Toy</span><span class=\'text-[11px] text-slate-400 font-mono\'>Tactile Sensory Scales</span></div>';"
+            />
+            <div class="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/10 pointer-events-none"></div>
+          </div>
+          <p class="text-[11px] text-slate-400 mt-3 text-center tracking-wide">
+            Tactile spiral scales • Satisfying pocket fidget toy
+          </p>
+        </div>
+
+        <!-- Right: Option Selectors & Actions -->
+        <div class="w-full md:w-1/2 flex flex-col justify-between">
+          <div>
+            <span class="text-[10px] uppercase tracking-wider text-brand-600 font-semibold block mb-1">Sensory Workshop Series</span>
+            <h2 class="font-serif text-3xl font-medium text-slate-900 tracking-wide mb-2">Dragon Egg Fidget Toy</h2>
+            
+            <div class="flex items-baseline gap-3 mb-5">
+              <span class="text-2xl font-bold text-slate-900 font-sans">$3.00 SGD</span>
+              <span class="text-xs text-slate-400 font-medium tracking-wide">each</span>
+            </div>
+
+            <p class="text-xs text-slate-500 font-light leading-relaxed mb-6">
+              A sensory dragon egg fidget collectible featuring interlocking layered scales. Designed for smooth, tactile palm-twisting and stress relief. Pick your favourite matte color.
+            </p>
+
+            <!-- Pill Button Colour Selector for Dragon Egg -->
+            <div class="mb-6">
+              <label class="block text-xs uppercase tracking-wider font-semibold text-slate-800 mb-2.5">
+                Colour: <span id="selected-dragon-egg-colour-name" class="font-bold text-brand-700 capitalize">White</span>
+              </label>
+              <div id="dragon-egg-colour-pill-container" class="flex flex-wrap gap-2">
+                <!-- 6 Colour Pills rendered via JS -->
+              </div>
+            </div>
+
+            <!-- Stepper Quantity Selector -->
+            <div class="mb-8">
+              <label class="block text-xs uppercase tracking-wider font-semibold text-slate-800 mb-2">Quantity</label>
+              <div class="inline-flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-2xl p-1.5">
+                <button 
+                  type="button" 
+                  onclick="changeDragonEggQty(-1)" 
+                  class="w-8 h-8 rounded-xl bg-white border border-slate-200 text-slate-700 flex items-center justify-center text-sm font-semibold hover:bg-slate-100 active:scale-95 transition cursor-pointer shadow-xs"
+                >-</button>
+                <input 
+                  type="number" 
+                  id="dragon-egg-qty-input" 
+                  value="1" 
+                  min="1" 
+                  max="99" 
+                  oninput="handleDragonEggQtyInput(this)" 
+                  class="w-12 h-8 text-center text-sm font-bold text-slate-800 bg-transparent focus:bg-white focus:outline-none rounded-lg transition"
+                />
+                <button 
+                  type="button" 
+                  onclick="changeDragonEggQty(1)" 
+                  class="w-8 h-8 rounded-xl bg-white border border-slate-200 text-slate-700 flex items-center justify-center text-sm font-semibold hover:bg-slate-100 active:scale-95 transition cursor-pointer shadow-xs"
+                >+</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="pt-6 border-t border-slate-100 flex items-center gap-4">
+            <button 
+              type="button" 
+              onclick="addDragonEggToBag()" 
+              class="w-full py-4 rounded-2xl bg-slate-900 hover:bg-brand-600 text-white flex items-center justify-center gap-2 text-xs uppercase tracking-widest font-semibold active:scale-95 transition cursor-pointer shadow-md"
+            >
+              <i class="fa-solid fa-bag-shopping text-sm"></i>
+              <span id="dragon-egg-add-cta">Add Dragon Egg (White) (1) to Bag • $3.00 SGD</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- VIEW 4: DEDICATED CUSTOM ORDER SUB-PAGE -->
+    <section id="view-custom-order" class="view-state flex flex-col max-w-4xl mx-auto w-full pt-2">
       <div class="mb-6">
         <button 
           type="button" 
@@ -508,108 +608,8 @@
       </div>
     </section>
 
-    <!-- VIEW 4: DEDICATED DRAGON EGG FIDGET TOY SUB-PAGE -->
-    <section id="view-dragon-egg-detail" class="view-state flex-col max-w-4xl mx-auto w-full pt-2">
-      <div class="mb-6">
-        <button 
-          type="button" 
-          onclick="switchTab('catalog')" 
-          class="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-slate-500 hover:text-slate-900 transition cursor-pointer group"
-        >
-          <i class="fa-solid fa-arrow-left text-[11px] group-hover:-translate-x-1 transition-transform"></i>
-          <span>Back to Collection</span>
-        </button>
-      </div>
-
-      <div class="bg-white rounded-3xl p-6 sm:p-10 border border-slate-200/90 shadow-card flex flex-col md:flex-row gap-8 lg:gap-12 items-start">
-        
-        <!-- Left: Product Image Preview -->
-        <div class="w-full md:w-1/2">
-          <div class="relative w-full aspect-square rounded-2xl overflow-hidden bg-slate-900 group shadow-inner">
-            <img 
-              id="detail-dragon-egg-img"
-              src="dragon egg.jpg" 
-              alt="Dragon Egg Fidget Toy Preview" 
-              class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out" 
-              loading="lazy"
-              onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'w-full h-full bg-slate-800 flex flex-col items-center justify-center text-white text-center p-6\'><i class=\'fa-solid fa-egg text-4xl text-brand-300 mb-3\'></i><span class=\'font-serif text-base tracking-widest block mb-1\'>Dragon Egg Fidget Toy</span><span class=\'text-[11px] text-slate-400 font-mono\'>dragon egg.jpg</span></div>';"
-            />
-            <div class="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/10 pointer-events-none"></div>
-          </div>
-          <p class="text-[11px] text-slate-400 mt-3 text-center tracking-wide">
-            Tactile spiral scales • Satisfying pocket fidget toy
-          </p>
-        </div>
-
-        <!-- Right: Option Selectors & Actions -->
-        <div class="w-full md:w-1/2 flex flex-col justify-between">
-          <div>
-            <span class="text-[10px] uppercase tracking-wider text-brand-600 font-semibold block mb-1">Sensory Workshop Series</span>
-            <h2 class="font-serif text-3xl font-medium text-slate-900 tracking-wide mb-2">Dragon Egg Fidget Toy</h2>
-            
-            <div class="flex items-baseline gap-3 mb-5">
-              <span class="text-2xl font-bold text-slate-900 font-sans">$2.00 SGD</span>
-              <span class="text-xs text-slate-400 font-medium tracking-wide">each</span>
-            </div>
-
-            <p class="text-xs text-slate-500 font-light leading-relaxed mb-6">
-              A sensory dragon egg fidget collectible featuring interlocking layered scales. Designed for smooth, tactile palm-twisting and stress relief. Pick your favourite matte color.
-            </p>
-
-            <!-- Pill Button Colour Selector for Dragon Egg -->
-            <div class="mb-6">
-              <label class="block text-xs uppercase tracking-wider font-semibold text-slate-800 mb-2.5">
-                Colour: <span id="selected-dragon-egg-colour-name" class="font-bold text-brand-700 capitalize">White</span>
-              </label>
-              <div id="dragon-egg-colour-pill-container" class="flex flex-wrap gap-2">
-                <!-- 6 Colour Pills rendered via JS -->
-              </div>
-            </div>
-
-            <!-- Stepper Quantity Selector -->
-            <div class="mb-8">
-              <label class="block text-xs uppercase tracking-wider font-semibold text-slate-800 mb-2">Quantity</label>
-              <div class="inline-flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-2xl p-1.5">
-                <button 
-                  type="button" 
-                  onclick="changeDragonEggQty(-1)" 
-                  class="w-8 h-8 rounded-xl bg-white border border-slate-200 text-slate-700 flex items-center justify-center text-sm font-semibold hover:bg-slate-100 active:scale-95 transition cursor-pointer shadow-xs"
-                >-</button>
-                <input 
-                  type="number" 
-                  id="dragon-egg-qty-input" 
-                  value="1" 
-                  min="1" 
-                  max="99" 
-                  oninput="handleDragonEggQtyInput(this)" 
-                  class="w-12 h-8 text-center text-sm font-bold text-slate-800 bg-transparent focus:bg-white focus:outline-none rounded-lg transition"
-                />
-                <button 
-                  type="button" 
-                  onclick="changeDragonEggQty(1)" 
-                  class="w-8 h-8 rounded-xl bg-white border border-slate-200 text-slate-700 flex items-center justify-center text-sm font-semibold hover:bg-slate-100 active:scale-95 transition cursor-pointer shadow-xs"
-                >+</button>
-              </div>
-            </div>
-          </div>
-
-          <div class="pt-6 border-t border-slate-100 flex items-center gap-4">
-            <button 
-              type="button" 
-              onclick="addDragonEggToBag()" 
-              class="w-full py-4 rounded-2xl bg-slate-900 hover:bg-brand-600 text-white flex items-center justify-center gap-2 text-xs uppercase tracking-widest font-semibold active:scale-95 transition cursor-pointer shadow-md"
-            >
-              <i class="fa-solid fa-bag-shopping text-sm"></i>
-              <span id="dragon-egg-add-cta">Add Dragon Egg (White) (1) to Bag • $2.00 SGD</span>
-            </button>
-          </div>
-        </div>
-
-      </div>
-    </section>
-
     <!-- VIEW 5: FAQ -->
-    <section id="view-faq" class="view-state flex-col max-w-3xl mx-auto w-full pt-4">
+    <section id="view-faq" class="view-state flex flex-col max-w-3xl mx-auto w-full pt-4">
       <div class="mb-8 text-center">
         <h3 class="font-serif text-2xl sm:text-3xl text-slate-900 tracking-wide font-normal">Frequently Asked Questions</h3>
         <div class="w-12 h-px bg-slate-300 mx-auto mt-4"></div>
@@ -831,13 +831,20 @@
     let cart = [];
     let currentTab = "catalog";
 
-    window.addEventListener("DOMContentLoaded", () => {
+    function initializeStore() {
       renderProducts();
       renderPillOptions();
       renderColourOptions();
       renderDragonEggColourOptions();
       updateCartBadge();
-    });
+      switchTab('catalog');
+    }
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", initializeStore);
+    } else {
+      initializeStore();
+    }
 
     // RENDER MAIN CATALOG (HALLOWEEN FIGURINES + DRAGON EGG + CUSTOM ORDER)
     function renderProducts() {
@@ -848,20 +855,20 @@
         <!-- Product 1: Halloween Figurines -->
         <div class="bg-white rounded-3xl p-6 border border-slate-200/90 shadow-card hover:shadow-luxury hover:border-brand-200 transition duration-300 flex flex-col justify-between cursor-pointer" onclick="openProductSubpage()">
           <div>
-            <div class="relative w-full aspect-square rounded-2xl overflow-hidden mb-6 bg-slate-900 group shadow-inner">
+            <div class="relative w-full aspect-square rounded-2xl overflow-hidden mb-6 bg-slate-900 group shadow-inner flex items-center justify-center">
               <img 
                 src="image/halloween.jpg" 
                 alt="Halloween Figurines" 
                 class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out" 
                 loading="lazy"
-                onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\\'w-full h-full bg-slate-800 flex flex-col items-center justify-center text-white text-center p-6\\'><i class=\\'fa-solid fa-ghost text-4xl text-brand-300 mb-3\\'></i><span class=\\'font-serif text-base tracking-widest block mb-1\\'>Halloween Figurines</span><span class=\\'text-[11px] text-slate-400 font-mono\\'>halloween_2.jpg</span></div>';"
+                onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\\'w-full h-full bg-slate-800 flex flex-col items-center justify-center text-white text-center p-6\\'><i class=\\'fa-solid fa-ghost text-5xl text-brand-300 mb-3\\'></i><span class=\\'font-serif text-lg tracking-widest block mb-1\\'>Halloween Figurines</span><span class=\\'text-[11px] text-slate-400 font-mono\\'>Handcrafted Collectibles</span></div>';"
               />
               <div class="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/20 pointer-events-none"></div>
             </div>
 
             <div class="flex items-center justify-between gap-2 mb-1.5">
               <h4 class="font-serif text-xl sm:text-2xl font-medium text-slate-900 tracking-wide">Halloween Figurines</h4>
-              <span class="text-base font-bold text-slate-900 font-sans">$1.50 – $15</span>
+              <span class="text-sm font-semibold text-slate-900 font-sans whitespace-nowrap">$1.50 – $15</span>
             </div>
             <span class="text-[10px] uppercase tracking-wider text-brand-600 font-semibold block mb-3">Handcrafted Collectibles • Matte Finish</span>
             <p class="text-xs text-slate-500 font-light leading-relaxed mb-6">A curated series of miniature spooky companions. Choose from 13 individual animals or the full set in 6 custom colours.</p>
@@ -883,23 +890,23 @@
           </div>
         </div>
 
-        <!-- Product 2: Dragon Egg Fidget Toy -->
+        <!-- Product 2: Dragon Egg Fidget Toy ($3.00 SGD) -->
         <div class="bg-white rounded-3xl p-6 border border-slate-200/90 shadow-card hover:shadow-luxury hover:border-brand-200 transition duration-300 flex flex-col justify-between cursor-pointer" onclick="openDragonEggSubpage()">
           <div>
-            <div class="relative w-full aspect-square rounded-2xl overflow-hidden mb-6 bg-slate-900 group shadow-inner">
+            <div class="relative w-full aspect-square rounded-2xl overflow-hidden mb-6 bg-slate-900 group shadow-inner flex items-center justify-center">
               <img 
-                src="dragon egg.jpg" 
+                src="image/dragon egg.jpg" 
                 alt="Dragon Egg Fidget Toy" 
                 class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out" 
                 loading="lazy"
-                onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\\'w-full h-full bg-slate-800 flex flex-col items-center justify-center text-white text-center p-6\\'><i class=\\'fa-solid fa-egg text-4xl text-brand-300 mb-3\\'></i><span class=\\'font-serif text-base tracking-widest block mb-1\\'>Dragon Egg Fidget Toy</span><span class=\\'text-[11px] text-slate-400 font-mono\\'>dragon egg.jpg</span></div>';"
+                onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\\'w-full h-full bg-slate-800 flex flex-col items-center justify-center text-white text-center p-6\\'><i class=\\'fa-solid fa-egg text-5xl text-brand-300 mb-3\\'></i><span class=\\'font-serif text-lg tracking-widest block mb-1\\'>Dragon Egg Fidget Toy</span><span class=\\'text-[11px] text-slate-400 font-mono\\'>Tactile Sensory Scales</span></div>';"
               />
               <div class="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/20 pointer-events-none"></div>
             </div>
 
             <div class="flex items-center justify-between gap-2 mb-1.5">
               <h4 class="font-serif text-xl sm:text-2xl font-medium text-slate-900 tracking-wide">Dragon Egg Fidget Toy</h4>
-              <span class="text-base font-bold text-slate-900 font-sans">$2.00 SGD</span>
+              <span class="text-sm font-semibold text-slate-900 font-sans whitespace-nowrap">$3.00 SGD</span>
             </div>
             <span class="text-[10px] uppercase tracking-wider text-brand-600 font-semibold block mb-3">Tactile Scales • Sensory Play</span>
             <p class="text-xs text-slate-500 font-light leading-relaxed mb-6">Satisfying textured dragon egg designed with interlocking layers for tactile palm twisting. Available in 6 vibrant colours.</p>
@@ -908,7 +915,7 @@
           <div class="flex items-center justify-between pt-5 border-t border-slate-100" onclick="event.stopPropagation()">
             <div>
               <span class="text-[10px] uppercase tracking-wider text-slate-400 font-semibold block">Fidget Collectible</span>
-              <span class="text-xs font-semibold text-slate-700">$2.00 each</span>
+              <span class="text-xs font-semibold text-slate-700">$3.00 each</span>
             </div>
             <button 
               type="button" 
@@ -938,7 +945,7 @@
 
             <div class="flex items-center justify-between gap-2 mb-1.5">
               <h4 class="font-serif text-xl sm:text-2xl font-medium text-slate-900 tracking-wide">Custom Order</h4>
-              <span class="text-base font-bold text-slate-900 font-sans">From $0.00</span>
+              <span class="text-sm font-semibold text-slate-900 font-sans whitespace-nowrap">From $0.00</span>
             </div>
             <span class="text-[10px] uppercase tracking-wider text-brand-600 font-semibold block mb-3">Tailored Prints • Free Quote</span>
             <p class="text-xs text-slate-500 font-light leading-relaxed mb-6">Need a custom keychain, commemorative token, figure, or personalized design? Submit instructions for a quick review and quote.</p>
@@ -1077,7 +1084,7 @@
 
       if (colEl) colEl.innerText = col.name;
 
-      const totalPreview = (2.00 * dragonEggQuantity).toFixed(2);
+      const totalPreview = (3.00 * dragonEggQuantity).toFixed(2);
       if (ctaEl) {
         ctaEl.innerText = `Add Dragon Egg (${col.name}) (${dragonEggQuantity}) to Bag • $${totalPreview} SGD`;
       }
@@ -1121,7 +1128,7 @@
           name: `Dragon Egg Fidget Toy (${colour.name})`,
           character: "Dragon Egg Fidget Toy",
           colour: colour.name,
-          price: 2.00,
+          price: 3.00,
           qty: dragonEggQuantity,
           isCustom: false
         });
@@ -1288,7 +1295,7 @@
 
         const icon = item.isCustom 
           ? `<i class="fa-solid fa-wand-magic-sparkles text-xs"></i>`
-          : `<i class="fa-solid fa-ghost text-xs"></i>`;
+          : (item.name.includes("Dragon Egg") ? `<i class="fa-solid fa-egg text-xs"></i>` : `<i class="fa-solid fa-ghost text-xs"></i>`);
 
         const details = item.isCustom 
           ? `<div class="text-[11px] text-slate-500 font-medium">Quote upon review</div><div class="text-[10px] text-slate-400 italic truncate max-w-[200px] mt-0.5">"${item.instructions}"</div>`
@@ -1375,17 +1382,17 @@
       const faqView = document.getElementById("view-faq");
       const navCatalog = document.getElementById("nav-btn-catalog");
 
-      catalogView.classList.remove("view-active");
-      productDetailView.classList.remove("view-active");
+      if (catalogView) catalogView.classList.remove("view-active");
+      if (productDetailView) productDetailView.classList.remove("view-active");
       if (dragonEggView) dragonEggView.classList.remove("view-active");
       if (customOrderView) customOrderView.classList.remove("view-active");
-      faqView.classList.remove("view-active");
+      if (faqView) faqView.classList.remove("view-active");
 
       if (tab === "catalog") {
-        catalogView.classList.add("view-active");
+        if (catalogView) catalogView.classList.add("view-active");
         if (navCatalog) navCatalog.className = "flex flex-col items-center gap-1 text-brand-600 transition";
       } else if (tab === "product-detail") {
-        productDetailView.classList.add("view-active");
+        if (productDetailView) productDetailView.classList.add("view-active");
         if (navCatalog) navCatalog.className = "flex flex-col items-center gap-1 text-brand-600 transition";
       } else if (tab === "dragon-egg-detail") {
         if (dragonEggView) dragonEggView.classList.add("view-active");
@@ -1394,9 +1401,10 @@
         if (customOrderView) customOrderView.classList.add("view-active");
         if (navCatalog) navCatalog.className = "flex flex-col items-center gap-1 text-brand-600 transition";
       } else {
-        faqView.classList.add("view-active");
+        if (faqView) faqView.classList.add("view-active");
         if (navCatalog) navCatalog.className = "flex flex-col items-center gap-1 text-slate-400 transition";
-        document.getElementById("store-section").scrollIntoView({ behavior: "smooth" });
+        const storeSec = document.getElementById("store-section");
+        if (storeSec) storeSec.scrollIntoView({ behavior: "smooth" });
       }
     }
 
@@ -1404,6 +1412,7 @@
     function openMenuDrawer() {
       const drawer = document.getElementById("menu-drawer");
       const backdrop = document.getElementById("menu-backdrop");
+      if (!drawer || !backdrop) return;
       backdrop.classList.remove("opacity-0", "pointer-events-none");
       drawer.classList.remove("-translate-x-full");
       document.body.classList.add("overflow-hidden");
@@ -1412,6 +1421,7 @@
     function closeMenuDrawer() {
       const drawer = document.getElementById("menu-drawer");
       const backdrop = document.getElementById("menu-backdrop");
+      if (!drawer || !backdrop) return;
       backdrop.classList.add("opacity-0", "pointer-events-none");
       drawer.classList.add("-translate-x-full");
       document.body.classList.remove("overflow-hidden");
@@ -1464,7 +1474,7 @@
       const matches = [];
 
       if ("dragon egg fidget toy sensory egg".includes(term)) {
-        matches.push({ type: 'dragon-egg', name: 'Dragon Egg Fidget Toy', priceText: '$2.00 SGD' });
+        matches.push({ type: 'dragon-egg', name: 'Dragon Egg Fidget Toy', priceText: '$3.00 SGD' });
       }
 
       if ("custom order tailored print".includes(term)) {
@@ -1575,6 +1585,7 @@
       renderCartItems();
       const sheet = document.getElementById("cart-sheet");
       const backdrop = document.getElementById("cart-sheet-backdrop");
+      if (!sheet || !backdrop) return;
       backdrop.classList.remove("opacity-0", "pointer-events-none");
       if (window.innerWidth >= 768) {
         sheet.classList.remove("md:translate-x-full");
@@ -1586,6 +1597,7 @@
     function closeCart() {
       const sheet = document.getElementById("cart-sheet");
       const backdrop = document.getElementById("cart-sheet-backdrop");
+      if (!sheet || !backdrop) return;
       backdrop.classList.add("opacity-0", "pointer-events-none");
       sheet.classList.add("translate-y-full");
       sheet.classList.add("md:translate-x-full");
@@ -1683,6 +1695,7 @@ Hi! Ready to confirm #${orderId}  Let me know the quote or PayNow details whenev
 
     function showToast(msg) {
       const toast = document.getElementById("toast");
+      if (!toast) return;
       document.getElementById("toast-message").innerText = msg;
       toast.classList.remove("opacity-0", "pointer-events-none");
       setTimeout(() => {
