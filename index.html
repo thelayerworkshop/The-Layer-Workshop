@@ -289,7 +289,7 @@
   <!-- ================= MAIN CONTENT WRAPPER ================= -->
   <main id="store-section" class="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 pt-10">
     
-    <!-- VIEW 1: CATALOG / SPECIAL COLLECTION (GRID OF 2 ITEMS) -->
+    <!-- VIEW 1: CATALOG / SPECIAL COLLECTION (GRID OF 3 ITEMS) -->
     <section id="view-catalog" class="view-state view-active flex-col">
       <div class="mb-10 text-center max-w-xl mx-auto">
         <h3 class="font-serif text-2xl sm:text-3xl text-slate-900 tracking-wide font-normal">Special Collection</h3>
@@ -297,8 +297,8 @@
         <div class="w-12 h-px bg-slate-300 mx-auto mt-4"></div>
       </div>
 
-      <!-- Products Grid: Halloween Figurines + Custom Order -->
-      <div id="product-grid" class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto w-full">
+      <!-- Products Grid: Halloween Figurines + Dragon Egg Fidget Toy + Custom Order -->
+      <div id="product-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto w-full">
         <!-- Rendered dynamically -->
       </div>
     </section>
@@ -508,7 +508,107 @@
       </div>
     </section>
 
-    <!-- VIEW 4: FAQ -->
+    <!-- VIEW 4: DEDICATED DRAGON EGG FIDGET TOY SUB-PAGE -->
+    <section id="view-dragon-egg-detail" class="view-state flex-col max-w-4xl mx-auto w-full pt-2">
+      <div class="mb-6">
+        <button 
+          type="button" 
+          onclick="switchTab('catalog')" 
+          class="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-slate-500 hover:text-slate-900 transition cursor-pointer group"
+        >
+          <i class="fa-solid fa-arrow-left text-[11px] group-hover:-translate-x-1 transition-transform"></i>
+          <span>Back to Collection</span>
+        </button>
+      </div>
+
+      <div class="bg-white rounded-3xl p-6 sm:p-10 border border-slate-200/90 shadow-card flex flex-col md:flex-row gap-8 lg:gap-12 items-start">
+        
+        <!-- Left: Product Image Preview -->
+        <div class="w-full md:w-1/2">
+          <div class="relative w-full aspect-square rounded-2xl overflow-hidden bg-slate-900 group shadow-inner">
+            <img 
+              id="detail-dragon-egg-img"
+              src="dragon egg.jpg" 
+              alt="Dragon Egg Fidget Toy Preview" 
+              class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out" 
+              loading="lazy"
+              onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'w-full h-full bg-slate-800 flex flex-col items-center justify-center text-white text-center p-6\'><i class=\'fa-solid fa-egg text-4xl text-brand-300 mb-3\'></i><span class=\'font-serif text-base tracking-widest block mb-1\'>Dragon Egg Fidget Toy</span><span class=\'text-[11px] text-slate-400 font-mono\'>dragon egg.jpg</span></div>';"
+            />
+            <div class="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/10 pointer-events-none"></div>
+          </div>
+          <p class="text-[11px] text-slate-400 mt-3 text-center tracking-wide">
+            Tactile spiral scales • Satisfying pocket fidget toy
+          </p>
+        </div>
+
+        <!-- Right: Option Selectors & Actions -->
+        <div class="w-full md:w-1/2 flex flex-col justify-between">
+          <div>
+            <span class="text-[10px] uppercase tracking-wider text-brand-600 font-semibold block mb-1">Sensory Workshop Series</span>
+            <h2 class="font-serif text-3xl font-medium text-slate-900 tracking-wide mb-2">Dragon Egg Fidget Toy</h2>
+            
+            <div class="flex items-baseline gap-3 mb-5">
+              <span class="text-2xl font-bold text-slate-900 font-sans">$2.00 SGD</span>
+              <span class="text-xs text-slate-400 font-medium tracking-wide">each</span>
+            </div>
+
+            <p class="text-xs text-slate-500 font-light leading-relaxed mb-6">
+              A sensory dragon egg fidget collectible featuring interlocking layered scales. Designed for smooth, tactile palm-twisting and stress relief. Pick your favourite matte color.
+            </p>
+
+            <!-- Pill Button Colour Selector for Dragon Egg -->
+            <div class="mb-6">
+              <label class="block text-xs uppercase tracking-wider font-semibold text-slate-800 mb-2.5">
+                Colour: <span id="selected-dragon-egg-colour-name" class="font-bold text-brand-700 capitalize">White</span>
+              </label>
+              <div id="dragon-egg-colour-pill-container" class="flex flex-wrap gap-2">
+                <!-- 6 Colour Pills rendered via JS -->
+              </div>
+            </div>
+
+            <!-- Stepper Quantity Selector -->
+            <div class="mb-8">
+              <label class="block text-xs uppercase tracking-wider font-semibold text-slate-800 mb-2">Quantity</label>
+              <div class="inline-flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-2xl p-1.5">
+                <button 
+                  type="button" 
+                  onclick="changeDragonEggQty(-1)" 
+                  class="w-8 h-8 rounded-xl bg-white border border-slate-200 text-slate-700 flex items-center justify-center text-sm font-semibold hover:bg-slate-100 active:scale-95 transition cursor-pointer shadow-xs"
+                >-</button>
+                <input 
+                  type="number" 
+                  id="dragon-egg-qty-input" 
+                  value="1" 
+                  min="1" 
+                  max="99" 
+                  oninput="handleDragonEggQtyInput(this)" 
+                  class="w-12 h-8 text-center text-sm font-bold text-slate-800 bg-transparent focus:bg-white focus:outline-none rounded-lg transition"
+                />
+                <button 
+                  type="button" 
+                  onclick="changeDragonEggQty(1)" 
+                  class="w-8 h-8 rounded-xl bg-white border border-slate-200 text-slate-700 flex items-center justify-center text-sm font-semibold hover:bg-slate-100 active:scale-95 transition cursor-pointer shadow-xs"
+                >+</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="pt-6 border-t border-slate-100 flex items-center gap-4">
+            <button 
+              type="button" 
+              onclick="addDragonEggToBag()" 
+              class="w-full py-4 rounded-2xl bg-slate-900 hover:bg-brand-600 text-white flex items-center justify-center gap-2 text-xs uppercase tracking-widest font-semibold active:scale-95 transition cursor-pointer shadow-md"
+            >
+              <i class="fa-solid fa-bag-shopping text-sm"></i>
+              <span id="dragon-egg-add-cta">Add Dragon Egg (White) (1) to Bag • $2.00 SGD</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- VIEW 5: FAQ -->
     <section id="view-faq" class="view-state flex-col max-w-3xl mx-auto w-full pt-4">
       <div class="mb-8 text-center">
         <h3 class="font-serif text-2xl sm:text-3xl text-slate-900 tracking-wide font-normal">Frequently Asked Questions</h3>
@@ -723,6 +823,10 @@
     let selectedColourIndex = 1; // Default to White
     let detailQuantity = 1;
 
+    // Dragon Egg Selection State
+    let selectedDragonEggColourIndex = 1; // Default White
+    let dragonEggQuantity = 1;
+
     // Cart contains array of added items
     let cart = [];
     let currentTab = "catalog";
@@ -731,17 +835,18 @@
       renderProducts();
       renderPillOptions();
       renderColourOptions();
+      renderDragonEggColourOptions();
       updateCartBadge();
     });
 
-    // RENDER MAIN CATALOG (HALLOWEEN FIGURINES + CUSTOM ORDER)
+    // RENDER MAIN CATALOG (HALLOWEEN FIGURINES + DRAGON EGG + CUSTOM ORDER)
     function renderProducts() {
       const container = document.getElementById("product-grid");
       if (!container) return;
 
       container.innerHTML = `
         <!-- Product 1: Halloween Figurines -->
-        <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/90 shadow-card hover:shadow-luxury hover:border-brand-200 transition duration-300 flex flex-col justify-between cursor-pointer" onclick="openProductSubpage()">
+        <div class="bg-white rounded-3xl p-6 border border-slate-200/90 shadow-card hover:shadow-luxury hover:border-brand-200 transition duration-300 flex flex-col justify-between cursor-pointer" onclick="openProductSubpage()">
           <div>
             <div class="relative w-full aspect-square rounded-2xl overflow-hidden mb-6 bg-slate-900 group shadow-inner">
               <img 
@@ -755,11 +860,11 @@
             </div>
 
             <div class="flex items-center justify-between gap-2 mb-1.5">
-              <h4 class="font-serif text-2xl font-medium text-slate-900 tracking-wide">Halloween Figurines</h4>
-              <span class="text-base font-bold text-slate-900 font-sans">$1.50 – $15.00 SGD</span>
+              <h4 class="font-serif text-xl sm:text-2xl font-medium text-slate-900 tracking-wide">Halloween Figurines</h4>
+              <span class="text-base font-bold text-slate-900 font-sans">$1.50 – $15</span>
             </div>
-            <span class="text-[10px] uppercase tracking-wider text-brand-600 font-semibold block mb-3">Handcrafted Collectibles • Matte Stone Finish</span>
-            <p class="text-xs text-slate-500 font-light leading-relaxed mb-6">A curated series of miniature spooky companions, crafted with layered precision. Choose from 13 individual animals or the full set in 6 custom colours.</p>
+            <span class="text-[10px] uppercase tracking-wider text-brand-600 font-semibold block mb-3">Handcrafted Collectibles • Matte Finish</span>
+            <p class="text-xs text-slate-500 font-light leading-relaxed mb-6">A curated series of miniature spooky companions. Choose from 13 individual animals or the full set in 6 custom colours.</p>
           </div>
 
           <div class="flex items-center justify-between pt-5 border-t border-slate-100" onclick="event.stopPropagation()">
@@ -770,7 +875,7 @@
             <button 
               type="button" 
               onclick="openProductSubpage()" 
-              class="px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-brand-600 text-white flex items-center gap-2 text-xs font-semibold tracking-wider active:scale-95 transition cursor-pointer shadow-sm"
+              class="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-brand-600 text-white flex items-center gap-2 text-xs font-semibold tracking-wider active:scale-95 transition cursor-pointer shadow-sm"
             >
               <span>Select Options</span>
               <i class="fa-solid fa-arrow-right text-[10px]"></i>
@@ -778,15 +883,53 @@
           </div>
         </div>
 
-        <!-- Product 2: Custom Order -->
-        <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/90 shadow-card hover:shadow-luxury hover:border-brand-200 transition duration-300 flex flex-col justify-between cursor-pointer" onclick="openCustomOrderSubpage()">
+        <!-- Product 2: Dragon Egg Fidget Toy -->
+        <div class="bg-white rounded-3xl p-6 border border-slate-200/90 shadow-card hover:shadow-luxury hover:border-brand-200 transition duration-300 flex flex-col justify-between cursor-pointer" onclick="openDragonEggSubpage()">
+          <div>
+            <div class="relative w-full aspect-square rounded-2xl overflow-hidden mb-6 bg-slate-900 group shadow-inner">
+              <img 
+                src="dragon egg.jpg" 
+                alt="Dragon Egg Fidget Toy" 
+                class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out" 
+                loading="lazy"
+                onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\\'w-full h-full bg-slate-800 flex flex-col items-center justify-center text-white text-center p-6\\'><i class=\\'fa-solid fa-egg text-4xl text-brand-300 mb-3\\'></i><span class=\\'font-serif text-base tracking-widest block mb-1\\'>Dragon Egg Fidget Toy</span><span class=\\'text-[11px] text-slate-400 font-mono\\'>dragon egg.jpg</span></div>';"
+              />
+              <div class="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/20 pointer-events-none"></div>
+            </div>
+
+            <div class="flex items-center justify-between gap-2 mb-1.5">
+              <h4 class="font-serif text-xl sm:text-2xl font-medium text-slate-900 tracking-wide">Dragon Egg Fidget Toy</h4>
+              <span class="text-base font-bold text-slate-900 font-sans">$2.00 SGD</span>
+            </div>
+            <span class="text-[10px] uppercase tracking-wider text-brand-600 font-semibold block mb-3">Tactile Scales • Sensory Play</span>
+            <p class="text-xs text-slate-500 font-light leading-relaxed mb-6">Satisfying textured dragon egg designed with interlocking layers for tactile palm twisting. Available in 6 vibrant colours.</p>
+          </div>
+
+          <div class="flex items-center justify-between pt-5 border-t border-slate-100" onclick="event.stopPropagation()">
+            <div>
+              <span class="text-[10px] uppercase tracking-wider text-slate-400 font-semibold block">Fidget Collectible</span>
+              <span class="text-xs font-semibold text-slate-700">$2.00 each</span>
+            </div>
+            <button 
+              type="button" 
+              onclick="openDragonEggSubpage()" 
+              class="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-brand-600 text-white flex items-center gap-2 text-xs font-semibold tracking-wider active:scale-95 transition cursor-pointer shadow-sm"
+            >
+              <span>Choose Colour</span>
+              <i class="fa-solid fa-arrow-right text-[10px]"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Product 3: Custom Order -->
+        <div class="bg-white rounded-3xl p-6 border border-slate-200/90 shadow-card hover:shadow-luxury hover:border-brand-200 transition duration-300 flex flex-col justify-between cursor-pointer" onclick="openCustomOrderSubpage()">
           <div>
             <div class="relative w-full aspect-square rounded-2xl overflow-hidden mb-6 bg-slate-900 flex flex-col items-center justify-center p-8 text-center text-white group shadow-inner">
               <div class="w-16 h-16 rounded-2xl bg-white/10 luxury-blur border border-white/20 flex items-center justify-center text-brand-300 mb-4 group-hover:scale-110 transition-transform">
                 <i class="fa-solid fa-wand-magic-sparkles text-2xl"></i>
               </div>
               <span class="font-serif text-2xl tracking-wider block mb-1">Custom Order</span>
-              <p class="text-[11px] text-slate-300 font-light max-w-[220px]">Upload your sketches, reference photos, or 3D ideas for a tailored print</p>
+              <p class="text-[11px] text-slate-300 font-light max-w-[220px]">Upload sketches, photos, or 3D ideas for a tailored print</p>
               
               <div class="absolute bottom-4 left-4 right-4 text-white pointer-events-none text-center">
                 <span class="text-xs font-serif italic text-white/90">Upload & Quote</span>
@@ -794,11 +937,11 @@
             </div>
 
             <div class="flex items-center justify-between gap-2 mb-1.5">
-              <h4 class="font-serif text-2xl font-medium text-slate-900 tracking-wide">Custom Order</h4>
-              <span class="text-base font-bold text-slate-900 font-sans">From $0.00 SGD</span>
+              <h4 class="font-serif text-xl sm:text-2xl font-medium text-slate-900 tracking-wide">Custom Order</h4>
+              <span class="text-base font-bold text-slate-900 font-sans">From $0.00</span>
             </div>
-            <span class="text-[10px] uppercase tracking-wider text-brand-600 font-semibold block mb-3">Tailored Prints • Free Quote Upon Review</span>
-            <p class="text-xs text-slate-500 font-light leading-relaxed mb-6">Need a custom keychain, commemorative token, figure, or personalized design? Submit your photo and instructions for a quick quote.</p>
+            <span class="text-[10px] uppercase tracking-wider text-brand-600 font-semibold block mb-3">Tailored Prints • Free Quote</span>
+            <p class="text-xs text-slate-500 font-light leading-relaxed mb-6">Need a custom keychain, commemorative token, figure, or personalized design? Submit instructions for a quick review and quote.</p>
           </div>
 
           <div class="flex items-center justify-between pt-5 border-t border-slate-100" onclick="event.stopPropagation()">
@@ -809,7 +952,7 @@
             <button 
               type="button" 
               onclick="openCustomOrderSubpage()" 
-              class="px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-brand-600 text-white flex items-center gap-2 text-xs font-semibold tracking-wider active:scale-95 transition cursor-pointer shadow-sm"
+              class="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-brand-600 text-white flex items-center gap-2 text-xs font-semibold tracking-wider active:scale-95 transition cursor-pointer shadow-sm"
             >
               <span>Customise Now</span>
               <i class="fa-solid fa-arrow-right text-[10px]"></i>
@@ -822,6 +965,11 @@
     // SUBPAGE NAVIGATION
     function openProductSubpage() {
       switchTab('product-detail');
+      window.scrollTo({ top: document.getElementById("store-section").offsetTop - 40, behavior: "smooth" });
+    }
+
+    function openDragonEggSubpage() {
+      switchTab('dragon-egg-detail');
       window.scrollTo({ top: document.getElementById("store-section").offsetTop - 40, behavior: "smooth" });
     }
 
@@ -889,6 +1037,99 @@
     function selectColour(idx) {
       selectedColourIndex = idx;
       renderColourOptions();
+    }
+
+    // PILL BUTTON OPTIONS (DRAGON EGG COLOURS)
+    function renderDragonEggColourOptions() {
+      const container = document.getElementById("dragon-egg-colour-pill-container");
+      if (!container) return;
+
+      container.innerHTML = COLOUR_OPTIONS.map((col, idx) => {
+        const isSelected = idx === selectedDragonEggColourIndex;
+        const activeClass = isSelected 
+          ? "bg-slate-950 text-white border-slate-950 shadow-sm" 
+          : "bg-white text-slate-700 border-slate-300 hover:border-slate-400 hover:bg-slate-50";
+
+        return `
+          <button 
+            type="button" 
+            onclick="selectDragonEggColour(${idx})" 
+            class="px-4 py-2 rounded-full border text-xs sm:text-sm font-medium transition cursor-pointer active:scale-95 flex items-center gap-2 ${activeClass}"
+          >
+            <span class="w-2.5 h-2.5 rounded-full inline-block" style="background-color: ${col.dotBg}; border: 1px solid ${col.border};"></span>
+            <span>${col.name}</span>
+          </button>
+        `;
+      }).join("");
+
+      updateDragonEggSubpageDetails();
+    }
+
+    function selectDragonEggColour(idx) {
+      selectedDragonEggColourIndex = idx;
+      renderDragonEggColourOptions();
+    }
+
+    function updateDragonEggSubpageDetails() {
+      const col = COLOUR_OPTIONS[selectedDragonEggColourIndex];
+      const colEl = document.getElementById("selected-dragon-egg-colour-name");
+      const ctaEl = document.getElementById("dragon-egg-add-cta");
+
+      if (colEl) colEl.innerText = col.name;
+
+      const totalPreview = (2.00 * dragonEggQuantity).toFixed(2);
+      if (ctaEl) {
+        ctaEl.innerText = `Add Dragon Egg (${col.name}) (${dragonEggQuantity}) to Bag • $${totalPreview} SGD`;
+      }
+    }
+
+    function changeDragonEggQty(delta) {
+      let next = dragonEggQuantity + delta;
+      if (next < 1) next = 1;
+      if (next > 99) next = 99;
+      dragonEggQuantity = next;
+      const input = document.getElementById("dragon-egg-qty-input");
+      if (input) input.value = next;
+      updateDragonEggSubpageDetails();
+    }
+
+    function handleDragonEggQtyInput(input) {
+      let val = parseInt(input.value, 10);
+      if (isNaN(val) || val < 1) val = 1;
+      if (val > 99) val = 99;
+      dragonEggQuantity = val;
+      updateDragonEggSubpageDetails();
+    }
+
+    function addDragonEggToBag() {
+      const colour = COLOUR_OPTIONS[selectedDragonEggColourIndex];
+      const compositeId = `dragon-egg-${colour.id}`;
+
+      const existing = cart.find(item => item.id === compositeId && !item.isCustom);
+
+      if (existing) {
+        if (existing.qty + dragonEggQuantity > 99) {
+          existing.qty = 99;
+          showToast("Maximum quantity of 99 reached for this combination");
+        } else {
+          existing.qty += dragonEggQuantity;
+          showToast(`Updated Dragon Egg (${colour.name}) quantity in bag`);
+        }
+      } else {
+        cart.push({
+          id: compositeId,
+          name: `Dragon Egg Fidget Toy (${colour.name})`,
+          character: "Dragon Egg Fidget Toy",
+          colour: colour.name,
+          price: 2.00,
+          qty: dragonEggQuantity,
+          isCustom: false
+        });
+        showToast(`Added ${dragonEggQuantity}x Dragon Egg (${colour.name}) to bag`);
+      }
+
+      updateCartBadge();
+      renderCartItems();
     }
 
     function updateSubpageDetails() {
@@ -1129,12 +1370,14 @@
 
       const catalogView = document.getElementById("view-catalog");
       const productDetailView = document.getElementById("view-product-detail");
+      const dragonEggView = document.getElementById("view-dragon-egg-detail");
       const customOrderView = document.getElementById("view-custom-order");
       const faqView = document.getElementById("view-faq");
       const navCatalog = document.getElementById("nav-btn-catalog");
 
       catalogView.classList.remove("view-active");
       productDetailView.classList.remove("view-active");
+      if (dragonEggView) dragonEggView.classList.remove("view-active");
       if (customOrderView) customOrderView.classList.remove("view-active");
       faqView.classList.remove("view-active");
 
@@ -1143,6 +1386,9 @@
         if (navCatalog) navCatalog.className = "flex flex-col items-center gap-1 text-brand-600 transition";
       } else if (tab === "product-detail") {
         productDetailView.classList.add("view-active");
+        if (navCatalog) navCatalog.className = "flex flex-col items-center gap-1 text-brand-600 transition";
+      } else if (tab === "dragon-egg-detail") {
+        if (dragonEggView) dragonEggView.classList.add("view-active");
         if (navCatalog) navCatalog.className = "flex flex-col items-center gap-1 text-brand-600 transition";
       } else if (tab === "custom-order") {
         if (customOrderView) customOrderView.classList.add("view-active");
@@ -1217,6 +1463,10 @@
 
       const matches = [];
 
+      if ("dragon egg fidget toy sensory egg".includes(term)) {
+        matches.push({ type: 'dragon-egg', name: 'Dragon Egg Fidget Toy', priceText: '$2.00 SGD' });
+      }
+
       if ("custom order tailored print".includes(term)) {
         matches.push({ type: 'custom', name: 'Custom Order', priceText: 'From $0.00 SGD' });
       }
@@ -1238,6 +1488,23 @@
       }
 
       resultsContainer.innerHTML = matches.map(m => {
+        if (m.type === 'dragon-egg') {
+          return `
+            <div onclick="jumpToDragonEggFromDrawer()" class="py-2.5 px-2 flex items-center justify-between gap-3 hover:bg-slate-100/70 rounded-xl cursor-pointer transition">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-brand-50 border border-brand-100 flex items-center justify-center text-brand-600 text-xs font-bold shrink-0">
+                  <i class="fa-solid fa-egg text-[10px]"></i>
+                </div>
+                <div>
+                  <h5 class="text-xs font-bold text-slate-800">${m.name}</h5>
+                  <span class="text-[11px] text-brand-600 font-semibold">${m.priceText}</span>
+                </div>
+              </div>
+              <span class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Choose &rarr;</span>
+            </div>
+          `;
+        }
+
         if (m.type === 'custom') {
           return `
             <div onclick="jumpToCustomOrderFromDrawer()" class="py-2.5 px-2 flex items-center justify-between gap-3 hover:bg-slate-100/70 rounded-xl cursor-pointer transition">
@@ -1270,6 +1537,12 @@
           </div>
         `;
       }).join("");
+    }
+
+    function jumpToDragonEggFromDrawer() {
+      closeMenuDrawer();
+      switchTab('dragon-egg-detail');
+      document.getElementById("store-section").scrollIntoView({ behavior: 'smooth' });
     }
 
     function clearDrawerSearch() {
