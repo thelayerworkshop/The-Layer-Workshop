@@ -308,7 +308,7 @@
   <!-- ================= MAIN CONTENT WRAPPER ================= -->
   <main id="store-section" class="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 pt-10">
     
-    <!-- VIEW: CATALOG / SPECIAL COLLECTION -->
+    <!-- VIEW 1: CATALOG / SPECIAL COLLECTION -->
     <section id="view-catalog" class="view-state view-active flex-col">
       <div class="mb-10 text-center max-w-xl mx-auto">
         <h3 class="font-serif text-2xl sm:text-3xl text-slate-900 tracking-wide font-normal">Special Collection</h3>
@@ -316,13 +316,121 @@
         <div class="w-12 h-px bg-slate-300 mx-auto mt-4"></div>
       </div>
 
-      <!-- Minimalist Product Showcase (Exclusively Halloween Figurines) -->
+      <!-- Solitary Debut Product Card -->
       <div id="product-grid" class="max-w-xl mx-auto w-full">
         <!-- Rendered dynamically -->
       </div>
     </section>
 
-    <!-- VIEW: FAQ -->
+    <!-- VIEW 2: DEDICATED PRODUCT SUB-PAGE (CUSTOM OPTIONS) -->
+    <section id="view-product-detail" class="view-state flex-col max-w-4xl mx-auto w-full pt-2">
+      <!-- Breadcrumb / Back button -->
+      <div class="mb-6">
+        <button 
+          type="button" 
+          onclick="switchTab('catalog')" 
+          class="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-slate-500 hover:text-slate-900 transition cursor-pointer group"
+        >
+          <i class="fa-solid fa-arrow-left text-[11px] group-hover:-translate-x-1 transition-transform"></i>
+          <span>Back to Collection</span>
+        </button>
+      </div>
+
+      <!-- Sub-Page Product Layout (Two columns on desktop) -->
+      <div class="bg-white rounded-3xl p-6 sm:p-10 border border-slate-200/90 shadow-card flex flex-col md:flex-row gap-8 lg:gap-12 items-start">
+        
+        <!-- Left: Product Image Preview (Matches Main Catalog exactly) -->
+        <div class="w-full md:w-1/2">
+          <div class="relative w-full aspect-square rounded-2xl overflow-hidden bg-slate-900 group shadow-inner">
+            <img 
+              id="detail-product-img"
+              src="image/halloween.jpg" 
+              alt="Halloween Figurines Preview" 
+              class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out" 
+              loading="lazy"
+              onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'w-full h-full bg-slate-800 flex flex-col items-center justify-center text-white text-center p-6\'><i class=\'fa-solid fa-ghost text-4xl text-brand-300 mb-3\'></i><span class=\'font-serif text-base tracking-widest block mb-1\'>Halloween Figurines</span><span class=\'text-[11px] text-slate-400 font-mono\'>halloween_2.jpg</span></div>';"
+            />
+            <div class="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/10 pointer-events-none"></div>
+            <div class="absolute top-4 left-4 bg-white/90 luxury-blur px-3 py-1 rounded-full text-[9px] uppercase tracking-[0.25em] font-bold text-slate-900 shadow-sm">
+              Debut Release
+            </div>
+          </div>
+          <p class="text-[11px] text-slate-400 mt-3 text-center tracking-wide">
+            Reference guide: Previewing the full spooky collection
+          </p>
+        </div>
+
+        <!-- Right: Option Selectors & Actions -->
+        <div class="w-full md:w-1/2 flex flex-col justify-between">
+          <div>
+            <span class="text-[10px] uppercase tracking-wider text-brand-600 font-semibold block mb-1">Handcrafted Series</span>
+            <h2 class="font-serif text-3xl font-medium text-slate-900 tracking-wide mb-2">Halloween Figurines</h2>
+            
+            <!-- Dynamic Price Tag -->
+            <div class="flex items-baseline gap-3 mb-5">
+              <span id="detail-price-display" class="text-2xl font-bold text-slate-900 font-sans">$1.50 SGD</span>
+              <span id="detail-price-type" class="text-xs text-slate-400 font-medium tracking-wide">per item</span>
+            </div>
+
+            <p class="text-xs text-slate-500 font-light leading-relaxed mb-6">
+              A bespoke series of tactile spooky figurines, printed with layered precision in matte stone white. Select any individual character or choose the full collection set.
+            </p>
+
+            <!-- Pill Button Variant Selector (No H or numbering) -->
+            <div class="mb-7">
+              <label class="block text-xs uppercase tracking-wider font-semibold text-slate-800 mb-3">
+                Select Option: <span id="selected-animal-name" class="font-bold text-brand-700 capitalize">Chick</span>
+              </label>
+              
+              <div id="animal-pill-container" class="flex flex-wrap gap-2">
+                <!-- 14 Pill Options rendered via JS -->
+              </div>
+            </div>
+
+            <!-- Stepper Quantity Selector -->
+            <div class="mb-8">
+              <label class="block text-xs uppercase tracking-wider font-semibold text-slate-800 mb-2">Quantity</label>
+              <div class="inline-flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-2xl p-1.5">
+                <button 
+                  type="button" 
+                  onclick="changeDetailQty(-1)" 
+                  class="w-8 h-8 rounded-xl bg-white border border-slate-200 text-slate-700 flex items-center justify-center text-sm font-semibold hover:bg-slate-100 active:scale-95 transition cursor-pointer shadow-xs"
+                >-</button>
+                <input 
+                  type="number" 
+                  id="detail-qty-input" 
+                  value="1" 
+                  min="1" 
+                  max="99" 
+                  oninput="handleDetailQtyInput(this)" 
+                  class="w-12 h-8 text-center text-sm font-bold text-slate-800 bg-transparent focus:bg-white focus:outline-none rounded-lg transition"
+                />
+                <button 
+                  type="button" 
+                  onclick="changeDetailQty(1)" 
+                  class="w-8 h-8 rounded-xl bg-white border border-slate-200 text-slate-700 flex items-center justify-center text-sm font-semibold hover:bg-slate-100 active:scale-95 transition cursor-pointer shadow-xs"
+                >+</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Add to Bag CTA -->
+          <div class="pt-6 border-t border-slate-100 flex items-center gap-4">
+            <button 
+              type="button" 
+              onclick="addSelectedVariantToBag()" 
+              class="w-full py-4 rounded-2xl bg-slate-900 hover:bg-brand-600 text-white flex items-center justify-center gap-2 text-xs uppercase tracking-widest font-semibold active:scale-95 transition cursor-pointer shadow-md"
+            >
+              <i class="fa-solid fa-bag-shopping text-sm"></i>
+              <span id="detail-add-cta">Add Chick to Bag • $1.50 SGD</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- VIEW 3: FAQ -->
     <section id="view-faq" class="view-state flex-col max-w-3xl mx-auto w-full pt-4">
       <div class="mb-8 text-center">
         <h3 class="font-serif text-2xl sm:text-3xl text-slate-900 tracking-wide font-normal">Frequently Asked Questions</h3>
@@ -512,38 +620,60 @@
       currency: "SGD"
     };
 
-    // Solitary Featured Product: Halloween Figurines
+    // The 14 exact options (13 individual characters + 1 full set)
+    const FIGURINE_OPTIONS = [
+      { id: "chick", name: "Chick", price: 1.50 },
+      { id: "dog", name: "Dog", price: 1.50 },
+      { id: "ghost", name: "Ghost", price: 1.50 },
+      { id: "pumpkin", name: "Pumpkin", price: 1.50 },
+      { id: "pig", name: "Pig", price: 1.50 },
+      { id: "cat", name: "Cat", price: 1.50 },
+      { id: "monkey", name: "Monkey", price: 1.50 },
+      { id: "dinosaur", name: "Dinosaur", price: 1.50 },
+      { id: "cow", name: "Cow", price: 1.50 },
+      { id: "mouse", name: "Mouse", price: 1.50 },
+      { id: "rabbit", name: "Rabbit", price: 1.50 },
+      { id: "duck", name: "Duck", price: 1.50 },
+      { id: "skull", name: "Skull", price: 1.50 },
+      { id: "set", name: "Set", price: 15.00 }
+    ];
+
+    // Single Featured Main Product (uses image/halloween.jpg)
     const PRODUCTS = [
       {
         id: "prod-halloween",
         name: "Halloween Figurines",
         subtitle: "Handcrafted Collectibles • Matte Stone Finish",
         badge: "Debut Release",
-        price: 12.00,
+        priceRange: "$1.50 – $15.00 SGD",
         image: "image/halloween.jpg",
         altFallback: "Halloween Figurines Mummy and Skeleton Collection",
-        description: "A curated 12-piece series of miniature spooky companions, crafted with layered precision and finished in matte stone white. Tactile desk companions and seasonal talismans."
+        description: "A curated series of miniature spooky companions, crafted with layered precision and finished in matte stone white. Choose from 13 individual animals or the complete set."
       }
     ];
 
-    // Single item cart quantity tracker
-    let cartQuantities = [0];
+    // Subpage selection state
+    let selectedOptionIndex = 0;
+    let detailQuantity = 1;
+
+    // Cart contains array of added variants: [{ name, price, qty }]
+    let cart = [];
     let currentTab = "catalog";
 
     window.addEventListener("DOMContentLoaded", () => {
       renderProducts();
+      renderPillOptions();
       updateCartBadge();
-      setupEventDelegation();
     });
 
-    // RENDER PRODUCT CATALOG
+    // RENDER MAIN CATALOG CARD
     function renderProducts() {
       const container = document.getElementById("product-grid");
       if (!container) return;
 
-      container.innerHTML = PRODUCTS.map((p, index) => {
+      container.innerHTML = PRODUCTS.map((p) => {
         return `
-          <div id="card-${p.id}" class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/90 shadow-card hover:shadow-luxury hover:border-brand-200 transition duration-300 flex flex-col justify-between">
+          <div id="card-${p.id}" class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/90 shadow-card hover:shadow-luxury hover:border-brand-200 transition duration-300 flex flex-col justify-between cursor-pointer" onclick="openProductSubpage()">
             <div>
               <div class="relative w-full aspect-square rounded-2xl overflow-hidden mb-6 bg-slate-900 group shadow-inner">
                 <img 
@@ -551,39 +681,38 @@
                   alt="${p.altFallback}" 
                   class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out" 
                   loading="lazy"
-                  onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\\'w-full h-full bg-slate-800 flex flex-col items-center justify-center text-white\\'><i class=\\'fa-solid fa-ghost text-3xl text-brand-300 mb-2\\'></i><span class=\\'font-serif text-sm tracking-widest\\'>Halloween Figurines</span></div>';"
+                  onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\\'w-full h-full bg-slate-800 flex flex-col items-center justify-center text-white text-center p-6\\'><i class=\\'fa-solid fa-ghost text-4xl text-brand-300 mb-3\\'></i><span class=\\'font-serif text-base tracking-widest block mb-1\\'>Halloween Figurines</span><span class=\\'text-[11px] text-slate-400 font-mono\\'>halloween_2.jpg</span></div>';"
                 />
                 <div class="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/20 pointer-events-none"></div>
                 <div class="absolute top-4 left-4 bg-white/90 luxury-blur px-3 py-1 rounded-full text-[9px] uppercase tracking-[0.25em] font-bold text-slate-900 shadow-sm">
                   ${p.badge}
                 </div>
                 <div class="absolute bottom-4 left-4 right-4 text-white pointer-events-none flex justify-between items-end">
-                  <span class="text-[11px] uppercase tracking-wider text-slate-200 font-medium">12 Miniature Characters</span>
-                  <span class="text-xs font-serif italic text-white/90">Curated Atelier Set</span>
+                  <span class="text-[11px] uppercase tracking-wider text-slate-200 font-medium">13 Characters or 1 Set</span>
+                  <span class="text-xs font-serif italic text-white/90">Click to Choose</span>
                 </div>
               </div>
 
               <div class="flex items-center justify-between gap-2 mb-1.5">
                 <h4 class="font-serif text-2xl font-medium text-slate-900 tracking-wide">${p.name}</h4>
-                <span class="text-base font-bold text-slate-900 font-sans">$${p.price.toFixed(2)} SGD</span>
+                <span class="text-base font-bold text-slate-900 font-sans">${p.priceRange}</span>
               </div>
               <span class="text-[10px] uppercase tracking-wider text-brand-600 font-semibold block mb-3">${p.subtitle}</span>
               <p class="text-xs text-slate-500 font-light leading-relaxed mb-6">${p.description}</p>
             </div>
 
-            <div class="flex items-center justify-between pt-5 border-t border-slate-100">
+            <div class="flex items-center justify-between pt-5 border-t border-slate-100" onclick="event.stopPropagation()">
               <div>
                 <span class="text-[10px] uppercase tracking-wider text-slate-400 font-semibold block">Craft Edition</span>
-                <span class="text-xs font-semibold text-slate-700">$${p.price.toFixed(2)} SGD / set</span>
+                <span class="text-xs font-semibold text-slate-700">$1.50 each • $15.00 full set</span>
               </div>
               <button 
                 type="button" 
-                data-action="add-item" 
-                data-product-index="${index}" 
+                onclick="openProductSubpage()" 
                 class="px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-brand-600 text-white flex items-center gap-2 text-xs font-semibold tracking-wider active:scale-95 transition cursor-pointer shadow-sm"
               >
-                <i class="fa-solid fa-bag-shopping text-xs pointer-events-none"></i>
-                <span class="pointer-events-none">Add to Bag</span>
+                <span>Select Options</span>
+                <i class="fa-solid fa-arrow-right text-[10px]"></i>
               </button>
             </div>
           </div>
@@ -591,237 +720,115 @@
       }).join("");
     }
 
-    // EVENT DELEGATION FOR CATALOG & CART
-    function setupEventDelegation() {
-      document.body.addEventListener("click", (e) => {
-        const targetBtn = e.target.closest("button[data-action]");
-        if (!targetBtn) return;
-
-        const action = targetBtn.getAttribute("data-action");
-        const indexStr = targetBtn.getAttribute("data-product-index");
-        const idx = parseInt(indexStr, 10);
-
-        if (isNaN(idx) || idx < 0 || idx >= PRODUCTS.length) return;
-
-        if (action === "add-item") {
-          addItemByIndex(idx);
-        } else if (action === "qty-change") {
-          const delta = parseInt(targetBtn.getAttribute("data-delta"), 10) || 0;
-          changeQtyByIndex(idx, delta);
-        }
-      });
+    // OPEN SUB-PAGE FOR PRODUCT DETAILS & SELECTION
+    function openProductSubpage() {
+      switchTab('product-detail');
+      window.scrollTo({ top: document.getElementById("store-section").offsetTop - 40, behavior: "smooth" });
     }
 
-    // HAMBURGER MENU DRAWER CONTROLS
-    function openMenuDrawer() {
-      const drawer = document.getElementById("menu-drawer");
-      const backdrop = document.getElementById("menu-backdrop");
-      backdrop.classList.remove("opacity-0", "pointer-events-none");
-      drawer.classList.remove("-translate-x-full");
-      document.body.classList.add("overflow-hidden");
-    }
+    // RENDER 14 PILL BUTTONS ON SUBPAGE
+    function renderPillOptions() {
+      const container = document.getElementById("animal-pill-container");
+      if (!container) return;
 
-    function closeMenuDrawer() {
-      const drawer = document.getElementById("menu-drawer");
-      const backdrop = document.getElementById("menu-backdrop");
-      backdrop.classList.add("opacity-0", "pointer-events-none");
-      drawer.classList.add("-translate-x-full");
-      document.body.classList.remove("overflow-hidden");
-    }
+      container.innerHTML = FIGURINE_OPTIONS.map((opt, idx) => {
+        const isSelected = idx === selectedOptionIndex;
+        const activeClass = isSelected 
+          ? "bg-slate-950 text-white border-slate-950 shadow-sm" 
+          : "bg-white text-slate-700 border-slate-300 hover:border-slate-400 hover:bg-slate-50";
 
-    // TOGGLE COLLECTION DROPDOWN ACCORDION
-    function toggleCollectionDropdown() {
-      const submenu = document.getElementById("collection-submenu");
-      const chevron = document.getElementById("collection-chevron");
-      const toggleBtn = document.getElementById("collection-toggle-btn");
-
-      if (!submenu || !chevron) return;
-
-      const isHidden = submenu.classList.contains("hidden");
-      if (isHidden) {
-        submenu.classList.remove("hidden");
-        chevron.classList.add("rotate-180");
-        if (toggleBtn) toggleBtn.setAttribute("aria-expanded", "true");
-      } else {
-        submenu.classList.add("hidden");
-        chevron.classList.remove("rotate-180");
-        if (toggleBtn) toggleBtn.setAttribute("aria-expanded", "false");
-      }
-    }
-
-    function navigateToSection(target) {
-      closeMenuDrawer();
-      switchTab(target);
-      const targetEl = document.getElementById("store-section");
-      if (targetEl) {
-        targetEl.scrollIntoView({ behavior: "smooth" });
-      }
-    }
-
-    // INTEGRATED DRAWER SEARCH (EMPTY BY DEFAULT, DIRECT CARD JUMP)
-    function handleDrawerSearch(query) {
-      const term = query.trim().toLowerCase();
-      const resultsContainer = document.getElementById("drawer-search-results");
-      const clearBtn = document.getElementById("drawer-search-clear");
-
-      if (!term) {
-        resultsContainer.innerHTML = "";
-        resultsContainer.classList.add("hidden");
-        clearBtn.classList.add("hidden");
-        return;
-      }
-
-      clearBtn.classList.remove("hidden");
-      resultsContainer.classList.remove("hidden");
-
-      const matches = [];
-      PRODUCTS.forEach((p, index) => {
-        if (p.name.toLowerCase().includes(term) || p.description.toLowerCase().includes(term)) {
-          matches.push({ product: p, index });
-        }
-      });
-
-      if (matches.length === 0) {
-        resultsContainer.innerHTML = `
-          <div class="py-6 text-center text-slate-400">
-            <i class="fa-solid fa-magnifying-glass text-xl text-slate-300 mb-2"></i>
-            <p class="text-xs">No items match "${query}"</p>
-          </div>
-        `;
-        return;
-      }
-
-      resultsContainer.innerHTML = matches.map(m => `
-        <div onclick="jumpToProductFromDrawer('${m.product.id}')" class="py-3 px-2 flex items-center justify-between gap-3 hover:bg-slate-100/70 rounded-xl cursor-pointer transition">
-          <div class="flex items-center gap-3">
-            <div class="w-9 h-9 rounded-lg bg-brand-50 border border-brand-100 flex items-center justify-center text-brand-600 text-xs font-bold shrink-0">
-              <i class="fa-solid fa-layer-group text-[10px]"></i>
-            </div>
-            <div>
-              <h5 class="text-xs font-bold text-slate-800">${m.product.name}</h5>
-              <span class="text-[11px] text-brand-600 font-semibold">$${m.product.price.toFixed(2)} SGD</span>
-            </div>
-          </div>
+        return `
           <button 
-            type="button" 
-            onclick="event.stopPropagation(); addItemByIndex(${m.index});" 
-            class="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-brand-600 text-white text-[11px] font-semibold active:scale-95 transition cursor-pointer"
+            type="button"
+            onclick="selectOption(${idx})"
+            class="px-4 py-2 rounded-full border text-xs sm:text-sm font-medium transition cursor-pointer active:scale-95 ${activeClass}"
           >
-            + Add
+            ${opt.name}
           </button>
-        </div>
-      `).join("");
+        `;
+      }).join("");
+
+      updateSubpageDetails();
     }
 
-    function clearDrawerSearch() {
-      const input = document.getElementById("drawer-search-input");
-      const resultsContainer = document.getElementById("drawer-search-results");
-      const clearBtn = document.getElementById("drawer-search-clear");
-      if (input) input.value = "";
-      if (resultsContainer) {
-        resultsContainer.innerHTML = "";
-        resultsContainer.classList.add("hidden");
+    function selectOption(idx) {
+      selectedOptionIndex = idx;
+      renderPillOptions();
+    }
+
+    function updateSubpageDetails() {
+      const cur = FIGURINE_OPTIONS[selectedOptionIndex];
+      const nameEl = document.getElementById("selected-animal-name");
+      const priceEl = document.getElementById("detail-price-display");
+      const typeEl = document.getElementById("detail-price-type");
+      const ctaEl = document.getElementById("detail-add-cta");
+
+      if (nameEl) nameEl.innerText = cur.name;
+      if (priceEl) priceEl.innerText = `$${cur.price.toFixed(2)} SGD`;
+      if (typeEl) typeEl.innerText = cur.id === 'set' ? "full set" : "per item";
+
+      const totalPreview = (cur.price * detailQuantity).toFixed(2);
+      if (ctaEl) {
+        ctaEl.innerText = `Add ${cur.name} (${detailQuantity}) to Bag • $${totalPreview} SGD`;
       }
-      if (clearBtn) clearBtn.classList.add("hidden");
     }
 
-    function jumpToProductFromDrawer(productId) {
-      closeMenuDrawer();
-      switchTab('catalog');
+    // SUBPAGE QUANTITY STEPPER
+    function changeDetailQty(delta) {
+      let next = detailQuantity + delta;
+      if (next < 1) next = 1;
+      if (next > 99) next = 99;
+      detailQuantity = next;
+      const input = document.getElementById("detail-qty-input");
+      if (input) input.value = next;
+      updateSubpageDetails();
+    }
 
-      setTimeout(() => {
-        const targetCard = document.getElementById(`card-${productId}`);
-        if (targetCard) {
-          targetCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          targetCard.classList.remove('item-highlight');
-          void targetCard.offsetWidth; // Trigger reflow
-          targetCard.classList.add('item-highlight');
+    function handleDetailQtyInput(input) {
+      let val = parseInt(input.value, 10);
+      if (isNaN(val) || val < 1) val = 1;
+      if (val > 99) val = 99;
+      detailQuantity = val;
+      updateSubpageDetails();
+    }
+
+    // ADD VARIANT TO CART
+    function addSelectedVariantToBag() {
+      const selected = FIGURINE_OPTIONS[selectedOptionIndex];
+      const existing = cart.find(item => item.id === selected.id);
+
+      if (existing) {
+        if (existing.qty + detailQuantity > 99) {
+          existing.qty = 99;
+          showToast("Maximum quantity of 99 reached for this option");
+        } else {
+          existing.qty += detailQuantity;
+          showToast(`Updated ${selected.name} quantity in bag`);
         }
-      }, 200);
-    }
-
-    // CART STATE CONTROLS (1-99 EDITABLE)
-    function addItemByIndex(idx) {
-      if (cartQuantities[idx] >= 99) {
-        showToast("Maximum quantity of 99 reached");
-        return;
-      }
-      cartQuantities[idx] = Math.min(99, (cartQuantities[idx] || 0) + 1);
-      updateCartBadge();
-      renderCartItems();
-      showToast(`Added ${PRODUCTS[idx].name} to bag`);
-    }
-
-    function changeQtyByIndex(idx, delta) {
-      const nextVal = (cartQuantities[idx] || 0) + delta;
-      if (nextVal <= 0) {
-        cartQuantities[idx] = 0;
-      } else if (nextVal > 99) {
-        cartQuantities[idx] = 99;
       } else {
-        cartQuantities[idx] = nextVal;
+        cart.push({
+          id: selected.id,
+          name: selected.name,
+          price: selected.price,
+          qty: detailQuantity
+        });
+        showToast(`Added ${detailQuantity}x ${selected.name} to bag`);
       }
+
       updateCartBadge();
       renderCartItems();
     }
 
-    function handleQtyInputLive(idx, inputElement) {
-      let val = inputElement.value;
-      if (val === "") return;
-      let parsed = parseInt(val, 10);
-      if (isNaN(parsed)) parsed = 1;
-      if (parsed > 99) {
-        parsed = 99;
-        inputElement.value = 99;
-      }
-      if (parsed < 1) parsed = 1;
-
-      cartQuantities[idx] = parsed;
-      updateCartBadge();
-
-      let subtotal = 0;
-      cartQuantities.forEach((qty, i) => {
-        if (qty > 0) subtotal += PRODUCTS[i].price * qty;
-      });
-      const subtotalEl = document.getElementById("cart-subtotal");
-      if (subtotalEl) subtotalEl.innerText = `$${subtotal.toFixed(2)} SGD`;
-    }
-
-    function handleQtyBlur(idx, inputElement) {
-      let val = inputElement.value.trim();
-      let parsed = parseInt(val, 10);
-      if (isNaN(parsed) || parsed <= 0) {
-        cartQuantities[idx] = 0;
-      } else if (parsed > 99) {
-        cartQuantities[idx] = 99;
-      } else {
-        cartQuantities[idx] = parsed;
-      }
-      updateCartBadge();
-      renderCartItems();
-    }
-
+    // UPDATE CART BADGES AND BUTTONS
     function updateCartBadge() {
-      let totalQty = 0;
-      let subtotal = 0;
-
-      cartQuantities.forEach((qty, idx) => {
-        if (qty > 0) {
-          totalQty += qty;
-          subtotal += PRODUCTS[idx].price * qty;
-        }
-      });
+      const totalQty = cart.reduce((sum, item) => sum + item.qty, 0);
+      const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
 
       const headerBadge = document.getElementById("header-cart-badge");
       const navBadge = document.getElementById("nav-cart-badge");
-      const menuBagCount = document.getElementById("menu-bag-count");
       const floatingBtn = document.getElementById("floating-checkout-btn");
       const floatingBadge = document.getElementById("floating-cart-badge");
       const floatingSubtotal = document.getElementById("floating-cart-subtotal");
-
-      if (menuBagCount) {
-        menuBagCount.innerText = totalQty === 1 ? "1 item" : `${totalQty} items`;
-      }
 
       if (totalQty > 0) {
         if (headerBadge) {
@@ -848,15 +855,12 @@
       }
     }
 
+    // RENDER SHOPPING BAG DRAWER
     function renderCartItems() {
       const container = document.getElementById("cart-items");
       if (!container) return;
 
-      const activeIndices = cartQuantities
-        .map((qty, idx) => ({ qty, idx }))
-        .filter(item => item.qty > 0);
-
-      if (activeIndices.length === 0) {
+      if (cart.length === 0) {
         container.innerHTML = `
           <div class="py-16 text-center text-slate-400 flex flex-col items-center">
             <i class="fa-solid fa-bag-shopping text-3xl mb-3 text-brand-200"></i>
@@ -868,51 +872,42 @@
       }
 
       let subtotal = 0;
-      container.innerHTML = activeIndices.map(({ qty, idx }) => {
-        const product = PRODUCTS[idx];
-        const itemTotal = product.price * qty;
+      container.innerHTML = cart.map((item, idx) => {
+        const itemTotal = item.price * item.qty;
         subtotal += itemTotal;
 
         return `
           <div class="py-4 flex items-center justify-between gap-4">
             <div class="w-10 h-10 rounded-xl bg-brand-50 border border-brand-100 flex items-center justify-center text-brand-700 font-bold text-xs shrink-0">
-              <i class="fa-solid fa-layer-group text-xs"></i>
+              <i class="fa-solid fa-ghost text-xs"></i>
             </div>
             <div class="flex-1 min-w-0">
-              <h5 class="text-xs font-semibold text-slate-800 truncate">${product.name}</h5>
-              <span class="text-[11px] text-slate-500 font-medium">$${product.price.toFixed(2)} each</span>
+              <h5 class="text-xs font-semibold text-slate-800 truncate">${item.name}</h5>
+              <span class="text-[11px] text-slate-500 font-medium">$${item.price.toFixed(2)} each</span>
             </div>
             <div class="flex items-center gap-1.5 bg-slate-50 border border-slate-200/80 rounded-xl p-1">
               <button 
                 type="button" 
-                data-action="qty-change" 
-                data-product-index="${idx}" 
-                data-delta="-1" 
+                onclick="changeCartItemQty(${idx}, -1)" 
                 class="w-6 h-6 rounded-lg bg-white border border-slate-200 text-slate-700 flex items-center justify-center text-xs active:scale-90 hover:bg-slate-100 transition cursor-pointer shadow-xs"
                 title="Decrease"
               >-</button>
-              <input 
-                type="number" 
-                min="1" 
-                max="99" 
-                value="${qty}" 
-                onclick="this.select()"
-                onfocus="this.select()"
-                oninput="handleQtyInputLive(${idx}, this)"
-                onblur="handleQtyBlur(${idx}, this)"
-                onkeydown="if(event.key === 'Enter') { this.blur(); }"
-                class="w-8 h-6 text-center text-xs font-semibold text-slate-800 bg-transparent focus:bg-white focus:outline-none focus:ring-1 focus:ring-brand-400 rounded-md transition"
-                aria-label="Quantity for ${product.name}"
-              />
+              <span class="w-7 text-center text-xs font-bold text-slate-800">${item.qty}</span>
               <button 
                 type="button" 
-                data-action="qty-change" 
-                data-product-index="${idx}" 
-                data-delta="1" 
+                onclick="changeCartItemQty(${idx}, 1)" 
                 class="w-6 h-6 rounded-lg bg-white border border-slate-200 text-slate-700 flex items-center justify-center text-xs active:scale-90 hover:bg-slate-100 transition cursor-pointer shadow-xs"
                 title="Increase"
               >+</button>
             </div>
+            <button 
+              type="button" 
+              onclick="removeCartItem(${idx})" 
+              class="text-slate-300 hover:text-rose-500 text-xs p-1 transition cursor-pointer"
+              title="Remove"
+            >
+              <i class="fa-solid fa-trash-can"></i>
+            </button>
           </div>
         `;
       }).join("");
@@ -920,26 +915,166 @@
       document.getElementById("cart-subtotal").innerText = `$${subtotal.toFixed(2)} SGD`;
     }
 
-    // TAB NAVIGATION
+    function changeCartItemQty(index, delta) {
+      if (!cart[index]) return;
+      const next = cart[index].qty + delta;
+      if (next <= 0) {
+        cart.splice(index, 1);
+      } else if (next > 99) {
+        cart[index].qty = 99;
+      } else {
+        cart[index].qty = next;
+      }
+      updateCartBadge();
+      renderCartItems();
+    }
+
+    function removeCartItem(index) {
+      if (cart[index]) {
+        cart.splice(index, 1);
+        updateCartBadge();
+        renderCartItems();
+      }
+    }
+
+    // TAB / SUB-PAGE NAVIGATION SWITCH
     function switchTab(tab) {
       currentTab = tab;
       const catalogView = document.getElementById("view-catalog");
+      const productDetailView = document.getElementById("view-product-detail");
       const faqView = document.getElementById("view-faq");
       const navCatalog = document.getElementById("nav-btn-catalog");
 
+      catalogView.classList.remove("view-active");
+      productDetailView.classList.remove("view-active");
+      faqView.classList.remove("view-active");
+
       if (tab === "catalog") {
         catalogView.classList.add("view-active");
-        faqView.classList.remove("view-active");
+        if (navCatalog) navCatalog.className = "flex flex-col items-center gap-1 text-brand-600 transition";
+      } else if (tab === "product-detail") {
+        productDetailView.classList.add("view-active");
         if (navCatalog) navCatalog.className = "flex flex-col items-center gap-1 text-brand-600 transition";
       } else {
-        catalogView.classList.remove("view-active");
         faqView.classList.add("view-active");
         if (navCatalog) navCatalog.className = "flex flex-col items-center gap-1 text-slate-400 transition";
         document.getElementById("store-section").scrollIntoView({ behavior: "smooth" });
       }
     }
 
-    // CART DRAWER CONTROLS
+    // DRAWER CONTROLS
+    function openMenuDrawer() {
+      const drawer = document.getElementById("menu-drawer");
+      const backdrop = document.getElementById("menu-backdrop");
+      backdrop.classList.remove("opacity-0", "pointer-events-none");
+      drawer.classList.remove("-translate-x-full");
+      document.body.classList.add("overflow-hidden");
+    }
+
+    function closeMenuDrawer() {
+      const drawer = document.getElementById("menu-drawer");
+      const backdrop = document.getElementById("menu-backdrop");
+      backdrop.classList.add("opacity-0", "pointer-events-none");
+      drawer.classList.add("-translate-x-full");
+      document.body.classList.remove("overflow-hidden");
+    }
+
+    function toggleCollectionDropdown() {
+      const submenu = document.getElementById("collection-submenu");
+      const chevron = document.getElementById("collection-chevron");
+      const toggleBtn = document.getElementById("collection-toggle-btn");
+
+      if (!submenu || !chevron) return;
+      const isHidden = submenu.classList.contains("hidden");
+      if (isHidden) {
+        submenu.classList.remove("hidden");
+        chevron.classList.add("rotate-180");
+        if (toggleBtn) toggleBtn.setAttribute("aria-expanded", "true");
+      } else {
+        submenu.classList.add("hidden");
+        chevron.classList.remove("rotate-180");
+        if (toggleBtn) toggleBtn.setAttribute("aria-expanded", "false");
+      }
+    }
+
+    function navigateToSection(target) {
+      closeMenuDrawer();
+      switchTab(target);
+      const targetEl = document.getElementById("store-section");
+      if (targetEl) {
+        targetEl.scrollIntoView({ behavior: "smooth" });
+      }
+    }
+
+    // SEARCH IN HAMBURGER
+    function handleDrawerSearch(query) {
+      const term = query.trim().toLowerCase();
+      const resultsContainer = document.getElementById("drawer-search-results");
+      const clearBtn = document.getElementById("drawer-search-clear");
+
+      if (!term) {
+        resultsContainer.innerHTML = "";
+        resultsContainer.classList.add("hidden");
+        clearBtn.classList.add("hidden");
+        return;
+      }
+
+      clearBtn.classList.remove("hidden");
+      resultsContainer.classList.remove("hidden");
+
+      const matches = [];
+      FIGURINE_OPTIONS.forEach((opt, idx) => {
+        if (opt.name.toLowerCase().includes(term)) {
+          matches.push({ option: opt, idx });
+        }
+      });
+
+      if (matches.length === 0) {
+        resultsContainer.innerHTML = `
+          <div class="py-6 text-center text-slate-400">
+            <i class="fa-solid fa-magnifying-glass text-xl text-slate-300 mb-2"></i>
+            <p class="text-xs">No option matching "${query}"</p>
+          </div>
+        `;
+        return;
+      }
+
+      resultsContainer.innerHTML = matches.map(m => `
+        <div onclick="jumpToOptionFromDrawer(${m.idx})" class="py-2.5 px-2 flex items-center justify-between gap-3 hover:bg-slate-100/70 rounded-xl cursor-pointer transition">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-brand-50 border border-brand-100 flex items-center justify-center text-brand-600 text-xs font-bold shrink-0">
+              <i class="fa-solid fa-ghost text-[10px]"></i>
+            </div>
+            <div>
+              <h5 class="text-xs font-bold text-slate-800">${m.option.name}</h5>
+              <span class="text-[11px] text-brand-600 font-semibold">$${m.option.price.toFixed(2)} SGD</span>
+            </div>
+          </div>
+          <span class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Choose &rarr;</span>
+        </div>
+      `).join("");
+    }
+
+    function clearDrawerSearch() {
+      const input = document.getElementById("drawer-search-input");
+      const resultsContainer = document.getElementById("drawer-search-results");
+      const clearBtn = document.getElementById("drawer-search-clear");
+      if (input) input.value = "";
+      if (resultsContainer) {
+        resultsContainer.innerHTML = "";
+        resultsContainer.classList.add("hidden");
+      }
+      if (clearBtn) clearBtn.classList.add("hidden");
+    }
+
+    function jumpToOptionFromDrawer(idx) {
+      closeMenuDrawer();
+      switchTab('product-detail');
+      selectOption(idx);
+      document.getElementById("store-section").scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // CART DRAWER MODAL
     function openCart() {
       renderCartItems();
       const sheet = document.getElementById("cart-sheet");
@@ -960,20 +1095,16 @@
       sheet.classList.add("md:translate-x-full");
     }
 
-    // CHECKOUT LOGIC WITH SEPARATE TELEGRAM & WHATSAPP TEMPLATES
+    // DUAL TELEGRAM & WHATSAPP CHECKOUT
     function checkoutVia(channel) {
-      const activeIndices = cartQuantities
-        .map((qty, idx) => ({ qty, idx }))
-        .filter(item => item.qty > 0);
-
-      if (activeIndices.length === 0) {
+      if (cart.length === 0) {
         showToast("Cart is empty");
         return;
       }
 
       const contact = document.getElementById("customer-contact").value.trim();
       if (!contact) {
-        showToast("Please enter your name or contact info");
+        showToast("Please enter your name or handle");
         document.getElementById("customer-contact").focus();
         return;
       }
@@ -984,11 +1115,10 @@
       let itemsSummary = "";
       let subtotal = 0;
 
-      activeIndices.forEach(({ qty, idx }) => {
-        const item = PRODUCTS[idx];
-        const itemTotal = item.price * qty;
+      cart.forEach((item) => {
+        const itemTotal = item.price * item.qty;
         subtotal += itemTotal;
-        itemsSummary += `✩ ${item.name} ×${qty} — $${itemTotal.toFixed(2)}\n`;
+        itemsSummary += `✩ ${item.name} ×${item.qty} — $${itemTotal.toFixed(2)}\n`;
       });
 
       let message = "";
@@ -1014,7 +1144,6 @@ Collection: ${notes}
 Hi! Ready to confirm #${orderId}  Let me know the PayNow details whenever you're free!`;
       }
 
-      // Copy to clipboard fallback
       if (navigator.clipboard) {
         navigator.clipboard.writeText(message).catch(() => copyFallback(message));
       } else {
@@ -1030,15 +1159,13 @@ Hi! Ready to confirm #${orderId}  Let me know the PayNow details whenever you're
         document.body.removeChild(txt);
       }
 
-      // Automatic cart clearing upon checkout
-      cartQuantities.fill(0);
+      cart = [];
       updateCartBadge();
       renderCartItems();
       document.getElementById("customer-contact").value = "";
       document.getElementById("order-notes").value = "Local Delivery: [Enter Address / Postal Code]";
       setTimeout(closeCart, 400);
 
-      // Deep link to selected messaging channel
       if (channel === "telegram") {
         window.open(`https://t.me/${STORE_CONFIG.telegramUsername}?text=${encodeURIComponent(message)}`, "_blank");
       } else {
@@ -1055,7 +1182,6 @@ Hi! Ready to confirm #${orderId}  Let me know the PayNow details whenever you're
       }, 2000);
     }
 
-    // Keyboard navigation: Close menu drawer on ESC
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape") {
         closeMenuDrawer();
