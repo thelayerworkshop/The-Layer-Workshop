@@ -50,10 +50,12 @@
   </script>
 
   <style>
-    body {
+    html, body {
+      height: auto;
+      min-height: 100%;
+      overflow-x: hidden;
+      overflow-y: auto !important;
       -webkit-tap-highlight-color: transparent;
-      min-height: 100vh;
-      min-height: -webkit-fill-available;
       font-family: 'Montserrat', sans-serif;
     }
     .safe-top { padding-top: env(safe-area-inset-top, 0px); }
@@ -92,16 +94,6 @@
     details[open] {
       border-color: #A9CFF0;
       box-shadow: 0 4px 14px -2px rgba(82, 150, 213, 0.12);
-    }
-
-    /* Direct navigation highlight pulse */
-    @keyframes highlightCard {
-      0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(82, 150, 213, 0.7); border-color: #5296D5; }
-      50% { transform: scale(1.02); box-shadow: 0 0 0 10px rgba(82, 150, 213, 0.25); border-color: #5296D5; }
-      100% { transform: scale(1); box-shadow: 0 4px 20px -2px rgba(20, 41, 66, 0.04); }
-    }
-    .item-highlight {
-      animation: highlightCard 1.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
   </style>
 </head>
@@ -196,7 +188,6 @@
     class="fixed top-0 bottom-0 left-0 z-50 w-full max-w-md bg-white border-r border-slate-200 shadow-2xl transform -translate-x-full transition-transform duration-300 ease-out flex flex-col justify-between overflow-hidden"
     aria-label="Navigation Menu Drawer"
   >
-    <!-- Drawer Top Bar -->
     <div class="px-6 sm:px-8 pt-6 pb-4 border-b border-slate-100 flex items-center justify-between">
       <div>
         <span class="text-[10px] tracking-[0.3em] uppercase text-slate-400 font-semibold block">Navigation</span>
@@ -212,17 +203,14 @@
       </button>
     </div>
 
-    <!-- Scrollable Center: Streamlined Search & Minimal Menu Links -->
     <div class="flex-1 overflow-y-auto px-6 sm:px-8 py-6 space-y-7">
-      
-      <!-- 1. Integrated Search Box inside Hamburger -->
       <div class="relative bg-slate-50 border border-slate-200/90 rounded-2xl p-3 focus-within:border-brand-400 focus-within:bg-white focus-within:ring-2 focus-within:ring-brand-100 transition duration-200">
         <div class="flex items-center gap-3">
           <i class="fa-solid fa-magnifying-glass text-slate-400 text-xs pl-1"></i>
           <input 
             type="text" 
             id="drawer-search-input" 
-            placeholder="Search items (e.g. Item 1, Item 2)..." 
+            placeholder="Search items or characters..." 
             class="w-full bg-transparent text-xs sm:text-sm font-medium text-slate-800 placeholder-slate-400 focus:outline-none"
             oninput="handleDrawerSearch(this.value)"
           />
@@ -236,14 +224,10 @@
             <i class="fa-solid fa-circle-xmark"></i>
           </button>
         </div>
-
-        <!-- Live Search Results Container (Empty by default) -->
         <div id="drawer-search-results" class="mt-3 divide-y divide-slate-100 hidden max-h-60 overflow-y-auto"></div>
       </div>
 
-      <!-- 2 & 3. Streamlined Menu Navigation Links -->
       <nav class="space-y-4 pt-2">
-        <!-- Collection Accordion Dropdown -->
         <div class="border-b border-slate-100/80 pb-3">
           <button 
             type="button" 
@@ -260,7 +244,6 @@
             <i id="collection-chevron" class="fa-solid fa-chevron-down text-xs text-slate-400 group-hover:text-brand-600 transition-transform duration-300"></i>
           </button>
           
-          <!-- Collapsible Dropdown Submenu: Special Collection -->
           <div 
             id="collection-submenu" 
             class="hidden pl-8 pt-2 pb-1 space-y-2 transition-all duration-300"
@@ -279,7 +262,6 @@
           </div>
         </div>
 
-        <!-- FAQ -->
         <div>
           <button 
             type="button" 
@@ -296,7 +278,6 @@
       </nav>
     </div>
 
-    <!-- Drawer Footer Statement -->
     <div class="p-6 sm:p-8 bg-slate-50/80 border-t border-slate-100 text-center">
       <span class="text-[9px] uppercase tracking-[0.3em] font-semibold text-slate-500 block mb-1">
         HANDMADE IN SINGAPORE • LOCAL DOORSTEP DELIVERY
@@ -308,7 +289,7 @@
   <!-- ================= MAIN CONTENT WRAPPER ================= -->
   <main id="store-section" class="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 pt-10">
     
-    <!-- VIEW 1: CATALOG / SPECIAL COLLECTION -->
+    <!-- VIEW 1: CATALOG / SPECIAL COLLECTION (GRID OF 2 ITEMS) -->
     <section id="view-catalog" class="view-state view-active flex-col">
       <div class="mb-10 text-center max-w-xl mx-auto">
         <h3 class="font-serif text-2xl sm:text-3xl text-slate-900 tracking-wide font-normal">Special Collection</h3>
@@ -316,15 +297,14 @@
         <div class="w-12 h-px bg-slate-300 mx-auto mt-4"></div>
       </div>
 
-      <!-- Solitary Debut Product Card -->
-      <div id="product-grid" class="max-w-xl mx-auto w-full">
+      <!-- Products Grid: Halloween Figurines + Custom Order -->
+      <div id="product-grid" class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto w-full">
         <!-- Rendered dynamically -->
       </div>
     </section>
 
-    <!-- VIEW 2: DEDICATED PRODUCT SUB-PAGE (CUSTOM OPTIONS) -->
+    <!-- VIEW 2: DEDICATED HALLOWEEN PRODUCT SUB-PAGE -->
     <section id="view-product-detail" class="view-state flex-col max-w-4xl mx-auto w-full pt-2">
-      <!-- Breadcrumb / Back button -->
       <div class="mb-6">
         <button 
           type="button" 
@@ -336,10 +316,9 @@
         </button>
       </div>
 
-      <!-- Sub-Page Product Layout (Two columns on desktop) -->
       <div class="bg-white rounded-3xl p-6 sm:p-10 border border-slate-200/90 shadow-card flex flex-col md:flex-row gap-8 lg:gap-12 items-start">
         
-        <!-- Left: Product Image Preview (Matches Main Catalog exactly) -->
+        <!-- Left: Product Image Preview -->
         <div class="w-full md:w-1/2">
           <div class="relative w-full aspect-square rounded-2xl overflow-hidden bg-slate-900 group shadow-inner">
             <img 
@@ -366,24 +345,32 @@
             <span class="text-[10px] uppercase tracking-wider text-brand-600 font-semibold block mb-1">Handcrafted Series</span>
             <h2 class="font-serif text-3xl font-medium text-slate-900 tracking-wide mb-2">Halloween Figurines</h2>
             
-            <!-- Dynamic Price Tag -->
             <div class="flex items-baseline gap-3 mb-5">
               <span id="detail-price-display" class="text-2xl font-bold text-slate-900 font-sans">$1.50 SGD</span>
               <span id="detail-price-type" class="text-xs text-slate-400 font-medium tracking-wide">per item</span>
             </div>
 
             <p class="text-xs text-slate-500 font-light leading-relaxed mb-6">
-              A bespoke series of tactile spooky figurines, printed with layered precision in matte stone white. Select any individual character or choose the full collection set.
+              A bespoke series of tactile spooky figurines, printed with layered precision in matte stone finish. Select your character, preferred colour, or choose the full collection set.
             </p>
 
-            <!-- Pill Button Variant Selector (No H or numbering) -->
-            <div class="mb-7">
-              <label class="block text-xs uppercase tracking-wider font-semibold text-slate-800 mb-3">
+            <!-- Pill Button Character Selector -->
+            <div class="mb-5">
+              <label class="block text-xs uppercase tracking-wider font-semibold text-slate-800 mb-2.5">
                 Select Option: <span id="selected-animal-name" class="font-bold text-brand-700 capitalize">Chick</span>
               </label>
-              
               <div id="animal-pill-container" class="flex flex-wrap gap-2">
                 <!-- 14 Pill Options rendered via JS -->
+              </div>
+            </div>
+
+            <!-- Pill Button Colour Selector -->
+            <div class="mb-6">
+              <label class="block text-xs uppercase tracking-wider font-semibold text-slate-800 mb-2.5">
+                Colour: <span id="selected-colour-name" class="font-bold text-brand-700 capitalize">White</span>
+              </label>
+              <div id="colour-pill-container" class="flex flex-wrap gap-2">
+                <!-- 6 Colour Pills rendered via JS -->
               </div>
             </div>
 
@@ -414,7 +401,6 @@
             </div>
           </div>
 
-          <!-- Add to Bag CTA -->
           <div class="pt-6 border-t border-slate-100 flex items-center gap-4">
             <button 
               type="button" 
@@ -422,7 +408,7 @@
               class="w-full py-4 rounded-2xl bg-slate-900 hover:bg-brand-600 text-white flex items-center justify-center gap-2 text-xs uppercase tracking-widest font-semibold active:scale-95 transition cursor-pointer shadow-md"
             >
               <i class="fa-solid fa-bag-shopping text-sm"></i>
-              <span id="detail-add-cta">Add Chick to Bag • $1.50 SGD</span>
+              <span id="detail-add-cta">Add Chick (White) (1) to Bag • $1.50 SGD</span>
             </button>
           </div>
         </div>
@@ -430,14 +416,126 @@
       </div>
     </section>
 
-    <!-- VIEW 3: FAQ -->
+    <!-- VIEW 3: DEDICATED CUSTOM ORDER SUB-PAGE -->
+    <section id="view-custom-order" class="view-state flex-col max-w-4xl mx-auto w-full pt-2">
+      <div class="mb-6">
+        <button 
+          type="button" 
+          onclick="switchTab('catalog')" 
+          class="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-slate-500 hover:text-slate-900 transition cursor-pointer group"
+        >
+          <i class="fa-solid fa-arrow-left text-[11px] group-hover:-translate-x-1 transition-transform"></i>
+          <span>Back to Collection</span>
+        </button>
+      </div>
+
+      <div class="bg-white rounded-3xl p-6 sm:p-10 border border-slate-200/90 shadow-card flex flex-col md:flex-row gap-8 lg:gap-12 items-start">
+        
+        <!-- Left: Upload Box Area -->
+        <div class="w-full md:w-1/2">
+          <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-2">Upload Reference / Photo (Optional)</label>
+          <div 
+            id="dropzone"
+            onclick="document.getElementById('custom-file-input').click()"
+            class="relative w-full aspect-square rounded-2xl border-2 border-dashed border-slate-300 hover:border-brand-400 bg-slate-50/70 hover:bg-brand-50/30 transition duration-200 flex flex-col items-center justify-center p-6 text-center cursor-pointer overflow-hidden group"
+          >
+            <input 
+              type="file" 
+              id="custom-file-input" 
+              accept="image/*,.stl,.obj,.png,.jpg,.jpeg" 
+              class="hidden" 
+              onchange="handleFileUpload(event)"
+            />
+
+            <!-- Empty Dropzone State -->
+            <div id="dropzone-empty" class="flex flex-col items-center justify-center">
+              <div class="w-14 h-14 rounded-2xl bg-white shadow-sm border border-slate-200 flex items-center justify-center text-brand-600 mb-3 group-hover:scale-105 transition-transform">
+                <i class="fa-solid fa-cloud-arrow-up text-xl"></i>
+              </div>
+              <span class="text-xs font-bold text-slate-800 mb-1">Click or Drag & Drop image here</span>
+              <p class="text-[11px] text-slate-400 max-w-[210px] leading-relaxed">Upload sketches, portraits, models, or reference photos (PNG, JPG, STL)</p>
+            </div>
+
+            <!-- Uploaded Image Preview State -->
+            <div id="dropzone-preview" class="hidden absolute inset-0 w-full h-full bg-slate-900">
+              <img id="preview-img" src="" alt="Uploaded reference" class="w-full h-full object-cover" />
+              <div class="absolute inset-0 bg-black/40 flex flex-col items-center justify-center text-white p-4">
+                <span id="preview-filename" class="text-xs font-mono font-medium truncate max-w-full px-3 py-1 bg-black/60 rounded-lg mb-2">file.jpg</span>
+                <button 
+                  type="button" 
+                  onclick="event.stopPropagation(); removeUploadedFile();" 
+                  class="px-3 py-1.5 bg-rose-500 hover:bg-rose-600 text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 shadow-sm active:scale-95 transition"
+                >
+                  <i class="fa-solid fa-trash-can text-[10px]"></i>
+                  <span>Remove / Change</span>
+                </button>
+              </div>
+            </div>
+          </div>
+          <p class="text-[10px] text-slate-400 mt-2 text-center">* You can also attach high-resolution files directly in Telegram/WhatsApp during order confirmation.</p>
+        </div>
+
+        <!-- Right: Specifications & Comment -->
+        <div class="w-full md:w-1/2 flex flex-col justify-between">
+          <div>
+            <h2 class="font-serif text-3xl font-medium text-slate-900 tracking-wide mb-1">Custom Order</h2>
+            
+            <div class="flex items-baseline gap-2 mb-4">
+              <span class="text-2xl font-bold text-slate-900 font-sans">$0.00 SGD</span>
+              <span class="text-xs text-slate-400 font-medium tracking-wide">• Quote Upon Review</span>
+            </div>
+
+            <p class="text-xs text-slate-500 font-light leading-relaxed mb-5">
+              Bring your own concept to life—from custom 3D printed medallions, personalized figurines, keychains, lithophanes, or tabletop props. Submit your details below for a tailored quote.
+            </p>
+
+            <!-- Customization Comment Box -->
+            <div class="mb-5">
+              <label class="block text-xs uppercase tracking-wider font-semibold text-slate-800 mb-1.5">
+                Customization Notes & Instructions <span class="text-rose-500">*</span>
+              </label>
+              <textarea 
+                id="custom-instructions" 
+                rows="4" 
+                placeholder="Describe your desired design, dimensions (e.g. 6cm diameter), preferred colors, text embossing, or any deadline..." 
+                class="w-full text-xs p-3.5 rounded-2xl border border-slate-200 bg-slate-50 text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-400 transition"
+              ></textarea>
+            </div>
+
+            <!-- Pricing Explanation Alert -->
+            <div class="bg-brand-50/70 border border-brand-200/90 rounded-2xl p-3.5 text-xs text-slate-600 mb-6">
+              <div class="flex gap-2.5">
+                <i class="fa-solid fa-circle-info text-brand-600 mt-0.5"></i>
+                <div class="text-[11px] leading-relaxed">
+                  <strong>How pricing works:</strong> Submitting this item adds a <strong>$0.00 SGD</strong> review order to your bag. Once received, I will evaluate print time, filament, and complexity to provide a firm quotation before printing.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Add Custom Order to Bag Button -->
+          <div class="pt-4 border-t border-slate-100">
+            <button 
+              type="button" 
+              onclick="addCustomOrderToBag()" 
+              class="w-full py-4 rounded-2xl bg-slate-900 hover:bg-brand-600 text-white flex items-center justify-center gap-2 text-xs uppercase tracking-widest font-semibold active:scale-95 transition cursor-pointer shadow-md"
+            >
+              <i class="fa-solid fa-wand-magic-sparkles text-sm"></i>
+              <span>Add Custom Order to Bag • $0.00 SGD</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- VIEW 4: FAQ -->
     <section id="view-faq" class="view-state flex-col max-w-3xl mx-auto w-full pt-4">
       <div class="mb-8 text-center">
         <h3 class="font-serif text-2xl sm:text-3xl text-slate-900 tracking-wide font-normal">Frequently Asked Questions</h3>
         <div class="w-12 h-px bg-slate-300 mx-auto mt-4"></div>
       </div>
 
-      <!-- Concise Question Prompt -->
       <div class="bg-brand-50/70 border border-brand-200/80 rounded-2xl p-5 mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm">
         <div>
           <h4 class="text-sm font-semibold text-slate-900 tracking-tight">Have questions or need help?</h4>
@@ -449,10 +547,7 @@
         </a>
       </div>
 
-      <!-- Full-Box Clickable FAQ Cards (01-04 with zero dead zones) -->
       <div class="space-y-3.5">
-        
-        <!-- FAQ 01 -->
         <details class="group bg-white rounded-2xl border border-slate-200/90 p-0 overflow-hidden shadow-xs hover:border-brand-300 transition duration-200">
           <summary class="w-full flex items-center justify-between p-5 sm:p-6 cursor-pointer list-none select-none hover:bg-slate-50/60 active:bg-slate-100/50 transition duration-150">
             <div class="flex items-center gap-4 pointer-events-none">
@@ -466,7 +561,6 @@
           </div>
         </details>
 
-        <!-- FAQ 02 -->
         <details class="group bg-white rounded-2xl border border-slate-200/90 p-0 overflow-hidden shadow-xs hover:border-brand-300 transition duration-200">
           <summary class="w-full flex items-center justify-between p-5 sm:p-6 cursor-pointer list-none select-none hover:bg-slate-50/60 active:bg-slate-100/50 transition duration-150">
             <div class="flex items-center gap-4 pointer-events-none">
@@ -480,7 +574,6 @@
           </div>
         </details>
 
-        <!-- FAQ 03 -->
         <details class="group bg-white rounded-2xl border border-slate-200/90 p-0 overflow-hidden shadow-xs hover:border-brand-300 transition duration-200">
           <summary class="w-full flex items-center justify-between p-5 sm:p-6 cursor-pointer list-none select-none hover:bg-slate-50/60 active:bg-slate-100/50 transition duration-150">
             <div class="flex items-center gap-4 pointer-events-none">
@@ -494,7 +587,6 @@
           </div>
         </details>
 
-        <!-- FAQ 04 -->
         <details class="group bg-white rounded-2xl border border-slate-200/90 p-0 overflow-hidden shadow-xs hover:border-brand-300 transition duration-200">
           <summary class="w-full flex items-center justify-between p-5 sm:p-6 cursor-pointer list-none select-none hover:bg-slate-50/60 active:bg-slate-100/50 transition duration-150">
             <div class="flex items-center gap-4 pointer-events-none">
@@ -504,10 +596,9 @@
             <i class="faq-chevron fa-solid fa-chevron-down text-slate-400 text-xs transition-transform duration-300 pointer-events-none"></i>
           </summary>
           <div class="px-5 sm:px-6 pb-6 pt-1 text-xs text-slate-500 leading-relaxed border-t border-slate-100">
-            Yes, custom dimensions and tailored orders can be arranged! Tap the "Contact me here" button above or mention your specific request when sending your order note.
+            Yes, custom dimensions and tailored orders can be arranged! You can place a Custom Order directly on the storefront with your reference image and notes, or tap "Contact me here" to discuss.
           </div>
         </details>
-
       </div>
     </section>
 
@@ -638,95 +729,137 @@
       { id: "set", name: "Set", price: 15.00 }
     ];
 
-    // Single Featured Main Product (uses halloween_2.jpg)
-    const PRODUCTS = [
-      {
-        id: "prod-halloween",
-        name: "Halloween Figurines",
-        subtitle: "Handcrafted Collectibles • Matte Stone Finish",
-        badge: "Debut Release",
-        priceRange: "$1.50 – $15.00 SGD",
-        image: "image/halloween.jpg",
-        altFallback: "Halloween Figurines Mummy and Skeleton Collection",
-        description: "A curated series of miniature spooky companions, crafted with layered precision and finished in matte stone white. Choose from 13 individual animals or the complete set."
-      }
+    // The 6 Colour options with visual dot colors
+    const COLOUR_OPTIONS = [
+      { id: "black", name: "Black", dotBg: "#0f172a", border: "#334155" },
+      { id: "white", name: "White", dotBg: "#f8fafc", border: "#cbd5e1" },
+      { id: "pink", name: "Pink", dotBg: "#f472b6", border: "#f472b6" },
+      { id: "red", name: "Red", dotBg: "#ef4444", border: "#ef4444" },
+      { id: "yellow", name: "Yellow", dotBg: "#eab308", border: "#eab308" },
+      { id: "blue", name: "Blue", dotBg: "#3b82f6", border: "#3b82f6" }
     ];
 
     // Subpage selection state
     let selectedOptionIndex = 0;
+    let selectedColourIndex = 1; // Default to White
     let detailQuantity = 1;
+    let customUploadedFile = null;
 
-    // Cart contains array of added variants: [{ name, price, qty }]
+    // Cart contains array of added items
     let cart = [];
     let currentTab = "catalog";
 
     window.addEventListener("DOMContentLoaded", () => {
       renderProducts();
       renderPillOptions();
+      renderColourOptions();
       updateCartBadge();
     });
 
-    // RENDER MAIN CATALOG CARD
+    // RENDER MAIN CATALOG (HALLOWEEN FIGURINES + CUSTOM ORDER)
     function renderProducts() {
       const container = document.getElementById("product-grid");
       if (!container) return;
 
-      container.innerHTML = PRODUCTS.map((p) => {
-        return `
-          <div id="card-${p.id}" class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/90 shadow-card hover:shadow-luxury hover:border-brand-200 transition duration-300 flex flex-col justify-between cursor-pointer" onclick="openProductSubpage()">
-            <div>
-              <div class="relative w-full aspect-square rounded-2xl overflow-hidden mb-6 bg-slate-900 group shadow-inner">
-                <img 
-                  src="${p.image}" 
-                  alt="${p.altFallback}" 
-                  class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out" 
-                  loading="lazy"
-                  onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\\'w-full h-full bg-slate-800 flex flex-col items-center justify-center text-white text-center p-6\\'><i class=\\'fa-solid fa-ghost text-4xl text-brand-300 mb-3\\'></i><span class=\\'font-serif text-base tracking-widest block mb-1\\'>Halloween Figurines</span><span class=\\'text-[11px] text-slate-400 font-mono\\'>halloween_2.jpg</span></div>';"
-                />
-                <div class="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/20 pointer-events-none"></div>
-                <div class="absolute top-4 left-4 bg-white/90 luxury-blur px-3 py-1 rounded-full text-[9px] uppercase tracking-[0.25em] font-bold text-slate-900 shadow-sm">
-                  ${p.badge}
-                </div>
-                <div class="absolute bottom-4 left-4 right-4 text-white pointer-events-none flex justify-between items-end">
-                  <span class="text-[11px] uppercase tracking-wider text-slate-200 font-medium">13 Characters or 1 Set</span>
-                  <span class="text-xs font-serif italic text-white/90">Click to Choose</span>
-                </div>
+      container.innerHTML = `
+        <!-- Product 1: Halloween Figurines -->
+        <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/90 shadow-card hover:shadow-luxury hover:border-brand-200 transition duration-300 flex flex-col justify-between cursor-pointer" onclick="openProductSubpage()">
+          <div>
+            <div class="relative w-full aspect-square rounded-2xl overflow-hidden mb-6 bg-slate-900 group shadow-inner">
+              <img 
+                src="image/halloween.jpg" 
+                alt="Halloween Figurines" 
+                class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out" 
+                loading="lazy"
+                onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\\'w-full h-full bg-slate-800 flex flex-col items-center justify-center text-white text-center p-6\\'><i class=\\'fa-solid fa-ghost text-4xl text-brand-300 mb-3\\'></i><span class=\\'font-serif text-base tracking-widest block mb-1\\'>Halloween Figurines</span><span class=\\'text-[11px] text-slate-400 font-mono\\'>halloween_2.jpg</span></div>';"
+              />
+              <div class="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/20 pointer-events-none"></div>
+              <div class="absolute top-4 left-4 bg-white/90 luxury-blur px-3 py-1 rounded-full text-[9px] uppercase tracking-[0.25em] font-bold text-slate-900 shadow-sm">
+                Debut Release
               </div>
-
-              <div class="flex items-center justify-between gap-2 mb-1.5">
-                <h4 class="font-serif text-2xl font-medium text-slate-900 tracking-wide">${p.name}</h4>
-                <span class="text-base font-bold text-slate-900 font-sans">${p.priceRange}</span>
+              <div class="absolute bottom-4 left-4 right-4 text-white pointer-events-none flex justify-between items-end">
+                <span class="text-[11px] uppercase tracking-wider text-slate-200 font-medium">13 Characters or 1 Set</span>
+                <span class="text-xs font-serif italic text-white/90">Click to Choose</span>
               </div>
-              <span class="text-[10px] uppercase tracking-wider text-brand-600 font-semibold block mb-3">${p.subtitle}</span>
-              <p class="text-xs text-slate-500 font-light leading-relaxed mb-6">${p.description}</p>
             </div>
 
-            <div class="flex items-center justify-between pt-5 border-t border-slate-100" onclick="event.stopPropagation()">
-              <div>
-                <span class="text-[10px] uppercase tracking-wider text-slate-400 font-semibold block">Craft Edition</span>
-                <span class="text-xs font-semibold text-slate-700">$1.50 each • $15.00 full set</span>
-              </div>
-              <button 
-                type="button" 
-                onclick="openProductSubpage()" 
-                class="px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-brand-600 text-white flex items-center gap-2 text-xs font-semibold tracking-wider active:scale-95 transition cursor-pointer shadow-sm"
-              >
-                <span>Select Options</span>
-                <i class="fa-solid fa-arrow-right text-[10px]"></i>
-              </button>
+            <div class="flex items-center justify-between gap-2 mb-1.5">
+              <h4 class="font-serif text-2xl font-medium text-slate-900 tracking-wide">Halloween Figurines</h4>
+              <span class="text-base font-bold text-slate-900 font-sans">$1.50 – $15.00 SGD</span>
             </div>
+            <span class="text-[10px] uppercase tracking-wider text-brand-600 font-semibold block mb-3">Handcrafted Collectibles • Matte Stone Finish</span>
+            <p class="text-xs text-slate-500 font-light leading-relaxed mb-6">A curated series of miniature spooky companions, crafted with layered precision. Choose from 13 individual animals or the full set in 6 custom colours.</p>
           </div>
-        `;
-      }).join("");
+
+          <div class="flex items-center justify-between pt-5 border-t border-slate-100" onclick="event.stopPropagation()">
+            <div>
+              <span class="text-[10px] uppercase tracking-wider text-slate-400 font-semibold block">Craft Edition</span>
+              <span class="text-xs font-semibold text-slate-700">$1.50 each • $15.00 set</span>
+            </div>
+            <button 
+              type="button" 
+              onclick="openProductSubpage()" 
+              class="px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-brand-600 text-white flex items-center gap-2 text-xs font-semibold tracking-wider active:scale-95 transition cursor-pointer shadow-sm"
+            >
+              <span>Select Options</span>
+              <i class="fa-solid fa-arrow-right text-[10px]"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Product 2: Custom Order (Clean styling, no Artisan Commission or Bespoke 3D Prints badges) -->
+        <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/90 shadow-card hover:shadow-luxury hover:border-brand-200 transition duration-300 flex flex-col justify-between cursor-pointer" onclick="openCustomOrderSubpage()">
+          <div>
+            <div class="relative w-full aspect-square rounded-2xl overflow-hidden mb-6 bg-slate-900 flex flex-col items-center justify-center p-8 text-center text-white group shadow-inner">
+              <div class="w-16 h-16 rounded-2xl bg-white/10 luxury-blur border border-white/20 flex items-center justify-center text-brand-300 mb-4 group-hover:scale-110 transition-transform">
+                <i class="fa-solid fa-wand-magic-sparkles text-2xl"></i>
+              </div>
+              <span class="font-serif text-2xl tracking-wider block mb-1">Custom Order</span>
+              <p class="text-[11px] text-slate-300 font-light max-w-[220px]">Upload your sketches, reference photos, or 3D ideas for a tailored print</p>
+              
+              <div class="absolute bottom-4 left-4 right-4 text-white pointer-events-none text-center">
+                <span class="text-xs font-serif italic text-white/90">Upload & Quote</span>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between gap-2 mb-1.5">
+              <h4 class="font-serif text-2xl font-medium text-slate-900 tracking-wide">Custom Order</h4>
+              <span class="text-base font-bold text-slate-900 font-sans">From $0.00 SGD</span>
+            </div>
+            <span class="text-[10px] uppercase tracking-wider text-brand-600 font-semibold block mb-3">Tailored Prints • Free Quote Upon Review</span>
+            <p class="text-xs text-slate-500 font-light leading-relaxed mb-6">Need a custom keychain, commemorative token, figure, or personalized design? Submit your photo and instructions for a quick quote.</p>
+          </div>
+
+          <div class="flex items-center justify-between pt-5 border-t border-slate-100" onclick="event.stopPropagation()">
+            <div>
+              <span class="text-[10px] uppercase tracking-wider text-slate-400 font-semibold block">Quotation Basis</span>
+              <span class="text-xs font-semibold text-slate-700">Proposal upon review</span>
+            </div>
+            <button 
+              type="button" 
+              onclick="openCustomOrderSubpage()" 
+              class="px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-brand-600 text-white flex items-center gap-2 text-xs font-semibold tracking-wider active:scale-95 transition cursor-pointer shadow-sm"
+            >
+              <span>Customise Now</span>
+              <i class="fa-solid fa-arrow-right text-[10px]"></i>
+            </button>
+          </div>
+        </div>
+      `;
     }
 
-    // OPEN SUB-PAGE FOR PRODUCT DETAILS & SELECTION
+    // SUBPAGE NAVIGATION
     function openProductSubpage() {
       switchTab('product-detail');
       window.scrollTo({ top: document.getElementById("store-section").offsetTop - 40, behavior: "smooth" });
     }
 
-    // RENDER 14 PILL BUTTONS ON SUBPAGE
+    function openCustomOrderSubpage() {
+      switchTab('custom-order');
+      window.scrollTo({ top: document.getElementById("store-section").offsetTop - 40, behavior: "smooth" });
+    }
+
+    // PILL BUTTON OPTIONS (ANIMALS/SET)
     function renderPillOptions() {
       const container = document.getElementById("animal-pill-container");
       if (!container) return;
@@ -756,24 +889,58 @@
       renderPillOptions();
     }
 
+    // PILL BUTTON OPTIONS (COLOURS)
+    function renderColourOptions() {
+      const container = document.getElementById("colour-pill-container");
+      if (!container) return;
+
+      container.innerHTML = COLOUR_OPTIONS.map((col, idx) => {
+        const isSelected = idx === selectedColourIndex;
+        const activeClass = isSelected 
+          ? "bg-slate-950 text-white border-slate-950 shadow-sm" 
+          : "bg-white text-slate-700 border-slate-300 hover:border-slate-400 hover:bg-slate-50";
+
+        return `
+          <button 
+            type="button"
+            onclick="selectColour(${idx})"
+            class="px-4 py-2 rounded-full border text-xs sm:text-sm font-medium transition cursor-pointer active:scale-95 flex items-center gap-2 ${activeClass}"
+          >
+            <span class="w-2.5 h-2.5 rounded-full inline-block" style="background-color: ${col.dotBg}; border: 1px solid ${col.border};"></span>
+            <span>${col.name}</span>
+          </button>
+        `;
+      }).join("");
+
+      updateSubpageDetails();
+    }
+
+    function selectColour(idx) {
+      selectedColourIndex = idx;
+      renderColourOptions();
+    }
+
     function updateSubpageDetails() {
       const cur = FIGURINE_OPTIONS[selectedOptionIndex];
+      const col = COLOUR_OPTIONS[selectedColourIndex];
       const nameEl = document.getElementById("selected-animal-name");
+      const colEl = document.getElementById("selected-colour-name");
       const priceEl = document.getElementById("detail-price-display");
       const typeEl = document.getElementById("detail-price-type");
       const ctaEl = document.getElementById("detail-add-cta");
 
       if (nameEl) nameEl.innerText = cur.name;
+      if (colEl) colEl.innerText = col.name;
       if (priceEl) priceEl.innerText = `$${cur.price.toFixed(2)} SGD`;
       if (typeEl) typeEl.innerText = cur.id === 'set' ? "full set" : "per item";
 
       const totalPreview = (cur.price * detailQuantity).toFixed(2);
       if (ctaEl) {
-        ctaEl.innerText = `Add ${cur.name} (${detailQuantity}) to Bag • $${totalPreview} SGD`;
+        ctaEl.innerText = `Add ${cur.name} (${col.name}) (${detailQuantity}) to Bag • $${totalPreview} SGD`;
       }
     }
 
-    // SUBPAGE QUANTITY STEPPER
+    // QUANTITY STEPPER
     function changeDetailQty(delta) {
       let next = detailQuantity + delta;
       if (next < 1) next = 1;
@@ -792,34 +959,102 @@
       updateSubpageDetails();
     }
 
-    // ADD VARIANT TO CART
+    // ADD VARIANT (WITH COLOUR) TO CART
     function addSelectedVariantToBag() {
       const selected = FIGURINE_OPTIONS[selectedOptionIndex];
-      const existing = cart.find(item => item.id === selected.id);
+      const colour = COLOUR_OPTIONS[selectedColourIndex];
+      const compositeId = `${selected.id}-${colour.id}`;
+
+      const existing = cart.find(item => item.id === compositeId && !item.isCustom);
 
       if (existing) {
         if (existing.qty + detailQuantity > 99) {
           existing.qty = 99;
-          showToast("Maximum quantity of 99 reached for this option");
+          showToast("Maximum quantity of 99 reached for this combination");
         } else {
           existing.qty += detailQuantity;
-          showToast(`Updated ${selected.name} quantity in bag`);
+          showToast(`Updated ${selected.name} (${colour.name}) quantity in bag`);
         }
       } else {
         cart.push({
-          id: selected.id,
-          name: selected.name,
+          id: compositeId,
+          name: `${selected.name} (${colour.name})`,
+          character: selected.name,
+          colour: colour.name,
           price: selected.price,
-          qty: detailQuantity
+          qty: detailQuantity,
+          isCustom: false
         });
-        showToast(`Added ${detailQuantity}x ${selected.name} to bag`);
+        showToast(`Added ${detailQuantity}x ${selected.name} (${colour.name}) to bag`);
       }
 
       updateCartBadge();
       renderCartItems();
     }
 
-    // UPDATE CART BADGES AND BUTTONS
+    // CUSTOM ORDER FILE HANDLING
+    function handleFileUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      customUploadedFile = file;
+      const dropzoneEmpty = document.getElementById("dropzone-empty");
+      const dropzonePreview = document.getElementById("dropzone-preview");
+      const previewImg = document.getElementById("preview-img");
+      const previewFilename = document.getElementById("preview-filename");
+
+      if (file.type.startsWith("image/")) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          previewImg.src = e.target.result;
+          previewImg.classList.remove("hidden");
+          dropzoneEmpty.classList.add("hidden");
+          dropzonePreview.classList.remove("hidden");
+          previewFilename.innerText = file.name;
+        };
+        reader.readAsDataURL(file);
+      } else {
+        previewImg.classList.add("hidden");
+        dropzoneEmpty.classList.add("hidden");
+        dropzonePreview.classList.remove("hidden");
+        previewFilename.innerText = file.name;
+      }
+    }
+
+    function removeUploadedFile() {
+      customUploadedFile = null;
+      document.getElementById("custom-file-input").value = "";
+      document.getElementById("dropzone-empty").classList.remove("hidden");
+      document.getElementById("dropzone-preview").classList.add("hidden");
+    }
+
+    function addCustomOrderToBag() {
+      const notes = document.getElementById("custom-instructions").value.trim();
+      if (!notes && !customUploadedFile) {
+        showToast("Please provide customization instructions or an image");
+        document.getElementById("custom-instructions").focus();
+        return;
+      }
+
+      cart.push({
+        id: "custom-" + Date.now(),
+        name: "Custom Order",
+        price: 0.00,
+        qty: 1,
+        isCustom: true,
+        instructions: notes || "Reference file attached",
+        fileName: customUploadedFile ? customUploadedFile.name : null
+      });
+
+      showToast("Custom order added to your bag");
+      document.getElementById("custom-instructions").value = "";
+      removeUploadedFile();
+      updateCartBadge();
+      renderCartItems();
+      openCart();
+    }
+
+    // CART BADGE & SUB-TOTALS
     function updateCartBadge() {
       const totalQty = cart.reduce((sum, item) => sum + item.qty, 0);
       const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
@@ -855,7 +1090,7 @@
       }
     }
 
-    // RENDER SHOPPING BAG DRAWER
+    // CART RENDERING
     function renderCartItems() {
       const container = document.getElementById("cart-items");
       if (!container) return;
@@ -876,30 +1111,44 @@
         const itemTotal = item.price * item.qty;
         subtotal += itemTotal;
 
+        const icon = item.isCustom 
+          ? `<i class="fa-solid fa-wand-magic-sparkles text-xs"></i>`
+          : `<i class="fa-solid fa-ghost text-xs"></i>`;
+
+        const details = item.isCustom 
+          ? `<div class="text-[11px] text-slate-500 font-medium">Quote upon review ${item.fileName ? '• 📎 ' + item.fileName : ''}</div><div class="text-[10px] text-slate-400 italic truncate max-w-[200px] mt-0.5">"${item.instructions}"</div>`
+          : `<span class="text-[11px] text-slate-500 font-medium">$${item.price.toFixed(2)} each</span>`;
+
+        const quantityControls = item.isCustom ? `
+          <span class="text-xs font-semibold text-brand-600 bg-brand-50 px-2 py-1 rounded-lg">1 item</span>
+        ` : `
+          <div class="flex items-center gap-1.5 bg-slate-50 border border-slate-200/80 rounded-xl p-1">
+            <button 
+              type="button" 
+              onclick="changeCartItemQty(${idx}, -1)" 
+              class="w-6 h-6 rounded-lg bg-white border border-slate-200 text-slate-700 flex items-center justify-center text-xs active:scale-90 hover:bg-slate-100 transition cursor-pointer shadow-xs"
+              title="Decrease"
+            >-</button>
+            <span class="w-7 text-center text-xs font-bold text-slate-800">${item.qty}</span>
+            <button 
+              type="button" 
+              onclick="changeCartItemQty(${idx}, 1)" 
+              class="w-6 h-6 rounded-lg bg-white border border-slate-200 text-slate-700 flex items-center justify-center text-xs active:scale-90 hover:bg-slate-100 transition cursor-pointer shadow-xs"
+              title="Increase"
+            >+</button>
+          </div>
+        `;
+
         return `
           <div class="py-4 flex items-center justify-between gap-4">
             <div class="w-10 h-10 rounded-xl bg-brand-50 border border-brand-100 flex items-center justify-center text-brand-700 font-bold text-xs shrink-0">
-              <i class="fa-solid fa-ghost text-xs"></i>
+              ${icon}
             </div>
             <div class="flex-1 min-w-0">
               <h5 class="text-xs font-semibold text-slate-800 truncate">${item.name}</h5>
-              <span class="text-[11px] text-slate-500 font-medium">$${item.price.toFixed(2)} each</span>
+              ${details}
             </div>
-            <div class="flex items-center gap-1.5 bg-slate-50 border border-slate-200/80 rounded-xl p-1">
-              <button 
-                type="button" 
-                onclick="changeCartItemQty(${idx}, -1)" 
-                class="w-6 h-6 rounded-lg bg-white border border-slate-200 text-slate-700 flex items-center justify-center text-xs active:scale-90 hover:bg-slate-100 transition cursor-pointer shadow-xs"
-                title="Decrease"
-              >-</button>
-              <span class="w-7 text-center text-xs font-bold text-slate-800">${item.qty}</span>
-              <button 
-                type="button" 
-                onclick="changeCartItemQty(${idx}, 1)" 
-                class="w-6 h-6 rounded-lg bg-white border border-slate-200 text-slate-700 flex items-center justify-center text-xs active:scale-90 hover:bg-slate-100 transition cursor-pointer shadow-xs"
-                title="Increase"
-              >+</button>
-            </div>
+            ${quantityControls}
             <button 
               type="button" 
               onclick="removeCartItem(${idx})" 
@@ -937,16 +1186,23 @@
       }
     }
 
-    // TAB / SUB-PAGE NAVIGATION SWITCH
+    // VIEW ROUTING WITH FULL SCROLL UNLOCK
     function switchTab(tab) {
       currentTab = tab;
+      
+      // Explicitly clear overflow-hidden to prevent scroll freezing
+      document.body.classList.remove("overflow-hidden");
+      document.documentElement.classList.remove("overflow-hidden");
+
       const catalogView = document.getElementById("view-catalog");
       const productDetailView = document.getElementById("view-product-detail");
+      const customOrderView = document.getElementById("view-custom-order");
       const faqView = document.getElementById("view-faq");
       const navCatalog = document.getElementById("nav-btn-catalog");
 
       catalogView.classList.remove("view-active");
       productDetailView.classList.remove("view-active");
+      if (customOrderView) customOrderView.classList.remove("view-active");
       faqView.classList.remove("view-active");
 
       if (tab === "catalog") {
@@ -954,6 +1210,9 @@
         if (navCatalog) navCatalog.className = "flex flex-col items-center gap-1 text-brand-600 transition";
       } else if (tab === "product-detail") {
         productDetailView.classList.add("view-active");
+        if (navCatalog) navCatalog.className = "flex flex-col items-center gap-1 text-brand-600 transition";
+      } else if (tab === "custom-order") {
+        if (customOrderView) customOrderView.classList.add("view-active");
         if (navCatalog) navCatalog.className = "flex flex-col items-center gap-1 text-brand-600 transition";
       } else {
         faqView.classList.add("view-active");
@@ -977,6 +1236,7 @@
       backdrop.classList.add("opacity-0", "pointer-events-none");
       drawer.classList.add("-translate-x-full");
       document.body.classList.remove("overflow-hidden");
+      document.documentElement.classList.remove("overflow-hidden");
     }
 
     function toggleCollectionDropdown() {
@@ -1023,9 +1283,14 @@
       resultsContainer.classList.remove("hidden");
 
       const matches = [];
+
+      if ("custom order tailored print".includes(term)) {
+        matches.push({ type: 'custom', name: 'Custom Order', priceText: 'From $0.00 SGD' });
+      }
+
       FIGURINE_OPTIONS.forEach((opt, idx) => {
         if (opt.name.toLowerCase().includes(term)) {
-          matches.push({ option: opt, idx });
+          matches.push({ type: 'figurine', option: opt, idx });
         }
       });
 
@@ -1039,20 +1304,39 @@
         return;
       }
 
-      resultsContainer.innerHTML = matches.map(m => `
-        <div onclick="jumpToOptionFromDrawer(${m.idx})" class="py-2.5 px-2 flex items-center justify-between gap-3 hover:bg-slate-100/70 rounded-xl cursor-pointer transition">
-          <div class="flex items-center gap-3">
-            <div class="w-8 h-8 rounded-lg bg-brand-50 border border-brand-100 flex items-center justify-center text-brand-600 text-xs font-bold shrink-0">
-              <i class="fa-solid fa-ghost text-[10px]"></i>
+      resultsContainer.innerHTML = matches.map(m => {
+        if (m.type === 'custom') {
+          return `
+            <div onclick="jumpToCustomOrderFromDrawer()" class="py-2.5 px-2 flex items-center justify-between gap-3 hover:bg-slate-100/70 rounded-xl cursor-pointer transition">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-brand-50 border border-brand-100 flex items-center justify-center text-brand-600 text-xs font-bold shrink-0">
+                  <i class="fa-solid fa-wand-magic-sparkles text-[10px]"></i>
+                </div>
+                <div>
+                  <h5 class="text-xs font-bold text-slate-800">${m.name}</h5>
+                  <span class="text-[11px] text-brand-600 font-semibold">${m.priceText}</span>
+                </div>
+              </div>
+              <span class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Customise &rarr;</span>
             </div>
-            <div>
-              <h5 class="text-xs font-bold text-slate-800">${m.option.name}</h5>
-              <span class="text-[11px] text-brand-600 font-semibold">$${m.option.price.toFixed(2)} SGD</span>
+          `;
+        }
+
+        return `
+          <div onclick="jumpToOptionFromDrawer(${m.idx})" class="py-2.5 px-2 flex items-center justify-between gap-3 hover:bg-slate-100/70 rounded-xl cursor-pointer transition">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-lg bg-brand-50 border border-brand-100 flex items-center justify-center text-brand-600 text-xs font-bold shrink-0">
+                <i class="fa-solid fa-ghost text-[10px]"></i>
+              </div>
+              <div>
+                <h5 class="text-xs font-bold text-slate-800">${m.option.name}</h5>
+                <span class="text-[11px] text-brand-600 font-semibold">$${m.option.price.toFixed(2)} SGD</span>
+              </div>
             </div>
+            <span class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Choose &rarr;</span>
           </div>
-          <span class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Choose &rarr;</span>
-        </div>
-      `).join("");
+        `;
+      }).join("");
     }
 
     function clearDrawerSearch() {
@@ -1074,7 +1358,13 @@
       document.getElementById("store-section").scrollIntoView({ behavior: 'smooth' });
     }
 
-    // CART DRAWER MODAL
+    function jumpToCustomOrderFromDrawer() {
+      closeMenuDrawer();
+      switchTab('custom-order');
+      document.getElementById("store-section").scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // CART MODAL CONTROLS
     function openCart() {
       renderCartItems();
       const sheet = document.getElementById("cart-sheet");
@@ -1093,9 +1383,11 @@
       backdrop.classList.add("opacity-0", "pointer-events-none");
       sheet.classList.add("translate-y-full");
       sheet.classList.add("md:translate-x-full");
+      document.body.classList.remove("overflow-hidden");
+      document.documentElement.classList.remove("overflow-hidden");
     }
 
-    // DUAL TELEGRAM & WHATSAPP CHECKOUT
+    // DUAL CHECKOUT ROUTING (TELEGRAM & WHATSAPP)
     function checkoutVia(channel) {
       if (cart.length === 0) {
         showToast("Cart is empty");
@@ -1114,12 +1406,22 @@
 
       let itemsSummary = "";
       let subtotal = 0;
+      let hasCustom = false;
 
       cart.forEach((item) => {
-        const itemTotal = item.price * item.qty;
-        subtotal += itemTotal;
-        itemsSummary += `✩ ${item.name} ×${item.qty} — $${itemTotal.toFixed(2)}\n`;
+        if (item.isCustom) {
+          hasCustom = true;
+          itemsSummary += `✩ Custom Order (${item.instructions})${item.fileName ? ' [Ref: ' + item.fileName + ']' : ''} — Quote Upon Review\n`;
+        } else {
+          const itemTotal = item.price * item.qty;
+          subtotal += itemTotal;
+          itemsSummary += `✩ ${item.name} ×${item.qty} — $${itemTotal.toFixed(2)}\n`;
+        }
       });
+
+      const totalDisplay = hasCustom 
+        ? (subtotal > 0 ? `$${subtotal.toFixed(2)} SGD + Custom Quote Pending` : "Quote Upon Review")
+        : `$${subtotal.toFixed(2)} SGD`;
 
       let message = "";
       if (channel === "telegram") {
@@ -1128,20 +1430,20 @@
 🔖 Order: #${orderId}
 👤 Name/Tele: ${contact}
 📦 What you’re getting:
-${itemsSummary}💰 Total: $${subtotal.toFixed(2)} SGD
+${itemsSummary}💰 Total: ${totalDisplay}
 📍 Collection: ${notes}
 ─── ･ ｡ﾟ☆: .☽ . :☆ﾟ. ───
-Hi @e1yse! Ready to confirm #${orderId} ✨ Let me know the PayNow details whenever you're free!`;
+Hi @e1yse! Ready to confirm #${orderId} ✨ Let me know the quote or PayNow details whenever you're free!`;
       } else {
         message = 
 `˗ˏˋ  The Layer Workshop — Order Note ˎˊ˗
 Order: #${orderId}
 Name/Contact: ${contact}
 What you’re getting:
-${itemsSummary}Total: $${subtotal.toFixed(2)} SGD
+${itemsSummary}Total: ${totalDisplay}
 Collection: ${notes}
 ─── ･ ｡ﾟ☆: .☽ . :☆ﾟ. ───
-Hi! Ready to confirm #${orderId}  Let me know the PayNow details whenever you're free!`;
+Hi! Ready to confirm #${orderId}  Let me know the quote or PayNow details whenever you're free!`;
       }
 
       if (navigator.clipboard) {
