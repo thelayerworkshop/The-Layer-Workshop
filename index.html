@@ -36,16 +36,13 @@
               700: '#2F6193',
               800: '#23486F',
               900: '#142942',
-            },
-            whatsapp: {
-              DEFAULT: '#25D366',
-              dark: '#1EBE5D'
             }
           },
           boxShadow: {
             'luxury': '0 20px 45px -15px rgba(20, 41, 66, 0.08)',
             'card': '0 4px 20px -2px rgba(20, 41, 66, 0.04)',
             'pill': '0 10px 25px -5px rgba(82, 150, 213, 0.45)',
+            'drawer': '-10px 0 35px -5px rgba(0, 0, 0, 0.3)',
           }
         }
       }
@@ -113,7 +110,7 @@
   <!-- ================= LUXURY EDITORIAL HERO COVER ================= -->
   <section id="cover-hero" class="relative w-full h-[88vh] md:h-[94vh] flex flex-col justify-between items-center text-white overflow-hidden bg-slate-900 select-none">
     
-    <!-- Background Cover Image with subtle dark vignette -->
+    <!-- Background Cover Image with dark vignette -->
     <div class="absolute inset-0 z-0">
       <img 
         src="https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&w=2000&q=80" 
@@ -124,20 +121,26 @@
       <div class="absolute inset-0 bg-radial-gradient from-transparent via-transparent to-black/50"></div>
     </div>
 
-    <!-- Top Luxury Navigation Bar -->
+    <!-- Top Luxury Navigation Bar with Hamburger Icon -->
     <header id="site-header" class="relative z-20 w-full transition-all duration-300 safe-top border-b border-white/10">
       <div class="max-w-7xl mx-auto px-5 sm:px-8 py-5 flex items-center justify-between">
         
-        <!-- Left: Store link & Search trigger -->
-        <div class="flex items-center gap-6 sm:gap-8">
-          <button onclick="switchTab('catalog')" class="text-[11px] sm:text-xs tracking-[0.25em] uppercase font-medium text-white/90 hover:text-white transition">
-            Store
-          </button>
-          <button onclick="openSearchOverlay()" class="group flex items-center gap-2 text-[11px] sm:text-xs tracking-[0.2em] uppercase font-medium text-white/90 hover:text-white transition">
-            <i class="fa-solid fa-magnifying-glass text-[10px] text-white/70 group-hover:text-white"></i>
-            <span>Search</span>
-          </button>
-        </div>
+        <!-- Left: Minimalist Hamburger Menu Trigger -->
+        <button 
+          type="button" 
+          onclick="openMenuDrawer()" 
+          class="group flex items-center gap-3 text-white/90 hover:text-white transition cursor-pointer p-1 -ml-1 focus:outline-none"
+          aria-label="Open Navigation Menu"
+        >
+          <div class="w-6 h-4 flex flex-col justify-between items-start">
+            <span class="w-6 h-0.5 bg-white group-hover:bg-brand-200 transition-all duration-200"></span>
+            <span class="w-4 h-0.5 bg-white group-hover:w-6 group-hover:bg-brand-200 transition-all duration-200"></span>
+            <span class="w-5 h-0.5 bg-white group-hover:w-6 group-hover:bg-brand-200 transition-all duration-200"></span>
+          </div>
+          <span class="hidden sm:inline text-[11px] uppercase tracking-[0.25em] font-medium text-white/80 group-hover:text-white transition">
+            Menu
+          </span>
+        </button>
 
         <!-- Center: Spaced Luxury Serif Brand Title -->
         <div class="text-center cursor-pointer" onclick="switchTab('catalog'); window.scrollTo({top:0, behavior:'smooth'});">
@@ -146,16 +149,17 @@
           </span>
         </div>
 
-        <!-- Right: FAQ & Bag Trigger -->
-        <div class="flex items-center gap-6 sm:gap-8">
-          <button onclick="switchTab('faq')" class="text-[11px] sm:text-xs tracking-[0.25em] uppercase font-medium text-white/90 hover:text-white transition">
-            FAQ
-          </button>
-
-          <button onclick="openCart()" class="relative group flex items-center gap-2 text-[11px] sm:text-xs tracking-[0.2em] uppercase font-medium text-white/90 hover:text-white transition cursor-pointer">
+        <!-- Right: Shopping Bag Trigger -->
+        <div class="flex items-center">
+          <button 
+            type="button" 
+            onclick="openCart()" 
+            class="relative group flex items-center gap-2 text-[11px] sm:text-xs tracking-[0.2em] uppercase font-medium text-white/90 hover:text-white transition cursor-pointer p-1 -mr-1"
+            aria-label="Open Shopping Bag"
+          >
             <span class="hidden sm:inline">Bag</span>
             <div class="relative">
-              <i class="fa-solid fa-bag-shopping text-sm text-white/80 group-hover:text-white"></i>
+              <i class="fa-solid fa-bag-shopping text-base text-white/85 group-hover:text-white"></i>
               <span id="header-cart-badge" class="hidden absolute -top-2 -right-2 bg-brand-500 text-white text-[9px] font-bold h-3.5 w-3.5 rounded-full flex items-center justify-center border border-white">0</span>
             </div>
           </button>
@@ -180,6 +184,127 @@
     <div class="w-full h-8 bg-gradient-to-t from-[#FBFDFE] to-transparent relative z-10"></div>
   </section>
 
+  <!-- ================= EDITORIAL HAMBURGER MENU DRAWER ================= -->
+  <div 
+    id="menu-backdrop" 
+    onclick="closeMenuDrawer()" 
+    class="fixed inset-0 bg-slate-950/70 luxury-blur z-50 opacity-0 pointer-events-none transition-opacity duration-300"
+  ></div>
+
+  <aside 
+    id="menu-drawer" 
+    class="fixed top-0 bottom-0 left-0 z-50 w-full max-w-md bg-white border-r border-slate-200 shadow-2xl transform -translate-x-full transition-transform duration-300 ease-out flex flex-col justify-between overflow-hidden"
+    aria-label="Navigation Menu Drawer"
+  >
+    <!-- Drawer Top Bar -->
+    <div class="px-6 sm:px-8 pt-6 pb-4 border-b border-slate-100 flex items-center justify-between">
+      <div>
+        <span class="text-[10px] tracking-[0.3em] uppercase text-slate-400 font-semibold block">Navigation</span>
+        <h3 class="font-serif text-lg font-semibold text-slate-900 tracking-wide">The Layer Workshop</h3>
+      </div>
+      <button 
+        type="button" 
+        onclick="closeMenuDrawer()" 
+        class="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center text-sm transition active:scale-95 cursor-pointer"
+        aria-label="Close Menu"
+      >
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <!-- Scrollable Center: Streamlined Search & Minimal Menu Links -->
+    <div class="flex-1 overflow-y-auto px-6 sm:px-8 py-6 space-y-7">
+      
+      <!-- 1. Integrated Search Box inside Hamburger -->
+      <div class="relative bg-slate-50 border border-slate-200/90 rounded-2xl p-3 focus-within:border-brand-400 focus-within:bg-white focus-within:ring-2 focus-within:ring-brand-100 transition duration-200">
+        <div class="flex items-center gap-3">
+          <i class="fa-solid fa-magnifying-glass text-slate-400 text-xs pl-1"></i>
+          <input 
+            type="text" 
+            id="drawer-search-input" 
+            placeholder="Search items (e.g. Item 1, Item 2)..." 
+            class="w-full bg-transparent text-xs sm:text-sm font-medium text-slate-800 placeholder-slate-400 focus:outline-none"
+            oninput="handleDrawerSearch(this.value)"
+          />
+          <button 
+            type="button" 
+            id="drawer-search-clear" 
+            onclick="clearDrawerSearch()" 
+            class="hidden text-slate-400 hover:text-slate-700 text-xs pr-1 cursor-pointer"
+            aria-label="Clear Search"
+          >
+            <i class="fa-solid fa-circle-xmark"></i>
+          </button>
+        </div>
+
+        <!-- Live Search Results Container (Empty by default) -->
+        <div id="drawer-search-results" class="mt-3 divide-y divide-slate-100 hidden max-h-60 overflow-y-auto"></div>
+      </div>
+
+      <!-- 2 & 3. Streamlined Menu Navigation Links -->
+      <nav class="space-y-4 pt-2">
+        <!-- Collection Accordion Dropdown -->
+        <div class="border-b border-slate-100/80 pb-3">
+          <button 
+            type="button" 
+            onclick="toggleCollectionDropdown()" 
+            id="collection-toggle-btn"
+            class="w-full text-left group flex items-center justify-between py-2 text-slate-900 hover:text-brand-600 transition cursor-pointer select-none"
+            aria-expanded="false"
+            aria-controls="collection-submenu"
+          >
+            <div class="flex items-baseline gap-3">
+              <span class="text-[10px] font-mono tracking-widest text-slate-400 group-hover:text-brand-500">01</span>
+              <span class="font-serif text-xl sm:text-2xl font-normal tracking-wide uppercase">Collection</span>
+            </div>
+            <i id="collection-chevron" class="fa-solid fa-chevron-down text-xs text-slate-400 group-hover:text-brand-600 transition-transform duration-300"></i>
+          </button>
+          
+          <!-- Collapsible Dropdown Submenu: Special Collection -->
+          <div 
+            id="collection-submenu" 
+            class="hidden pl-8 pt-2 pb-1 space-y-2 transition-all duration-300"
+          >
+            <button 
+              type="button" 
+              onclick="navigateToSection('catalog')" 
+              class="w-full text-left group flex items-center justify-between py-2 px-3 rounded-xl hover:bg-slate-50 text-slate-600 hover:text-brand-600 transition cursor-pointer"
+            >
+              <div class="flex items-center gap-2.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-brand-400 group-hover:scale-125 transition-transform"></span>
+                <span class="text-xs uppercase tracking-wider font-semibold">Special Collection</span>
+              </div>
+              <i class="fa-solid fa-arrow-right text-[10px] text-slate-300 group-hover:text-brand-600 group-hover:translate-x-1 transition-transform"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- FAQ -->
+        <div>
+          <button 
+            type="button" 
+            onclick="navigateToSection('faq')" 
+            class="w-full text-left group flex items-baseline justify-between py-2 text-slate-900 hover:text-brand-600 transition cursor-pointer select-none"
+          >
+            <div class="flex items-baseline gap-3">
+              <span class="text-[10px] font-mono tracking-widest text-slate-400 group-hover:text-brand-500">02</span>
+              <span class="font-serif text-xl sm:text-2xl font-normal tracking-wide uppercase">FAQ</span>
+            </div>
+            <i class="fa-solid fa-arrow-right text-[11px] text-slate-300 group-hover:text-brand-600 group-hover:translate-x-1 transition-transform"></i>
+          </button>
+        </div>
+      </nav>
+    </div>
+
+    <!-- Drawer Footer Statement -->
+    <div class="p-6 sm:p-8 bg-slate-50/80 border-t border-slate-100 text-center">
+      <span class="text-[9px] uppercase tracking-[0.3em] font-semibold text-slate-500 block mb-1">
+        HANDMADE IN SINGAPORE • LOCAL DOORSTEP DELIVERY
+      </span>
+      <p class="text-[10px] text-slate-400">© 2026 The Layer Workshop. All rights reserved.</p>
+    </div>
+  </aside>
+
   <!-- ================= MAIN CONTENT WRAPPER ================= -->
   <main id="store-section" class="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 pt-10">
     
@@ -191,8 +316,8 @@
         <div class="w-12 h-px bg-slate-300 mx-auto mt-4"></div>
       </div>
 
-      <!-- Minimalist Geometric Product Grid (No photos, clean badges) -->
-      <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+      <!-- Minimalist Product Showcase (Exclusively Halloween Figurines) -->
+      <div id="product-grid" class="max-w-xl mx-auto w-full">
         <!-- Rendered dynamically -->
       </div>
     </section>
@@ -307,13 +432,13 @@
   <!-- ================= MOBILE NAVIGATION ================= -->
   <nav class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 luxury-blur border-t border-slate-200 safe-bottom-nav">
     <div class="max-w-md mx-auto grid grid-cols-3 pt-2">
+      <button onclick="openMenuDrawer()" id="nav-btn-menu" class="flex flex-col items-center gap-1 text-slate-400 hover:text-slate-700 transition">
+        <i class="fa-solid fa-bars text-base"></i>
+        <span class="text-[10px] font-semibold tracking-wider uppercase">Menu</span>
+      </button>
       <button onclick="switchTab('catalog')" id="nav-btn-catalog" class="flex flex-col items-center gap-1 text-brand-600 transition">
         <i class="fa-solid fa-compass text-base"></i>
         <span class="text-[10px] font-semibold tracking-wider uppercase">Store</span>
-      </button>
-      <button onclick="switchTab('faq')" id="nav-btn-faq" class="flex flex-col items-center gap-1 text-slate-400 transition">
-        <i class="fa-solid fa-circle-question text-base"></i>
-        <span class="text-[10px] font-medium tracking-wider uppercase">FAQ</span>
       </button>
       <button onclick="openCart()" class="flex flex-col items-center gap-1 text-slate-400 relative transition">
         <div class="relative">
@@ -324,30 +449,6 @@
       </button>
     </div>
   </nav>
-
-  <!-- ================= SEARCH OVERLAY ================= -->
-  <div id="search-overlay" class="fixed inset-0 z-50 bg-slate-900/90 luxury-blur hidden flex-col items-center pt-16 px-4">
-    <div class="w-full max-w-2xl bg-white rounded-2xl p-4 sm:p-6 shadow-2xl">
-      <div class="flex items-center justify-between border-b border-slate-200 pb-3 mb-4">
-        <div class="flex items-center gap-3 flex-1">
-          <i class="fa-solid fa-magnifying-glass text-slate-400 text-sm"></i>
-          <input 
-            type="text" 
-            id="overlay-search-input" 
-            placeholder="Type to search items (e.g. item 1, item 2)..." 
-            class="w-full bg-transparent text-sm sm:text-base font-medium text-slate-800 placeholder-slate-400 focus:outline-none"
-            autofocus
-          >
-        </div>
-        <button onclick="closeSearchOverlay()" class="text-xs uppercase tracking-widest text-slate-400 hover:text-slate-800 font-semibold px-2 cursor-pointer">
-          CLOSE [ESC]
-        </button>
-      </div>
-
-      <!-- Live Search Results Container (Empty by default) -->
-      <div id="overlay-search-results" class="max-h-[60vh] overflow-y-auto divide-y divide-slate-100"></div>
-    </div>
-  </div>
 
   <!-- ================= CART DRAWER ================= -->
   <div id="cart-sheet-backdrop" onclick="closeCart()" class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-50 opacity-0 pointer-events-none transition-opacity duration-300"></div>
@@ -411,30 +512,22 @@
       currency: "SGD"
     };
 
-    // Exactly 3 Distinct Products
+    // Solitary Featured Product: Halloween Figurines
     const PRODUCTS = [
       {
-        id: "prod-1",
-        name: "Item 1",
-        price: 1.00,
-        description: "An elegant basic custom object handmade and layered with fine tactile precision."
-      },
-      {
-        id: "prod-2",
-        name: "Item 2",
-        price: 2.00,
-        description: "An intricate medium multi-layered custom geometric decor or tray."
-      },
-      {
-        id: "prod-3",
-        name: "Item 3",
-        price: 3.00,
-        description: "A signature heavy layered handmade object designed with durable finish."
+        id: "prod-halloween",
+        name: "Halloween Figurines",
+        subtitle: "Handcrafted Collectibles • Matte Stone Finish",
+        badge: "Debut Release",
+        price: 12.00,
+        image: "image/halloween.jpg",
+        altFallback: "Halloween Figurines Mummy and Skeleton Collection",
+        description: "A curated 12-piece series of miniature spooky companions, crafted with layered precision and finished in matte stone white. Tactile desk companions and seasonal talismans."
       }
     ];
 
-    // Robust array-based cart quantities: [Item 1, Item 2, Item 3]
-    let cartQuantities = [0, 0, 0];
+    // Single item cart quantity tracker
+    let cartQuantities = [0];
     let currentTab = "catalog";
 
     window.addEventListener("DOMContentLoaded", () => {
@@ -443,35 +536,54 @@
       setupEventDelegation();
     });
 
-    // RENDER PRODUCT CATALOG USING DATA ATTRIBUTES
+    // RENDER PRODUCT CATALOG
     function renderProducts() {
       const container = document.getElementById("product-grid");
       if (!container) return;
 
       container.innerHTML = PRODUCTS.map((p, index) => {
         return `
-          <div id="card-${p.id}" class="bg-white rounded-3xl p-6 border border-slate-200/90 shadow-card flex flex-col justify-between hover:shadow-luxury hover:border-brand-200 transition duration-300">
+          <div id="card-${p.id}" class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/90 shadow-card hover:shadow-luxury hover:border-brand-200 transition duration-300 flex flex-col justify-between">
             <div>
-              <div class="w-full h-44 rounded-2xl bg-gradient-to-br from-brand-50 to-brand-100/60 border border-brand-100 flex flex-col items-center justify-center gap-2 text-brand-700 mb-5">
-                <i class="fa-solid fa-layer-group text-2xl text-brand-400"></i>
-                <span class="font-serif text-lg font-semibold tracking-wide text-brand-800">${p.name}</span>
+              <div class="relative w-full aspect-square rounded-2xl overflow-hidden mb-6 bg-slate-900 group shadow-inner">
+                <img 
+                  src="${p.image}" 
+                  alt="${p.altFallback}" 
+                  class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out" 
+                  loading="lazy"
+                  onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\\'w-full h-full bg-slate-800 flex flex-col items-center justify-center text-white\\'><i class=\\'fa-solid fa-ghost text-3xl text-brand-300 mb-2\\'></i><span class=\\'font-serif text-sm tracking-widest\\'>Halloween Figurines</span></div>';"
+                />
+                <div class="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/20 pointer-events-none"></div>
+                <div class="absolute top-4 left-4 bg-white/90 luxury-blur px-3 py-1 rounded-full text-[9px] uppercase tracking-[0.25em] font-bold text-slate-900 shadow-sm">
+                  ${p.badge}
+                </div>
+                <div class="absolute bottom-4 left-4 right-4 text-white pointer-events-none flex justify-between items-end">
+                  <span class="text-[11px] uppercase tracking-wider text-slate-200 font-medium">12 Miniature Characters</span>
+                  <span class="text-xs font-serif italic text-white/90">Curated Atelier Set</span>
+                </div>
               </div>
-              <h4 class="font-serif text-lg font-semibold text-slate-900 mb-1.5">${p.name}</h4>
-              <p class="text-xs text-slate-500 font-light leading-relaxed mb-4">${p.description}</p>
+
+              <div class="flex items-center justify-between gap-2 mb-1.5">
+                <h4 class="font-serif text-2xl font-medium text-slate-900 tracking-wide">${p.name}</h4>
+                <span class="text-base font-bold text-slate-900 font-sans">$${p.price.toFixed(2)} SGD</span>
+              </div>
+              <span class="text-[10px] uppercase tracking-wider text-brand-600 font-semibold block mb-3">${p.subtitle}</span>
+              <p class="text-xs text-slate-500 font-light leading-relaxed mb-6">${p.description}</p>
             </div>
-            <div class="flex items-center justify-between pt-4 border-t border-slate-100">
+
+            <div class="flex items-center justify-between pt-5 border-t border-slate-100">
               <div>
-                <span class="text-[10px] uppercase tracking-wider text-slate-400 font-medium block">Price</span>
-                <span class="text-sm font-bold text-slate-900">$${p.price.toFixed(2)}</span>
+                <span class="text-[10px] uppercase tracking-wider text-slate-400 font-semibold block">Craft Edition</span>
+                <span class="text-xs font-semibold text-slate-700">$${p.price.toFixed(2)} SGD / set</span>
               </div>
               <button 
                 type="button" 
                 data-action="add-item" 
                 data-product-index="${index}" 
-                class="px-4 py-2 rounded-xl bg-slate-900 hover:bg-brand-600 text-white flex items-center gap-1.5 text-xs font-semibold tracking-wider active:scale-95 transition cursor-pointer"
+                class="px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-brand-600 text-white flex items-center gap-2 text-xs font-semibold tracking-wider active:scale-95 transition cursor-pointer shadow-sm"
               >
-                <i class="fa-solid fa-plus text-[10px] pointer-events-none"></i>
-                <span class="pointer-events-none">Add</span>
+                <i class="fa-solid fa-bag-shopping text-xs pointer-events-none"></i>
+                <span class="pointer-events-none">Add to Bag</span>
               </button>
             </div>
           </div>
@@ -479,7 +591,7 @@
       }).join("");
     }
 
-    // EVENT DELEGATION
+    // EVENT DELEGATION FOR CATALOG & CART
     function setupEventDelegation() {
       document.body.addEventListener("click", (e) => {
         const targetBtn = e.target.closest("button[data-action]");
@@ -493,24 +605,142 @@
 
         if (action === "add-item") {
           addItemByIndex(idx);
-          if (targetBtn.getAttribute("data-close-search") === "true") {
-            closeSearchOverlay();
-          }
         } else if (action === "qty-change") {
           const delta = parseInt(targetBtn.getAttribute("data-delta"), 10) || 0;
           changeQtyByIndex(idx, delta);
         }
       });
+    }
 
-      const searchInput = document.getElementById("overlay-search-input");
-      if (searchInput) {
-        searchInput.addEventListener("input", (e) => {
-          handleSearch(e.target.value);
-        });
+    // HAMBURGER MENU DRAWER CONTROLS
+    function openMenuDrawer() {
+      const drawer = document.getElementById("menu-drawer");
+      const backdrop = document.getElementById("menu-backdrop");
+      backdrop.classList.remove("opacity-0", "pointer-events-none");
+      drawer.classList.remove("-translate-x-full");
+      document.body.classList.add("overflow-hidden");
+    }
+
+    function closeMenuDrawer() {
+      const drawer = document.getElementById("menu-drawer");
+      const backdrop = document.getElementById("menu-backdrop");
+      backdrop.classList.add("opacity-0", "pointer-events-none");
+      drawer.classList.add("-translate-x-full");
+      document.body.classList.remove("overflow-hidden");
+    }
+
+    // TOGGLE COLLECTION DROPDOWN ACCORDION
+    function toggleCollectionDropdown() {
+      const submenu = document.getElementById("collection-submenu");
+      const chevron = document.getElementById("collection-chevron");
+      const toggleBtn = document.getElementById("collection-toggle-btn");
+
+      if (!submenu || !chevron) return;
+
+      const isHidden = submenu.classList.contains("hidden");
+      if (isHidden) {
+        submenu.classList.remove("hidden");
+        chevron.classList.add("rotate-180");
+        if (toggleBtn) toggleBtn.setAttribute("aria-expanded", "true");
+      } else {
+        submenu.classList.add("hidden");
+        chevron.classList.remove("rotate-180");
+        if (toggleBtn) toggleBtn.setAttribute("aria-expanded", "false");
       }
     }
 
-    // CART STATE CONTROLS (1-99)
+    function navigateToSection(target) {
+      closeMenuDrawer();
+      switchTab(target);
+      const targetEl = document.getElementById("store-section");
+      if (targetEl) {
+        targetEl.scrollIntoView({ behavior: "smooth" });
+      }
+    }
+
+    // INTEGRATED DRAWER SEARCH (EMPTY BY DEFAULT, DIRECT CARD JUMP)
+    function handleDrawerSearch(query) {
+      const term = query.trim().toLowerCase();
+      const resultsContainer = document.getElementById("drawer-search-results");
+      const clearBtn = document.getElementById("drawer-search-clear");
+
+      if (!term) {
+        resultsContainer.innerHTML = "";
+        resultsContainer.classList.add("hidden");
+        clearBtn.classList.add("hidden");
+        return;
+      }
+
+      clearBtn.classList.remove("hidden");
+      resultsContainer.classList.remove("hidden");
+
+      const matches = [];
+      PRODUCTS.forEach((p, index) => {
+        if (p.name.toLowerCase().includes(term) || p.description.toLowerCase().includes(term)) {
+          matches.push({ product: p, index });
+        }
+      });
+
+      if (matches.length === 0) {
+        resultsContainer.innerHTML = `
+          <div class="py-6 text-center text-slate-400">
+            <i class="fa-solid fa-magnifying-glass text-xl text-slate-300 mb-2"></i>
+            <p class="text-xs">No items match "${query}"</p>
+          </div>
+        `;
+        return;
+      }
+
+      resultsContainer.innerHTML = matches.map(m => `
+        <div onclick="jumpToProductFromDrawer('${m.product.id}')" class="py-3 px-2 flex items-center justify-between gap-3 hover:bg-slate-100/70 rounded-xl cursor-pointer transition">
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-lg bg-brand-50 border border-brand-100 flex items-center justify-center text-brand-600 text-xs font-bold shrink-0">
+              <i class="fa-solid fa-layer-group text-[10px]"></i>
+            </div>
+            <div>
+              <h5 class="text-xs font-bold text-slate-800">${m.product.name}</h5>
+              <span class="text-[11px] text-brand-600 font-semibold">$${m.product.price.toFixed(2)} SGD</span>
+            </div>
+          </div>
+          <button 
+            type="button" 
+            onclick="event.stopPropagation(); addItemByIndex(${m.index});" 
+            class="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-brand-600 text-white text-[11px] font-semibold active:scale-95 transition cursor-pointer"
+          >
+            + Add
+          </button>
+        </div>
+      `).join("");
+    }
+
+    function clearDrawerSearch() {
+      const input = document.getElementById("drawer-search-input");
+      const resultsContainer = document.getElementById("drawer-search-results");
+      const clearBtn = document.getElementById("drawer-search-clear");
+      if (input) input.value = "";
+      if (resultsContainer) {
+        resultsContainer.innerHTML = "";
+        resultsContainer.classList.add("hidden");
+      }
+      if (clearBtn) clearBtn.classList.add("hidden");
+    }
+
+    function jumpToProductFromDrawer(productId) {
+      closeMenuDrawer();
+      switchTab('catalog');
+
+      setTimeout(() => {
+        const targetCard = document.getElementById(`card-${productId}`);
+        if (targetCard) {
+          targetCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          targetCard.classList.remove('item-highlight');
+          void targetCard.offsetWidth; // Trigger reflow
+          targetCard.classList.add('item-highlight');
+        }
+      }, 200);
+    }
+
+    // CART STATE CONTROLS (1-99 EDITABLE)
     function addItemByIndex(idx) {
       if (cartQuantities[idx] >= 99) {
         showToast("Maximum quantity of 99 reached");
@@ -584,9 +814,14 @@
 
       const headerBadge = document.getElementById("header-cart-badge");
       const navBadge = document.getElementById("nav-cart-badge");
+      const menuBagCount = document.getElementById("menu-bag-count");
       const floatingBtn = document.getElementById("floating-checkout-btn");
       const floatingBadge = document.getElementById("floating-cart-badge");
       const floatingSubtotal = document.getElementById("floating-cart-subtotal");
+
+      if (menuBagCount) {
+        menuBagCount.innerText = totalQty === 1 ? "1 item" : `${totalQty} items`;
+      }
 
       if (totalQty > 0) {
         if (headerBadge) {
@@ -685,110 +920,21 @@
       document.getElementById("cart-subtotal").innerText = `$${subtotal.toFixed(2)} SGD`;
     }
 
-    // SEARCH OVERLAY CONTROLS
-    function openSearchOverlay() {
-      const overlay = document.getElementById("search-overlay");
-      const input = document.getElementById("overlay-search-input");
-      const resultsContainer = document.getElementById("overlay-search-results");
-
-      overlay.classList.remove("hidden");
-      overlay.classList.add("flex");
-      input.value = "";
-      resultsContainer.innerHTML = ""; // No suggested items by default
-      setTimeout(() => input.focus(), 60);
-    }
-
-    function closeSearchOverlay() {
-      const overlay = document.getElementById("search-overlay");
-      overlay.classList.add("hidden");
-      overlay.classList.remove("flex");
-    }
-
-    function handleSearch(query) {
-      const term = query.trim().toLowerCase();
-      const resultsContainer = document.getElementById("overlay-search-results");
-
-      if (!term) {
-        resultsContainer.innerHTML = "";
-        return;
-      }
-
-      const matches = [];
-      PRODUCTS.forEach((p, index) => {
-        if (p.name.toLowerCase().includes(term) || p.description.toLowerCase().includes(term)) {
-          matches.push({ product: p, index });
-        }
-      });
-
-      if (matches.length === 0) {
-        resultsContainer.innerHTML = `
-          <div class="py-8 text-center text-slate-400">
-            <i class="fa-solid fa-magnifying-glass text-2xl text-slate-300 mb-2"></i>
-            <p class="text-xs">No items match "${query}"</p>
-          </div>
-        `;
-        return;
-      }
-
-      resultsContainer.innerHTML = matches.map(m => `
-        <div onclick="navigateToItem('${m.product.id}')" class="py-3.5 px-3 rounded-xl flex items-center justify-between gap-3 hover:bg-slate-50 cursor-pointer transition">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-brand-50 border border-brand-100 flex items-center justify-center text-brand-600 text-sm font-bold shrink-0">
-              <i class="fa-solid fa-layer-group text-xs"></i>
-            </div>
-            <div>
-              <h5 class="text-xs font-bold text-slate-800">${m.product.name}</h5>
-              <span class="text-[11px] text-brand-600 font-semibold">$${m.product.price.toFixed(2)} SGD</span>
-            </div>
-          </div>
-          <button 
-            type="button" 
-            onclick="event.stopPropagation(); addItemByIndex(${m.index});" 
-            class="px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-brand-600 text-white text-xs font-semibold active:scale-95 transition cursor-pointer"
-          >
-            + Add to Cart
-          </button>
-        </div>
-      `).join("");
-    }
-
-    function navigateToItem(productId) {
-      closeSearchOverlay();
-      switchTab('catalog');
-
-      setTimeout(() => {
-        const targetCard = document.getElementById(`card-${productId}`);
-        if (targetCard) {
-          targetCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          targetCard.classList.remove('item-highlight');
-          void targetCard.offsetWidth;
-          targetCard.classList.add('item-highlight');
-        }
-      }, 150);
-    }
-
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape") closeSearchOverlay();
-    });
-
     // TAB NAVIGATION
     function switchTab(tab) {
       currentTab = tab;
       const catalogView = document.getElementById("view-catalog");
       const faqView = document.getElementById("view-faq");
       const navCatalog = document.getElementById("nav-btn-catalog");
-      const navFaq = document.getElementById("nav-btn-faq");
 
       if (tab === "catalog") {
         catalogView.classList.add("view-active");
         faqView.classList.remove("view-active");
         if (navCatalog) navCatalog.className = "flex flex-col items-center gap-1 text-brand-600 transition";
-        if (navFaq) navFaq.className = "flex flex-col items-center gap-1 text-slate-400 transition";
       } else {
         catalogView.classList.remove("view-active");
         faqView.classList.add("view-active");
         if (navCatalog) navCatalog.className = "flex flex-col items-center gap-1 text-slate-400 transition";
-        if (navFaq) navFaq.className = "flex flex-col items-center gap-1 text-brand-600 transition";
         document.getElementById("store-section").scrollIntoView({ behavior: "smooth" });
       }
     }
@@ -814,7 +960,7 @@
       sheet.classList.add("md:translate-x-full");
     }
 
-    // CHECKOUT LOGIC WITH DEDICATED TELEGRAM & WHATSAPP TEMPLATES
+    // CHECKOUT LOGIC WITH SEPARATE TELEGRAM & WHATSAPP TEMPLATES
     function checkoutVia(channel) {
       const activeIndices = cartQuantities
         .map((qty, idx) => ({ qty, idx }))
@@ -868,7 +1014,7 @@ Collection: ${notes}
 Hi! Ready to confirm #${orderId}  Let me know the PayNow details whenever you're free!`;
       }
 
-      // Copy fallback
+      // Copy to clipboard fallback
       if (navigator.clipboard) {
         navigator.clipboard.writeText(message).catch(() => copyFallback(message));
       } else {
@@ -892,7 +1038,7 @@ Hi! Ready to confirm #${orderId}  Let me know the PayNow details whenever you're
       document.getElementById("order-notes").value = "Local Delivery: [Enter Address / Postal Code]";
       setTimeout(closeCart, 400);
 
-      // Deep link to selected messaging platform
+      // Deep link to selected messaging channel
       if (channel === "telegram") {
         window.open(`https://t.me/${STORE_CONFIG.telegramUsername}?text=${encodeURIComponent(message)}`, "_blank");
       } else {
@@ -908,6 +1054,14 @@ Hi! Ready to confirm #${orderId}  Let me know the PayNow details whenever you're
         toast.classList.add("opacity-0", "pointer-events-none");
       }, 2000);
     }
+
+    // Keyboard navigation: Close menu drawer on ESC
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        closeMenuDrawer();
+        closeCart();
+      }
+    });
   </script>
 </body>
 </html>
